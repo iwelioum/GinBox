@@ -1,0 +1,15 @@
+# Build output
+/target/
+
+# SQLite databases
+*.db
+*.db-wal
+*.db-shm
+
+# Environment (contains secrets)
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
