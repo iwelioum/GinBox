@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        SELECT ul.id as \"id!: i64\"\n        FROM user_lists ul\n        JOIN list_items li ON ul.id = li.list_id\n        WHERE ul.profile_id = ? AND li.content_id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!: i64",
+        "ordinal": 0,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true
+    ]
+  },
+  "hash": "0dfebb1e24eaedd4e4863887dc8d98f2ddee42cae032b978a6611cb5cf886ff1"
+}

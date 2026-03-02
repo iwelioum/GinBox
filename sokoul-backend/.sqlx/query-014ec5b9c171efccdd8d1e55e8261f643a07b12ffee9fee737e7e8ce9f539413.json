@@ -1,0 +1,32 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT trakt_access_token, trakt_refresh_token, trakt_expires_at FROM profiles WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "trakt_access_token",
+        "ordinal": 0,
+        "type_info": "Text"
+      },
+      {
+        "name": "trakt_refresh_token",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "trakt_expires_at",
+        "ordinal": 2,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "014ec5b9c171efccdd8d1e55e8261f643a07b12ffee9fee737e7e8ce9f539413"
+}

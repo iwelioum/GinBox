@@ -1,0 +1,38 @@
+   player.tokens.css — Variables CSS du lecteur Sokoul
+   Utilisées par tous les composants du dossier player/
+
+:root {
+  /* Couleurs */
+  --player-bg:             #000000;
+  --player-text:           #F5F5F5;
+  --player-text-muted:     rgba(245, 245, 245, 0.6);
+  --player-border:         rgba(202, 202, 202, 0.26);
+  --player-progress-bg:    rgba(255, 255, 255, 0.15);
+  --player-progress-buf:   rgba(255, 255, 255, 0.3);
+  --player-progress-fill:  #F5F5F5;
+  --player-overlay-top:    linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+  --player-overlay-bot:    linear-gradient(to top,   rgba(0,0,0,0.85), transparent);
+
+  /* Espacements */
+  --player-pad-h:   16px;
+  --player-pad-v:   12px;
+  --player-gap:     12px;
+
+  /* Icônes */
+  --player-icon-sm: 18px;
+  --player-icon-md: 22px;
+  --player-icon-lg: 28px;
+
+  /* Animations — même easing que Sokoul */
+  --player-ease:    cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --player-timing:  0.2s;
+
+  /* Progress bar */
+  --player-bar-h:        3px;
+  --player-bar-h-hover:  5px;
+  --player-scrubber-sz:  12px;
+
+  /* Overlay */
+  --player-overlay-h:  100px;
+  --player-header-h:    60px;
+}

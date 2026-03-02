@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO user_lists (profile_id, name, list_type, is_default, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "8f4342d09b5f4c394a307c7aa9e89871500133f7bb5e35e153fe3423ac6fdcbe"
+}

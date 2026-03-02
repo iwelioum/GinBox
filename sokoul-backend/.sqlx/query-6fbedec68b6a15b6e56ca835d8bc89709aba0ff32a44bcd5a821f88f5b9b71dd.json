@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE profiles SET name = ?, avatar_url = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "6fbedec68b6a15b6e56ca835d8bc89709aba0ff32a44bcd5a821f88f5b9b71dd"
+}

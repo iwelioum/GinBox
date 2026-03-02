@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id, name, avatar_url, is_kids as \"is_kids: bool\", trakt_access_token, trakt_refresh_token, trakt_expires_at, created_at FROM profiles ORDER BY created_at ASC",
+  "describe": {
+    "columns": [
+      {
+        "name": "id",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "name",
+        "ordinal": 1,
+        "type_info": "Text"
+      },
+      {
+        "name": "avatar_url",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "is_kids: bool",
+        "ordinal": 3,
+        "type_info": "Int64"
+      },
+      {
+        "name": "trakt_access_token",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "trakt_refresh_token",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "trakt_expires_at",
+        "ordinal": 6,
+        "type_info": "Int64"
+      },
+      {
+        "name": "created_at",
+        "ordinal": 7,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "7c0490b809875e3152831f66b30dfd50e083d92478dd49c7df35d3f701397f40"
+}

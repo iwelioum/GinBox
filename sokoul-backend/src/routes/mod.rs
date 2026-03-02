@@ -1,0 +1,11 @@
+pub mod profiles;
+pub mod playback;
+pub mod trakt;
+pub mod lists;
+pub mod preferences;
+pub mod catalog;
+pub mod stream;
+pub mod debrid;
+pub mod fanart;
+pub mod user_progress;
+pub mod collections;

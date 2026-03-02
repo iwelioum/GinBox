@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE profiles SET trakt_access_token = ?, trakt_refresh_token = ?, trakt_expires_at = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "cf72a8b4641b293a22fe92196c69265ccf1f8c3c9f85b0b9601f481f51045241"
+}

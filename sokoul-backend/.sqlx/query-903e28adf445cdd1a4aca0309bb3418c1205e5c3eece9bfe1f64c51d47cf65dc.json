@@ -1,0 +1,62 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            SELECT id as \"id!: i64\", list_id, content_id, content_type, title, poster_url, added_at, sort_order\n            FROM list_items\n            WHERE list_id = ? AND content_id = ?\n            ",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!: i64",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "list_id",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "content_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_type",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "title",
+        "ordinal": 4,
+        "type_info": "Text"
+      },
+      {
+        "name": "poster_url",
+        "ordinal": 5,
+        "type_info": "Text"
+      },
+      {
+        "name": "added_at",
+        "ordinal": 6,
+        "type_info": "Int64"
+      },
+      {
+        "name": "sort_order",
+        "ordinal": 7,
+        "type_info": "Int64"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "903e28adf445cdd1a4aca0309bb3418c1205e5c3eece9bfe1f64c51d47cf65dc"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO user_lists (profile_id, name, list_type, is_default, created_at, updated_at)\n        VALUES (?, ?, ?, ?, ?, ?)\n        ON CONFLICT(profile_id, name) DO NOTHING\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "7fc4b105b7b6f99d0457e6382c62140eb632513bf22c5d96868e20f32a7299a5"
+}

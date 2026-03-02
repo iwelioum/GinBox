@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT COALESCE(MAX(sort_order), 0) + 1 AS max_sort_order FROM list_items WHERE list_id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "max_sort_order",
+        "ordinal": 0,
+        "type_info": "Int"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "c2ea4d7a422e4908cbe990c45ecfa343e6294ff1f5e1635a7106ed9fe56a2c56"
+}

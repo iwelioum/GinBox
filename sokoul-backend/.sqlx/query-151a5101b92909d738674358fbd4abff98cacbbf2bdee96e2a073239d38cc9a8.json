@@ -1,0 +1,20 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT COUNT(id) AS count FROM user_lists WHERE profile_id = ? AND is_default = FALSE",
+  "describe": {
+    "columns": [
+      {
+        "name": "count",
+        "ordinal": 0,
+        "type_info": "Int"
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "151a5101b92909d738674358fbd4abff98cacbbf2bdee96e2a073239d38cc9a8"
+}

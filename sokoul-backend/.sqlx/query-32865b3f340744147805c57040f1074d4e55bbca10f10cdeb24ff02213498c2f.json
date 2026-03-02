@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE playback_history SET watched = 1, progress_pct = 100.0, updated_at = ? WHERE profile_id = ? AND content_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "32865b3f340744147805c57040f1074d4e55bbca10f10cdeb24ff02213498c2f"
+}

@@ -1,0 +1,12 @@
+pub mod artwork_providers;
+pub mod cache;
+pub mod fanart;
+pub mod prowlarr;
+pub mod realdebrid;
+pub mod tmdb;
+pub mod torrentio;
+pub mod profiles;
+pub mod playback;
+pub mod trakt;
+pub mod lists;
+pub mod preferences;

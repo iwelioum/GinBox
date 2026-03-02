@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT OR IGNORE INTO list_items (list_id, content_id, content_type, title, poster_url, added_at, sort_order)\n        VALUES (?, ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 7
+    },
+    "nullable": []
+  },
+  "hash": "d45f577d3f4bfefb51d20e7f04a1c3c77ca39680c715fedd4291011ee0907e8a"
+}

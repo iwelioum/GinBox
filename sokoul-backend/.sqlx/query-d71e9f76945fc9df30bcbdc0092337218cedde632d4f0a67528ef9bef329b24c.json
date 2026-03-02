@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE user_lists SET name = ?, updated_at = ? WHERE id = ? AND profile_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "d71e9f76945fc9df30bcbdc0092337218cedde632d4f0a67528ef9bef329b24c"
+}

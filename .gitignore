@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+target/
+
+# Vite
+.vite/
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# SQLite databases (runtime artifacts)
+*.db
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+scripts/logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Rust
+sokoul-backend/target/
+
+# Electron
+sokoul-desktop/dist/
+sokoul-desktop/build/
+sokoul-desktop/node_modules/
+sokoul-desktop/mpv/*.log
+
+# MPV binary (download locally, don't track)
+sokoul-desktop/mpv/mpv.exe
