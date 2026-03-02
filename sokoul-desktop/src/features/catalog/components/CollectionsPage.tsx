@@ -258,7 +258,7 @@ function CollectionCard({
 
       {/* Gradient bas subtil */}
       <div className="absolute inset-0 bg-gradient-to-t
-                      from-[#0A0B16]/50 via-transparent to-transparent" />
+                      from-[#0A0E1A]/50 via-transparent to-transparent" />
 
       {/* Contenu texte — gauche */}
       <div className="absolute inset-0 flex flex-col justify-end p-5">

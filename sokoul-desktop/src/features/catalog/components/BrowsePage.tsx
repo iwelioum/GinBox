@@ -33,14 +33,11 @@ import { ContentCard }                    from '@/features/catalog/components/Co
 import { HoverCard }                      from '@/features/catalog/components/HoverCard';
 import { useHoverCard }                   from '@/shared/hooks/useHoverCard';
 import {
-  Search,
   SlidersHorizontal,
-  ChevronDown,
   X,
   Home,
   Film,
   Tv,
-  Sparkles,
   Flame,
   Clock3,
   Activity,
@@ -311,7 +308,7 @@ function EditorialRail({
           <div>
             <h2
               style={{
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "'Clash Display', sans-serif",
                 fontSize: 'clamp(13px, 1.4vw, 18px)', fontWeight: 800,
                 letterSpacing: '-0.025em', color: 'rgba(249,249,249,0.95)',
               }}
@@ -321,7 +318,7 @@ function EditorialRail({
             {subtitle && (
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontSize: '11px', fontStyle: 'italic',
                   color: accentColor ? `${accentColor}cc` : 'rgba(249,249,249,0.40)',
                 }}
@@ -335,7 +332,7 @@ function EditorialRail({
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-        {items.slice(0, 16).map((item) => (
+        {items.slice(0, 25).map((item) => (
           <EditorialCard
             key={`${sectionId}-${item.id}`}
             item={item}
@@ -448,12 +445,6 @@ function BrowseHero({
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="max-w-xl"
           >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 text-[11px] text-white/70 px-2.5 py-1 rounded-full border border-white/20 bg-black/25 mb-4">
-              <Sparkles size={12} />
-              Sélection éditoriale
-            </div>
-
             {/* Logo ou Titre */}
             {heroLogo ? (
               <img
@@ -470,7 +461,7 @@ function BrowseHero({
             ) : (
               <h1
                 style={{
-                  fontFamily: "'Syne', sans-serif",
+                  fontFamily: "'Clash Display', sans-serif",
                   fontSize: 'clamp(1.8rem, 4vw, 4rem)',
                   fontWeight: 900,
                   letterSpacing: '-0.04em',
@@ -501,7 +492,7 @@ function BrowseHero({
             {synopsis && (
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontSize: 14,
                   color: 'rgba(249,249,249,0.60)',
                   lineHeight: 1.65,
@@ -979,7 +970,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       filteredItems
         .filter(i => i._userProgress > 5 && i._userProgress < 95)
         .sort((a, b) => b._userProgress - a._userProgress)
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (continueWatching.length > 0) {
       sections.push({
@@ -994,7 +985,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     const trending = dedup(
       [...filteredItems]
         .sort((a, b) => (b._popularity ?? 0) - (a._popularity ?? 0))
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (trending.length > 0) {
       sections.push({
@@ -1010,7 +1001,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       filteredItems
         .filter(i => (i._rating ?? 0) >= 7.5)
         .sort((a, b) => (b._rating ?? 0) - (a._rating ?? 0))
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (topRated.length > 0) {
       sections.push({
@@ -1025,7 +1016,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     const recentItems = dedup(
       filteredItems
         .filter(i => i._year !== null && i._year >= currentYear - 3)
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (recentItems.length > 0) {
       sections.push({
@@ -1040,7 +1031,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     const newItems = dedup(
       filteredItems
         .filter(i => i._year === currentYear)
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (newItems.length > 0) {
       sections.push({
@@ -1068,7 +1059,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       const genreList = dedup(
         filteredItems
           .filter(i => i._genres.includes(genre))
-          .slice(0, 20)
+          .slice(0, 25)
       );
       if (genreList.length >= 3) {
         sections.push({
@@ -1086,7 +1077,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     const international = dedup(
       filteredItems
         .filter(i => i._lang !== 'en' && i._lang !== 'fr' && i._lang !== 'unknown')
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (international.length >= 3 && sections.length < 21) {
       sections.push({
@@ -1102,7 +1093,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       filteredItems
         .filter(i => i._year !== null && i._year < 1995)
         .sort((a, b) => (b._rating ?? 0) - (a._rating ?? 0))
-        .slice(0, 20)
+        .slice(0, 25)
     );
     if (classics.length >= 3 && sections.length < 22) {
       sections.push({
@@ -1118,7 +1109,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       const returning = dedup(
         filteredItems
           .filter(i => i._status === 'returning')
-          .slice(0, 20)
+          .slice(0, 25)
       );
       if (returning.length >= 3) {
         sections.push({
@@ -1135,7 +1126,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       const animeAnim = dedup(
         filteredItems
           .filter(i => i._kind === 'anime' || i._kind === 'animation')
-          .slice(0, 20)
+          .slice(0, 25)
       );
       if (animeAnim.length >= 3) {
         sections.push({
@@ -1153,7 +1144,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
         filteredItems
           .filter(i => (i._rating ?? 0) >= 7.0 && (i._popularity ?? 0) < 50)
           .sort((a, b) => (b._rating ?? 0) - (a._rating ?? 0))
-          .slice(0, 20)
+          .slice(0, 25)
       );
       if (hidden.length >= 3) {
         sections.push({
@@ -1173,7 +1164,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-[#0A0B16] text-white"
+      className="flex flex-col min-h-screen bg-[#0A0E1A] text-white"
       style={{ paddingTop: 'var(--navbar-height)' }}
     >
       {!isSearching && (
@@ -1211,7 +1202,10 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             </div>
           )}
 
-          {/* Bouton Filtres */}
+          {/* Spacer pour pousser le bouton filtres à droite */}
+          <div className="flex-1" />
+
+          {/* Bouton Filtres — aligné à droite */}
           <button
             onClick={() => setDrawerOpen(true)}
             className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border
@@ -1230,52 +1224,6 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
               </span>
             )}
           </button>
-
-          {/* Recherche locale */}
-          <div className="flex-1 relative group max-w-md">
-            <Search
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-blue-400 transition-colors"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Chercher dans ces résultats..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-10
-                         text-sm outline-none focus:bg-white/10 focus:border-white/20 transition-all
-                         placeholder:text-white/20"
-            />
-            {searchInput && (
-              <button
-                onClick={() => setSearchInput('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center
-                           rounded-full hover:bg-white/10 text-white/40 hover:text-white transition-all"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
-
-          {/* Tri */}
-          <div className="relative">
-            <select
-              value={filters.sortBy}
-              onChange={(e) => setScopedFilters(f => ({ ...f, sortBy: e.target.value as SortOption }))}
-              className="appearance-none bg-white/5 border border-white/10 rounded-xl py-2.5 pl-4 pr-10
-                         text-sm text-white/60 hover:bg-white/10 transition-all outline-none cursor-pointer"
-            >
-              {SORT_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value} className="bg-[#0d0f1a] text-white">
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"
-              size={16}
-            />
-          </div>
         </div>
 
         {activeFiltersCount > 0 && (

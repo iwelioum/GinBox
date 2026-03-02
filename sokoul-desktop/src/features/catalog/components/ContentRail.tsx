@@ -78,7 +78,7 @@ function PosterCard({
         <div
           className="absolute z-0 font-black leading-none select-none pointer-events-none"
           style={{
-            fontFamily:       "'Syne', sans-serif",
+            fontFamily:       "'Clash Display', sans-serif",
             fontSize:         'clamp(80px, 12vw, 130px)',
             color:            'transparent',
             WebkitTextStroke: '2px rgba(255,255,255,0.12)',
@@ -341,7 +341,7 @@ const ContentRail: React.FC<ContentRailProps> = ({
             <h2
               className="font-bold leading-tight"
               style={{
-                fontFamily:    "'Syne', sans-serif",
+                fontFamily:    "'Clash Display', sans-serif",
                 fontSize:      isFeatured ? 'clamp(15px, 1.5vw, 18px)' : '11px',
                 fontWeight:    800,
                 color:         isFeatured ? 'rgba(249,249,249,0.92)' : 'rgba(249,249,249,0.45)',
@@ -355,7 +355,7 @@ const ContentRail: React.FC<ContentRailProps> = ({
               <p
                 className="mt-0.5"
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontStyle:  'italic',
                   fontSize:   '11px',
                   color:      accentColor ? `${accentColor}99` : 'rgba(249,249,249,0.30)',

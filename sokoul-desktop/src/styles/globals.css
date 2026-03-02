@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@600,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,36 +11,44 @@
    sont définies ici.
 
 :root {
-  --bg-abyss:              #0A0B16;
-  --bg-surface:            #16132B;
-  --primary-red:           #E63946;
-  --primary-red-hover:     #CF2F3D;
-  --primary-red-glow:      rgba(230, 57, 70, 0.3);
-  --magic-emerald:         #00E676;
-  --magic-yellow:          #FFEA00;
-  --magic-cyan:            #00E5FF;
-  --text-main:             #F8F9FA;
-  --text-muted:            #A1A1AA;
-  --glass-surface:         rgba(22, 19, 43, 0.55);
-  --glass-border:          1px solid rgba(0, 229, 255, 0.15);
-  --glass-blur:            blur(24px);
+  /* ── Brand Identity SOKOUL ── */
+  --bg-abyss:              #0A0E1A;
+  --bg-surface:            #111832;
+  --bg-ocean:              #1A2544;
+  --primary-violet:        #6C5CE7;
+  --primary-violet-light:  #A29BFE;
+  --primary-violet-glow:   rgba(108, 92, 231, 0.25);
+  --magic-emerald:         #34D399;
+  --magic-amber:           #FBBF24;
+  --magic-cyan:            #00D2FF;
+  --magic-magenta:         #FF6B9D;
+  --text-main:             #F8FAFC;
+  --text-muted:            #94A3B8;
+  --text-muted-deep:       #475569;
+  --glass-surface:         rgba(255, 255, 255, 0.05);
+  --glass-border:          1px solid rgba(255, 255, 255, 0.08);
+  --glass-blur:            blur(12px);
 
+  /* Aliases rétrocompatibles */
+  --primary-red:           var(--primary-violet);
+  --primary-red-hover:     var(--primary-violet-light);
+  --primary-red-glow:      var(--primary-violet-glow);
   --bg-obsidian:           var(--bg-abyss);
   --bg-obsidian-light:     var(--bg-surface);
-  --primary-berber:        var(--primary-red);
-  --primary-berber-hover:  var(--primary-red-hover);
-  --primary-berber-glow:   var(--primary-red-glow);
+  --primary-berber:        var(--primary-violet);
+  --primary-berber-hover:  var(--primary-violet-light);
+  --primary-berber-glow:   var(--primary-violet-glow);
   --text-sand:             var(--text-main);
 
   --color-bg-primary:   var(--bg-abyss);
   --color-bg-secondary: var(--bg-surface);
   --color-bg-card:      var(--bg-surface);
   --color-bg-glass:     var(--glass-surface);
-  --color-bg-overlay:   rgba(10, 11, 22, 0.85);
+  --color-bg-overlay:   rgba(10, 14, 26, 0.8);
 
-  --color-accent:       var(--primary-red);
-  --color-accent-hover: var(--primary-red-hover);
-  --color-accent-glow:  var(--primary-red-glow);
+  --color-accent:       var(--primary-violet);
+  --color-accent-hover: var(--primary-violet-light);
+  --color-accent-glow:  var(--primary-violet-glow);
 
   --color-brand-disney:   #ffffff;
   --color-brand-pixar:    #ffffff;
@@ -61,14 +70,14 @@
   --hero-height:     100vh;
   --section-px:      4vw;      /* padding horizontal des sections */
 
-  --radius-card:   4px;
-  --radius-modal:  10px;
-  --radius-button: 4px;
+  --radius-card:   12px;
+  --radius-modal:  16px;
+  --radius-button: 12px;
   --radius-pill:   9999px;
 
-  --font-main:    'DM Sans', -apple-system, 'Segoe UI', sans-serif;
-  --font-display: 'Syne',    system-ui, sans-serif;
-  --font-ui:      'DM Sans', system-ui, sans-serif;
+  --font-main:    'Plus Jakarta Sans', -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Clash Display',    system-ui, sans-serif;
+  --font-ui:      'Plus Jakarta Sans', system-ui, sans-serif;
 
   --text-xs:   10px;   /* métadonnées, badges         */
   --text-sm:   11px;   /* taglines, card meta         */
@@ -79,11 +88,11 @@
   --text-hero:  clamp(2.4rem, 5.5vw, 5.2rem); /* titre hero       */
 
   --gradient-hero:
-    linear-gradient(to top,  #0A0B16 0%, rgba(10,11,22,0.62) 50%, transparent 100%),
-    linear-gradient(to right, #0A0B16 0%, transparent 40%);
-  --gradient-navbar: linear-gradient(to bottom, rgba(10,11,22,0.95) 0%, transparent 100%);
+    linear-gradient(to top,  #0A0E1A 0%, rgba(10,14,26,0.62) 50%, transparent 100%),
+    linear-gradient(to right, #0A0E1A 0%, transparent 40%);
+  --gradient-navbar: linear-gradient(to bottom, rgba(10,14,26,0.95) 0%, transparent 100%);
   --gradient-card-hover:
-    linear-gradient(to top, rgba(10,11,22,0.95) 0%, rgba(10,11,22,0.42) 60%, transparent 100%);
+    linear-gradient(to top, rgba(10,14,26,0.95) 0%, rgba(10,14,26,0.42) 60%, transparent 100%);
 
   --shadow-card:       0 10px 14px 3px rgba(0,0,0,0.36);
   --shadow-card-hover: 0 20px 40px 6px rgba(0,0,0,0.5);
@@ -148,7 +157,7 @@ body {
 
 @keyframes accent-pulse {
   0%, 100% { box-shadow: 0 0 20px var(--primary-red-glow); }
-  50%       { box-shadow: 0 0 30px var(--primary-red-glow), 0 0 50px rgba(0, 229, 255, 0.15); }
+  50%       { box-shadow: 0 0 30px var(--primary-red-glow), 0 0 50px rgba(0, 210, 255, 0.12); }
 }
 
 .animate-fade-in-up { animation: fadeInUp 0.4s ease-out both; }
@@ -188,7 +197,7 @@ body {
 
   .glow-button:hover {
     transform: scale(1.03);
-    box-shadow: 0 6px 25px rgba(230, 57, 70, 0.5), 0 0 40px rgba(0, 229, 255, 0.2);
+    box-shadow: 0 6px 25px rgba(108, 92, 231, 0.4), 0 0 40px rgba(0, 210, 255, 0.15);
   }
 
   .btn-accent {
@@ -197,27 +206,27 @@ body {
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     border-radius: 10px;
-    border: 1px solid rgba(0, 229, 255, 0.25);
-    background: rgba(230, 57, 70, 0.12);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    background: rgba(108, 92, 231, 0.12);
     color: var(--primary-red);
     font-weight: 700;
     cursor: pointer;
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px var(--primary-red-glow), inset 0 0 20px rgba(230, 57, 70, 0.05);
+    box-shadow: 0 0 20px var(--primary-red-glow), inset 0 0 20px rgba(108, 92, 231, 0.05);
     transition: all 0.25s ease;
     animation: accent-pulse 3s ease-in-out infinite;
   }
 
   .btn-accent:hover {
-    background: rgba(230, 57, 70, 0.22);
+    background: rgba(108, 92, 231, 0.22);
     border-color: var(--magic-cyan);
     color: var(--text-main);
-    box-shadow: 0 0 30px var(--primary-red-glow), inset 0 0 30px rgba(0, 229, 255, 0.08);
+    box-shadow: 0 0 30px var(--primary-red-glow), inset 0 0 30px rgba(0, 210, 255, 0.08);
     transform: translateY(-1px);
   }
 
   .brand-mask {
-    background: linear-gradient(to bottom, #16132B, #0A0B16);
+    background: linear-gradient(to bottom, #111832, #0A0E1A);
   }
 
   .text-balance { text-wrap: balance; }
@@ -254,7 +263,7 @@ body {
 .browse-hero-image--fallback {
   background:
     radial-gradient(circle at center top, var(--primary-red-glow), transparent 55%),
-    linear-gradient(135deg, #16132B 0%, #0A0B16 100%);
+    linear-gradient(135deg, #111832 0%, #0A0E1A 100%);
 }
 
 .browse-hero-vignette {
@@ -325,7 +334,7 @@ body {
   border-radius: 10px;
   border: none;
   background: var(--primary-red);
-  color: #0A0B16;
+  color: #0A0E1A;
   font-size: 0.98rem;
   font-weight: 800;
   cursor: pointer;
@@ -337,7 +346,7 @@ body {
 .browse-btn-primary:focus-visible {
   background: var(--primary-red-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 25px rgba(230, 57, 70, 0.5);
+  box-shadow: 0 6px 25px rgba(108, 92, 231, 0.4);
 }
 
 .browse-btn-secondary {
@@ -347,7 +356,7 @@ body {
   width: 3rem;
   height: 3rem;
   border-radius: 999px;
-  border: 1px solid rgba(0, 229, 255, 0.2);
+  border: 1px solid rgba(0, 210, 255, 0.15);
   background: rgba(22, 19, 43, 0.58);
   color: #fff;
   cursor: pointer;
@@ -356,7 +365,7 @@ body {
 
 .browse-btn-secondary:hover,
 .browse-btn-secondary:focus-visible {
-  background: rgba(0, 229, 255, 0.15);
+  background: rgba(0, 210, 255, 0.12);
   transform: translateY(-1px);
 }
 

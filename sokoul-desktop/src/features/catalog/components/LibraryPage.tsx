@@ -435,13 +435,13 @@ export default function LibraryPage() {
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-[#0A0B16] text-white"
+      className="flex flex-col min-h-screen bg-[#0A0E1A] text-white"
       style={{ paddingTop: 'var(--navbar-height)' }}
     >
       <main className="flex-1 min-w-0 p-8 flex flex-col">
         
         <div className="sticky top-[var(--navbar-height)] z-30 -mx-8 -mt-8 mb-4 px-8 py-4
-                        bg-[#0A0B16]/80 backdrop-blur-md border-b border-white/[0.05]
+                        bg-[#0A0E1A]/80 backdrop-blur-md border-b border-white/[0.05]
                         flex items-center justify-between gap-6"
              style={{ top: 'calc(var(--navbar-height) - 1px)' }}>
           

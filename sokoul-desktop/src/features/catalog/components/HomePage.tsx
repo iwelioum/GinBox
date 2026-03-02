@@ -47,7 +47,51 @@ const RAILS: Array<{
   { key: 'western',        title: 'Western',                         subtitle: 'Justice, poussière et soleil couchant.',      accent: '#a04000', variant: 'poster',    genreIds: [37] },
 ];
 
-const BG = '#040814';
+const BG = '#0A0E1A';
+
+/* Logo du héro — fetch fanart logo pour afficher l'image au lieu du titre texte */
+function HeroLogo({ item, fallbackTitle }: { item: CatalogMeta; fallbackTitle: string }) {
+  const tmdbId = getTmdbId(item);
+  const fanartType = (item.type === 'series' ? 'tv' : 'movie') as 'movie' | 'tv';
+
+  const { data: fanartData } = useQuery({
+    queryKey: ['fanart-hero-home', fanartType, tmdbId],
+    queryFn: () => endpoints.fanart.get(fanartType, tmdbId).then(r => r.data),
+    enabled: !!tmdbId,
+    staleTime: Infinity,
+  });
+
+  const logoUrl = React.useMemo(() => extractLogo(fanartData), [fanartData]);
+
+  if (logoUrl) {
+    return (
+      <img
+        src={logoUrl}
+        alt={fallbackTitle}
+        loading="lazy"
+        style={{
+          maxHeight: 100, maxWidth: '45%', objectFit: 'contain',
+          marginBottom: '1.1rem',
+          filter: 'drop-shadow(0 4px 24px rgba(0,0,0,0.7))',
+        }}
+      />
+    );
+  }
+
+  return (
+    <h1
+      style={{
+        fontFamily: "'Clash Display', sans-serif",
+        fontSize: 'clamp(2.2rem, 5.5vw, 5rem)',
+        fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.0,
+        color: '#ffffff', textShadow: '0 2px 30px rgba(0,0,0,0.8)',
+        maxWidth: '60%', marginBottom: '1.1rem',
+      }}
+    >
+      {fallbackTitle}
+    </h1>
+  );
+}
 
 function PlayButton({ size = 48 }: { size?: number }) {
   return (
@@ -190,24 +234,14 @@ function CinematicHero({ items }: { items: CatalogMeta[] }) {
           )}
         </div>
 
-        {/* Titre */}
-        <h1
-          style={{
-            fontFamily: "'Syne', sans-serif",
-            fontSize: 'clamp(2.2rem, 5.5vw, 5rem)',
-            fontWeight: 900, letterSpacing: '-0.03em', lineHeight: 1.0,
-            color: '#ffffff', textShadow: '0 2px 30px rgba(0,0,0,0.8)',
-            maxWidth: '60%', marginBottom: '1.1rem',
-          }}
-        >
-          {title}
-        </h1>
+        {/* Logo ou Titre */}
+        <HeroLogo item={current} fallbackTitle={title} />
 
         {/* Synopsis */}
         {overview && (
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               maxWidth: '42%', fontSize: 'clamp(0.85rem, 1.05vw, 1rem)',
               lineHeight: 1.7, color: 'rgba(255,255,255,0.68)',
               display: '-webkit-box', WebkitLineClamp: 3,
@@ -382,7 +416,7 @@ function CardOverlay({
         >
           <p
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 11, fontWeight: 600,
               color: 'rgba(255,255,255,0.85)',
               textAlign: 'center',
@@ -438,7 +472,7 @@ function PosterCard({
         <div
           className="absolute z-0 font-black select-none pointer-events-none"
           style={{
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Clash Display', sans-serif",
             fontSize: 'clamp(70px, 9vw, 110px)', color: 'transparent',
             WebkitTextStroke: '2px rgba(255,255,255,0.1)',
             bottom: -10, left: -8, lineHeight: 1,
@@ -527,19 +561,7 @@ function LandscapeCard({ item, accent }: { item: CatalogMeta; accent: string }) 
         <CardOverlay logoUrl={logoUrl} hovered={hovered} title={title} />
       </div>
 
-      {/* Titre sous la card */}
-      <p
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          fontSize: 11, fontWeight: 500,
-          color: hovered ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.35)',
-          marginTop: 7, paddingLeft: 2,
-          overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
-          transition: 'color 0.25s ease',
-        }}
-      >
-        {title}
-      </p>
+      {/* Logo uniquement, pas de titre texte */}
     </div>
   );
 }
@@ -599,7 +621,7 @@ function Rail({
           <div>
             <h2
               style={{
-                fontFamily: "'Syne', sans-serif",
+                fontFamily: "'Clash Display', sans-serif",
                 fontSize: 'clamp(13px, 1.4vw, 19px)',
                 fontWeight: 800, letterSpacing: '-0.025em',
                 color: 'rgba(249,249,249,0.97)', lineHeight: 1.2,
@@ -610,7 +632,7 @@ function Rail({
             {subtitle && (
               <p
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontSize: 11, fontStyle: 'italic',
                   color: `${accent}bb`, marginTop: 2,
                 }}
@@ -818,7 +840,7 @@ export default function HomePage() {
         <div
           style={{
             padding: '2rem 4% 0.5rem',
-            fontFamily: "'Syne', sans-serif",
+            fontFamily: "'Clash Display', sans-serif",
             fontSize: 'clamp(1.1rem, 1.8vw, 1.5rem)',
             fontWeight: 700, letterSpacing: '-0.02em',
             color: 'rgba(249,249,249,0.88)',

@@ -363,7 +363,7 @@ const DetailPage: React.FC = () => {
   return (
     <div
       className="min-h-screen relative overflow-x-hidden text-[#F8F9FA]"
-      style={{ background: '#0A0B16' }}
+      style={{ background: '#0A0E1A' }}
     >
           FOND CINÉMATIQUE — backdrop plein écran, visible en scroll
           Couche 1 : image haute définition (opacity 0.30)
@@ -413,7 +413,7 @@ const DetailPage: React.FC = () => {
       {!bgBackdrop && (
         <div
           className="fixed inset-0 pointer-events-none"
-          style={{ zIndex: 0, background: '#0A0B16' }}
+          style={{ zIndex: 0, background: '#0A0E1A' }}
         />
       )}
 

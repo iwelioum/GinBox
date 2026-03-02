@@ -58,9 +58,9 @@ export default function CollectionDetailPage() {
             className="w-full h-full object-cover object-center" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t
-                        from-[#0A0B16] via-[#0A0B16]/40 to-transparent" />
+                        from-[#0A0E1A] via-[#0A0E1A]/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r
-                        from-[#0A0B16]/70 to-transparent" />
+                        from-[#0A0E1A]/70 to-transparent" />
 
         {/* Bouton retour */}
         <button

@@ -49,7 +49,7 @@ const ActorPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0B16] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center">
         <Spinner size={48} />
       </div>
     );
@@ -57,7 +57,7 @@ const ActorPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0A0B16] flex flex-col items-center justify-center text-white/60 gap-4">
+      <div className="min-h-screen bg-[#0A0E1A] flex flex-col items-center justify-center text-white/60 gap-4">
         <p>Impossible de charger la filmographie.</p>
         <Button variant="secondary" onClick={() => navigate(-1)}>Retour</Button>
       </div>
@@ -65,7 +65,7 @@ const ActorPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0B16] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#0A0E1A] text-white overflow-x-hidden">
 
       <div className="relative h-[55vh] overflow-hidden">
 
@@ -92,7 +92,7 @@ const ActorPage: React.FC = () => {
         />
 
         {/* Gradient bas → section body */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0B1680] to-[#0A0B16]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0E1A80] to-[#0A0E1A]" />
 
         {/* Bouton retour */}
         <button
@@ -129,7 +129,7 @@ const ActorPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-[#0A0B16] pb-16">
+      <div className="bg-[#0A0E1A] pb-16">
 
         {allMeta.length === 0 && (
           <div className="text-center text-white/40 py-24">
