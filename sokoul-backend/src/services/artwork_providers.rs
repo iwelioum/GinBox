@@ -11,7 +11,8 @@
 
 use std::collections::HashSet;
 use serde_json::Value;
-use crate::models::UnifiedImages;
+use crate::models::{ContentType, UnifiedImages};
+use crate::services::tmdb;
 use crate::AppState;
 
 // ── Limites par catégorie ─────────────────────────────────────
@@ -20,8 +21,6 @@ const MAX_POSTERS: usize = 12;
 const MAX_LOGOS:   usize =  8;
 const MAX_BANNERS: usize =  8;
 const MAX_SEASONS: usize = 16;
-
-const TMDB_IMG_BASE: &str = "https://image.tmdb.org/t/p/original";
 
 // ── IDs externes (récupérés via TMDB) ────────────────────────
 struct ExternalIds {
@@ -39,7 +38,7 @@ pub async fn fetch_unified_images(
 ) -> UnifiedImages {
     // ── Étape 1 : tous les appels qui ne nécessitent que tmdb_id ──
     let (tmdb_val, fanart_val, ext_ids, simkl_poster, watchmode_poster) = tokio::join!(
-        p_tmdb(tmdb_id, is_movie, &state.http_client, &state.tmdb_key),
+        p_tmdb(tmdb_id, is_movie, state),
         p_fanart(tmdb_id, is_movie, &state.http_client, &state.fanart_key),
         p_external_ids(tmdb_id, is_movie, &state.http_client, &state.tmdb_key),
         p_simkl(tmdb_id, is_movie, &state.http_client, &state.simkl_client_id),
@@ -120,43 +119,11 @@ fn dedup_limit(v: Vec<String>, limit: usize) -> Vec<String> {
 // ══════════════════════════════════════════════════════════════
 
 // ── TMDB images ───────────────────────────────────────────────
-async fn p_tmdb(
-    tmdb_id: i64,
-    is_movie: bool,
-    client: &reqwest::Client,
-    api_key: &str,
-) -> Value {
-    if api_key.is_empty() { return Value::Null; }
-    let kind = if is_movie { "movie" } else { "tv" };
-    let url = format!(
-        "https://api.themoviedb.org/3/{kind}/{tmdb_id}/images\
-         ?api_key={api_key}&include_image_language=fr,en,es,null"
-    );
-    let Ok(resp) = client.get(&url).send().await else { return Value::Null; };
-    let Ok(raw): Result<Value, _> = resp.json().await else { return Value::Null; };
-
-    // Trie les images par vote_average décroissant et construit les URLs complètes
-    let sorted_urls = |arr: &Value| -> Vec<String> {
-        let mut items: Vec<(f64, String)> = arr
-            .as_array()
-            .unwrap_or(&vec![])
-            .iter()
-            .filter_map(|i| {
-                i["file_path"].as_str().map(|p| (
-                    i["vote_average"].as_f64().unwrap_or(0.0),
-                    format!("{TMDB_IMG_BASE}{p}"),
-                ))
-            })
-            .collect();
-        items.sort_by(|a, b| b.0.partial_cmp(&a.0).unwrap_or(std::cmp::Ordering::Equal));
-        items.into_iter().map(|(_, u)| u).collect()
-    };
-
-    serde_json::json!({
-        "backdrops": sorted_urls(&raw["backdrops"]),
-        "posters":   sorted_urls(&raw["posters"]),
-        "logos":     sorted_urls(&raw["logos"]),
-    })
+async fn p_tmdb(tmdb_id: i64, is_movie: bool, state: &AppState) -> Value {
+    if state.tmdb_key.is_empty() { return Value::Null; }
+    let ct = if is_movie { ContentType::Movie } else { ContentType::Series };
+    let id_str = tmdb_id.to_string();
+    tmdb::fetch_tmdb_images(&id_str, &ct, state).await.unwrap_or_default()
 }
 
 // ── Fanart.tv ─────────────────────────────────────────────────

@@ -53,8 +53,9 @@ pub async fn catalog_handler(
         "top_rated" => tmdb::fetch_top_rated_catalog(&content_type, page, &state).await?,
         "genre"   => {
             let genre_str = query.genre.ok_or_else(|| AppError::NotFound("?genre requis".into()))?;
-            tmdb::fetch_discover_catalog(&content_type, page, &state,
-                Some(&genre_str), None, None, None, None).await?
+            let genre_id: u32 = genre_str.parse()
+                .map_err(|_| AppError::BadRequest(format!("genre invalide : {genre_str}")))?;
+            tmdb::fetch_genre_catalog(genre_id, &content_type, page, &state).await?
         }
         "language" => {
             let lang = query.language.ok_or_else(|| AppError::NotFound("?language requis".into()))?;
