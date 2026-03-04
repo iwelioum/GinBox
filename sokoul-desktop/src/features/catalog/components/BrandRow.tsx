@@ -1,193 +1,95 @@
-// BrandRow.tsx — Ligne des plateformes de streaming
-// RÈGLES : 6 blocs 16/9, border rgba(202,202,202,0.26), hover scale+masque,
-//          positionné IMMÉDIATEMENT après le Hero, AVANT les carousels.
+// BrandRow.tsx — Exact replica of Viewers.js from Disney+ clone
+//
+// 5 brand tiles (Disney/Pixar/Marvel/StarWars/NatGeo) in a 5-column grid
+// padding-top 56.25% · border-radius 10px · border 3px · scale(1.05) hover
+// img (z-index 1) + video (opacity 0→1 on hover) — exact Viewers.js CSS
 
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
 
-interface Platform {
-  id: number;
-  name: string;
-  shortName: string;
-  color: string;
-  textColor: string;
-  fontWeight: number;
-  fontSize: string;
-  letterSpacing: string;
-}
+// ── Brand data — exact same images/videos as clone ────────────────────────────
 
-const PLATFORMS: Platform[] = [
-  {
-    id: 8,
-    name: 'Netflix',
-    shortName: 'N',
-    color: '#e50914',
-    textColor: '#fff',
-    fontWeight: 900,
-    fontSize: '42px',
-    letterSpacing: '-1px',
-  },
-  {
-    id: 337,
-    name: 'Disney+',
-    shortName: 'Disney+',
-    color: '#113ccf',
-    textColor: '#fff',
-    fontWeight: 800,
-    fontSize: '18px',
-    letterSpacing: '1px',
-  },
-  {
-    id: 384,
-    name: 'Max',
-    shortName: 'max',
-    color: '#002be7',
-    textColor: '#fff',
-    fontWeight: 900,
-    fontSize: '28px',
-    letterSpacing: '-1px',
-  },
-  {
-    id: 283,
-    name: 'Crunchyroll',
-    shortName: 'CR',
-    color: '#f47521',
-    textColor: '#fff',
-    fontWeight: 900,
-    fontSize: '22px',
-    letterSpacing: '0',
-  },
-  {
-    id: 531,
-    name: 'Paramount+',
-    shortName: 'P+',
-    color: '#0064ff',
-    textColor: '#fff',
-    fontWeight: 900,
-    fontSize: '26px',
-    letterSpacing: '-1px',
-  },
-  {
-    id: 350,
-    name: 'Apple TV+',
-    shortName: '⎇ TV+',
-    color: '#000000',
-    textColor: '#fff',
-    fontWeight: 700,
-    fontSize: '16px',
-    letterSpacing: '0.5px',
-  },
-];
+const BRANDS = [
+  { name: 'Disney',              img: '/images/viewers-disney.png',    video: '/videos/1564674844-disney.mp4' },
+  { name: 'Pixar',               img: '/images/viewers-pixar.png',     video: '/videos/1564676714-pixar.mp4' },
+  { name: 'Marvel',              img: '/images/viewers-marvel.png',    video: '/videos/1564676115-marvel.mp4' },
+  { name: 'Star Wars',           img: '/images/viewers-starwars.png',  video: '/videos/1608229455-star-wars.mp4' },
+  { name: 'National Geographic', img: '/images/viewers-national.png',  video: '/videos/1564676296-national-geographic.mp4' },
+] as const;
 
-const BrandBlock: React.FC<{ platform: Platform; onClick: () => void }> = ({ platform, onClick }) => {
-  const [hovered, setHovered] = React.useState(false);
-
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        width: 'calc((100% - 5 * 12px) / 6)',
-        aspectRatio: '16 / 9',
-        maxHeight: '120px',
-        position: 'relative',
-        overflow: 'hidden',
-        border: '4px solid rgba(202, 202, 202, 0.26)',
-        borderRadius: '10px',
-        cursor: 'pointer',
-        background: `linear-gradient(135deg, #3a3c4a 0%, #242632 100%)`,
-        transform: hovered ? 'scale(1.05)' : 'scale(1)',
-        transition: 'transform 0.2s ease, border-color 0.2s ease',
-        borderColor: hovered ? 'rgba(249,249,249,0.55)' : 'rgba(202,202,202,0.26)',
-        padding: 0,
-      }}
-    >
-      {/* Bande couleur de la plateforme (côté gauche) */}
-      <div style={{
-        position: 'absolute',
-        left: 0,
-        top: 0,
-        bottom: 0,
-        width: '5px',
-        background: platform.color,
-        transition: 'width 0.2s ease',
-        ...(hovered && { width: '100%', opacity: 0.15 }),
-      }} />
-
-      {/* Masque gradient — disparaît au hover */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'linear-gradient(to bottom, #3a3c4a, #242632)',
-        opacity: hovered ? 0 : 0.5,
-        transition: 'opacity 0.25s ease',
-        zIndex: 1,
-      }} />
-
-      {/* Nom de la plateforme */}
-      <div style={{
-        position: 'relative',
-        zIndex: 2,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <span style={{
-          color: platform.textColor,
-          fontFamily: 'var(--font-main)',
-          fontWeight: platform.fontWeight,
-          fontSize: platform.fontSize,
-          letterSpacing: platform.letterSpacing,
-          textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-          userSelect: 'none',
-          transition: 'opacity 0.2s ease',
-        }}>
-          {platform.shortName}
-        </span>
-      </div>
-    </button>
-  );
-};
+// ── BrandRow ──────────────────────────────────────────────────────────────────
 
 const BrandRow: React.FC = () => {
-  const navigate = useNavigate();
-
   return (
-    <section style={{
-      paddingLeft: 'var(--section-px)',
-      paddingRight: 'var(--section-px)',
-      paddingTop: '2.5rem',
-      paddingBottom: '1rem',
-    }}>
-      <h2 style={{
-        margin: '0 0 1rem 0',
-        fontSize: '22px',
-        fontWeight: 700,
-        color: '#f9f9f9',
-        fontFamily: 'var(--font-main)',
-        letterSpacing: '0.3px',
-      }}>
-        Parcourir par plateforme
-      </h2>
-
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '12px',
-      }}>
-        {PLATFORMS.map((platform) => (
-          <BrandBlock
-            key={platform.id}
-            platform={platform}
-            onClick={() => navigate(`/search?type=movie&provider=${platform.id}`)}
+    <div
+      className="mt-[30px] grid gap-[25px]"
+      style={{
+        padding: '30px 0 26px',
+        gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+      }}
+    >
+      {BRANDS.map((brand) => (
+        <div
+          key={brand.name}
+          className="group/viewer relative overflow-hidden rounded-[10px] cursor-pointer"
+          style={{
+            paddingTop: '56.25%',
+            border: '3px solid rgba(249,249,249,0.1)',
+            boxShadow: 'rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px',
+            transition: 'all 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 0s',
+          }}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget;
+            el.style.transform = 'scale(1.05)';
+            el.style.borderColor = 'rgba(249,249,249,0.8)';
+            el.style.boxShadow = 'rgb(0 0 0 / 80%) 0px 40px 58px -16px, rgb(0 0 0 / 72%) 0px 30px 22px -10px';
+            const video = el.querySelector('video');
+            if (video) video.style.opacity = '1';
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget;
+            el.style.transform = 'scale(1)';
+            el.style.borderColor = 'rgba(249,249,249,0.1)';
+            el.style.boxShadow = 'rgb(0 0 0 / 69%) 0px 26px 30px -10px, rgb(0 0 0 / 73%) 0px 16px 10px -10px';
+            const video = el.querySelector('video');
+            if (video) video.style.opacity = '0';
+          }}
+        >
+          <img
+            src={brand.img}
+            alt={brand.name}
+            style={{
+              inset: '0px',
+              display: 'block',
+              height: '100%',
+              objectFit: 'cover',
+              opacity: 1,
+              position: 'absolute',
+              transition: 'opacity 500ms ease-in-out 0s',
+              width: '100%',
+              zIndex: 1,
+              top: 0,
+            }}
           />
-        ))}
-      </div>
-    </section>
+          <video
+            autoPlay
+            loop
+            playsInline
+            muted
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: '0px',
+              opacity: 0,
+              zIndex: 0,
+              transition: 'opacity 500ms ease-in-out 0s',
+            }}
+          >
+            <source src={brand.video} type="video/mp4" />
+          </video>
+        </div>
+      ))}
+    </div>
   );
 };
 

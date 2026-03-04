@@ -1,5 +1,5 @@
-// DetailPage.tsx — Refonte layout immersif
-// Backdrop plein écran · Trailer prominent · Glassmorphism
+// DetailPage.tsx — Disney+ detail layout
+// Backdrop plein écran · Sections Disney+ style
 
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -332,8 +332,8 @@ const DetailPage: React.FC = () => {
 
   if (metaError || !item) {
     return (
-      <div className="min-h-screen bg-[#07080f] flex flex-col items-center justify-center
-                      text-white/60 gap-4">
+      <div className="min-h-screen bg-dp-bg flex flex-col items-center justify-center
+                      text-dp-text/60 gap-4">
         <p>Erreur lors du chargement du contenu.</p>
         <Button variant="secondary" onClick={() => navigate(-1)}>← Retour</Button>
       </div>
@@ -362,74 +362,62 @@ const DetailPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen relative overflow-x-hidden text-[#F8F9FA]"
-      style={{ background: '#0A0E1A' }}
+      style={{
+        position: 'relative',
+        minHeight: 'calc(100vh - 250px)',
+        overflowX: 'hidden',
+        display: 'block',
+        top: 72,
+        padding: '0 calc(3.5vw + 5px)',
+      }}
     >
-          FOND CINÉMATIQUE — backdrop plein écran, visible en scroll
-          Couche 1 : image haute définition (opacity 0.30)
-          Couche 2 : gradient sombre pour lisibilité
-      {bgBackdrop && (
+      {/* Background — exact Detail.js: fixed, opacity 0.8 */}
+      {bgBackdrop ? (
         <div
-          className="fixed inset-0 pointer-events-none"
-          style={{ zIndex: 0 }}
+          style={{
+            left: 0,
+            opacity: 0.8,
+            position: 'fixed',
+            right: 0,
+            top: 0,
+            zIndex: -1,
+          }}
         >
-          <div
-            style={{
-              position:           'absolute',
-              inset:              0,
-              backgroundImage:    `url(${bgBackdrop})`,
-              backgroundSize:     'cover',
-              backgroundPosition: 'center 15%',
-              opacity:            0.55,
-            }}
-          />
-          {/* Dégradé : transparent en haut (le hero montre le backdrop brut),
-              de plus en plus sombre au fur et à mesure qu'on scrolle */}
-          <div
-            style={{
-              position:   'absolute',
-              inset:      0,
-              background: `
-                linear-gradient(
-                  to bottom,
-                  rgba(10,11,22,0)    0%,
-                  rgba(10,11,22,0.15) 20%,
-                  rgba(10,11,22,0.55) 50%,
-                  rgba(10,11,22,0.80) 75%,
-                  rgba(10,11,22,0.96) 100%
-                ),
-                linear-gradient(
-                  to right,
-                  rgba(10,11,22,0.6)  0%,
-                  transparent        55%
-                )
-              `,
-            }}
+          <img
+            alt=""
+            src={bgBackdrop}
+            style={{ width: '100vw', height: '100vh', objectFit: 'cover' }}
           />
         </div>
-      )}
-
-      {/* Sans backdrop : fond sombre uni */}
-      {!bgBackdrop && (
-        <div
-          className="fixed inset-0 pointer-events-none"
-          style={{ zIndex: 0, background: '#0A0E1A' }}
-        />
+      ) : (
+        <div style={{ position: 'fixed', inset: 0, zIndex: -1, background: '#040714' }} />
       )}
 
       <button
         onClick={() => navigate(-1)}
-        className="fixed left-5 z-50 flex items-center gap-1.5 px-4 py-2
-                   bg-black/40 backdrop-blur-md text-white/80 rounded-full
-                   text-[13px] font-medium transition-all duration-200
-                   hover:bg-black/70 hover:text-white border border-white/10"
-        style={{ top: 'calc(var(--titlebar-height, 0px) + var(--navbar-height, 70px) + 8px)' }}
+        style={{
+          position: 'fixed',
+          left: 20,
+          top: 'calc(var(--titlebar-height, 0px) + var(--navbar-height, 70px) + 8px)',
+          zIndex: 50,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '8px 16px',
+          background: 'rgba(0,0,0,0.4)',
+          color: 'rgba(249,249,249,0.8)',
+          borderRadius: 4,
+          fontSize: 13,
+          fontWeight: 500,
+          border: '1px solid rgba(249,249,249,0.1)',
+          cursor: 'pointer',
+          transition: 'all 0.2s',
+        }}
       >
         <ChevronLeft size={16} />
         {type === 'movie' ? 'Films' : 'Séries'}
       </button>
 
-          HERO — 100vh plein écran cinématique
       <HeroSection
         item={item}
         theme={theme}
@@ -443,24 +431,23 @@ const DetailPage: React.FC = () => {
       />
 
       {playError && (
-        <div className="fixed bottom-[24px] left-1/2 -translate-x-1/2 bg-red-900/90 text-white px-[20px] py-[14px] rounded-[10px] border border-red-500 flex items-center gap-[12px] shadow-2xl backdrop-blur-md z-50">
+        <div className="fixed bottom-[24px] left-1/2 -translate-x-1/2 bg-red-900/90 text-dp-text px-[20px] py-[14px] rounded-[4px] border border-red-500 flex items-center gap-[12px] shadow-2xl z-50">
           <span className="text-[14px] font-[600]">{playError}</span>
-          <button onClick={() => setPlayError(null)} className="ml-[8px] px-[10px] py-[4px] bg-white/20 hover:bg-white/30 rounded text-[12px] font-[700]">✕</button>
+          <button onClick={() => setPlayError(null)} className="ml-[8px] px-[10px] py-[4px] bg-dp-text/20 hover:bg-dp-text/30 rounded-[4px] text-[12px] font-[700]">✕</button>
         </div>
       )}
 
-          CONTENU — z-10, visible au dessus du fond
       <div className="relative" style={{ zIndex: 10 }}>
 
         <InfoSection item={item} theme={theme} />
 
         {isSeries && seasons.length > 0 && (
           <section className="max-w-[1400px] mx-auto px-[calc(3.5vw+5px)] pb-4">
-            <div className="rounded-2xl border border-white/10 bg-black/30 backdrop-blur-lg p-5 flex flex-col gap-4">
+            <div className="rounded-[10px] border-[3px] border-dp-text/10 bg-black/40 p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-white/85 m-0">Saison & épisode</h2>
+                <h2 className="text-sm font-semibold text-dp-text/85 m-0">Saison & épisode</h2>
                 {selectedEpisodeData && (
-                  <span className="text-xs text-white/45">
+                  <span className="text-xs text-dp-text/45">
                     S{String(selectedSeason).padStart(2, '0')}E{String(selectedEpisode).padStart(2, '0')}
                   </span>
                 )}
@@ -476,10 +463,10 @@ const DetailPage: React.FC = () => {
                       const firstEpisode = episodeVideos.find(v => v.season === s)?.episode ?? 1;
                       setSelectedEpisode(firstEpisode);
                     }}
-                    className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                    className={`flex-shrink-0 px-4 py-1.5 rounded-[4px] text-xs font-medium transition-all duration-200 ${
                       selectedSeason === s
-                        ? 'bg-white text-black'
-                        : 'bg-white/10 text-white/60 hover:bg-white/18'
+                        ? 'bg-dp-text text-black'
+                        : 'bg-dp-text/10 text-dp-text/60 hover:bg-dp-text/20'
                     }`}
                   >
                     Saison {s}
@@ -500,10 +487,10 @@ const DetailPage: React.FC = () => {
                     <div
                       key={`${ep.season}-${ep.episode}`}
                       onClick={() => setSelectedEpisode(ep.episode ?? 1)}
-                      className={`group flex items-start gap-3 p-3 rounded-xl text-left cursor-pointer transition-colors duration-200 ${
+                      className={`group flex items-start gap-3 p-3 rounded-[6px] text-left cursor-pointer transition-colors duration-200 ${
                         isSelectedEpisode
-                          ? 'bg-white/[0.08] ring-1 ring-white/25'
-                          : 'bg-white/[0.04] hover:bg-white/[0.07]'
+                          ? 'bg-dp-text/[0.08] ring-1 ring-dp-text/25'
+                          : 'bg-dp-text/[0.04] hover:bg-dp-text/[0.07]'
                       }`}
                       role="button"
                       tabIndex={0}
@@ -515,7 +502,7 @@ const DetailPage: React.FC = () => {
                       }}
                     >
                       {stillUrl ? (
-                        <div className="relative flex-shrink-0 w-[120px] aspect-video rounded-lg overflow-hidden bg-white/10">
+                        <div className="relative flex-shrink-0 w-[120px] aspect-video rounded-[6px] overflow-hidden bg-dp-text/10">
                           <img
                             src={stillUrl}
                             className="w-full h-full object-cover"
@@ -523,21 +510,21 @@ const DetailPage: React.FC = () => {
                             alt={ep.title ?? `Épisode ${ep.episode}`}
                           />
                           {progress && progress.progressPct > 0 && !progress.watched && (
-                            <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-white/20">
+                            <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-dp-text/20">
                               <div
-                                className="h-full bg-white/70"
+                                className="h-full bg-dp-text/70"
                                 style={{ width: `${Math.min(100, Math.max(0, progress.progressPct))}%` }}
                               />
                             </div>
                           )}
                         </div>
                       ) : (
-                        <div className="relative flex-shrink-0 w-[120px] aspect-video rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
-                          <span className="text-white/20 text-xs">E{ep.episode}</span>
+                        <div className="relative flex-shrink-0 w-[120px] aspect-video rounded-[6px] overflow-hidden bg-dp-text/10 flex items-center justify-center">
+                          <span className="text-dp-text/20 text-xs">E{ep.episode}</span>
                           {progress && progress.progressPct > 0 && !progress.watched && (
-                            <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-white/20">
+                            <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-dp-text/20">
                               <div
-                                className="h-full bg-white/70"
+                                className="h-full bg-dp-text/70"
                                 style={{ width: `${Math.min(100, Math.max(0, progress.progressPct))}%` }}
                               />
                             </div>
@@ -547,20 +534,20 @@ const DetailPage: React.FC = () => {
 
                       <div className="flex flex-col gap-1 flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-white/35 flex-shrink-0">
+                          <span className="text-xs text-dp-text/35 flex-shrink-0">
                             {ep.episode}
                           </span>
-                          <span className="text-sm font-medium text-white/85 truncate">
+                          <span className="text-sm font-medium text-dp-text/85 truncate">
                             {ep.title ?? `Épisode ${ep.episode}`}
                           </span>
                           {ep.runtime && (
-                            <span className="text-xs text-white/30 flex-shrink-0 ml-auto">
+                            <span className="text-xs text-dp-text/30 flex-shrink-0 ml-auto">
                               {ep.runtime} min
                             </span>
                           )}
                         </div>
                         {ep.overview && (
-                          <p className="text-[11px] text-white/45 line-clamp-2 leading-relaxed">
+                          <p className="text-[11px] text-dp-text/45 line-clamp-2 leading-relaxed">
                             {ep.overview}
                           </p>
                         )}
@@ -586,7 +573,7 @@ const DetailPage: React.FC = () => {
                               );
                             }}
                             disabled={isPlayLoading}
-                            className={`ml-auto flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white text-black text-xs font-bold hover:bg-white/90 transition-all duration-200 ${
+                            className={`ml-auto flex items-center gap-1.5 px-3 py-1 rounded-[4px] bg-dp-text text-black text-xs font-bold hover:bg-dp-text/90 transition-all duration-200 ${
                               isSelectedEpisode
                                 ? 'opacity-100'
                                 : 'opacity-0 group-hover:opacity-100'

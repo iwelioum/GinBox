@@ -1,14 +1,11 @@
-// components/detail/HeroSection.tsx
-// Backdrop 85vh + Ken Burns + parallax
-// Logo HD centré · Boutons CTA en bas (cliquables, z-30)
-// InfoSection gère la fiche détaillée en dessous
+// components/detail/HeroSection.tsx — Exact replica of Detail.js hero layout
+// Background image fixed · Logo/title left-aligned · Play/Trailer/AddList controls
+// SubTitle (year · runtime · rating · genres) · Description · GenreTags
 
 import * as React from 'react';
 import { Play, Plus, Check, Download, Loader2 } from 'lucide-react';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
 
 interface HeroSectionProps {
   item:              CatalogMeta;
@@ -23,168 +20,198 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  item, theme, logoUrl,
+  item, theme: _theme, logoUrl,
   isFavorite = false, isAddingToList = false,
   isPlayLoading = false,
   onPlay, onDownload, onToggleFavorite,
 }) => {
-  const parallaxRef = React.useRef<HTMLDivElement>(null);
-
-  // Parallax au scroll
-  React.useEffect(() => {
-    const el = parallaxRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      el.style.transform = `translateY(${window.scrollY * 0.3}px)`;
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  // Backdrop haute qualité
-  const backdropRaw = item.backdrop_path || item.background;
-  const backdropUrl = backdropRaw
-    ? (backdropRaw.startsWith('http')
-        ? backdropRaw.replace('/w500/', '/original/')
-        : `${TMDB_IMAGE_BASE}original${backdropRaw.startsWith('/') ? '' : '/'}${backdropRaw}`)
-    : null;
-
   const title = item.title || item.name || '';
 
-  const titleFont = theme.fontMood === 'serif-dramatic'
-    ? "'Playfair Display', Georgia, serif"
-    : theme.fontMood === 'mono-tech'
-    ? "'JetBrains Mono', 'Courier New', monospace"
-    : 'inherit';
+  // Metadata subtitle — exact Detail.js style: year · runtime · rating · genres
+  const year = (item.release_date || item.first_air_date || item.releaseInfo || '').toString().slice(0, 4);
+  const runtime = item.runtime
+    ? `${Math.floor(item.runtime / 60)}h ${item.runtime % 60}m`
+    : '';
+  const rating = item.vote_average ? `★ ${item.vote_average.toFixed(1)}` : '';
+  const genreNames: string[] = (item.genres ?? []).map(g =>
+    typeof g === 'string' ? g : (g as { name: string }).name
+  );
+  const genres = genreNames.join(' · ');
+  const subTitle = [year, runtime, rating, genres].filter(Boolean).join('   ·   ');
 
   return (
-    <section className="relative overflow-hidden" style={{ height: '85vh' }}>
-
+    <>
+      {/* ImageTitle — exact Detail.js: height 30vw, min-height 170px, flex-end, left-aligned */}
       <div
-        ref={parallaxRef}
-        className="absolute will-change-transform"
-        style={{ top: '-15%', left: 0, right: 0, bottom: 0 }}
-      >
-        {backdropUrl ? (
-          <div
-            style={{
-              width:               '100%',
-              height:              '100%',
-              backgroundImage:     `url(${backdropUrl})`,
-              backgroundSize:      'cover',
-              backgroundPosition:  'center 20%',
-              animation:           'kenburns 20s ease-in-out infinite alternate',
-              willChange:          'transform',
-            }}
-          />
-        ) : (
-          <div style={{ width: '100%', height: '100%', background: '#07080f' }} />
-        )}
-      </div>
-
-      <div
-        className="absolute inset-0"
         style={{
-          zIndex: 10,
-          background:
-            'linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(7,8,15,0.55) 65%, rgba(7,8,15,1) 100%)',
-          pointerEvents: 'none',
+          alignItems: 'flex-end',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          margin: '0px auto',
+          height: '30vw',
+          minHeight: 170,
+          paddingBottom: 24,
+          width: '100%',
         }}
-      />
-
-      <div
-        className="absolute inset-0 flex flex-col items-center justify-end pb-14 gap-6"
-        style={{ zIndex: 30 }}
       >
-        {/* Logo HD ou titre fallback */}
         {logoUrl ? (
           <img
-            src={logoUrl}
             alt={title}
-            style={{
-              maxWidth:  480,
-              maxHeight: 140,
-              objectFit: 'contain',
-              filter:    'drop-shadow(0 4px 28px rgba(0,0,0,0.95))',
-            }}
+            src={logoUrl}
+            style={{ maxWidth: 600, minWidth: 200, width: '35vw' }}
           />
         ) : (
           <h1
             style={{
-              fontFamily:  titleFont,
-              fontStyle:   theme.fontMood === 'serif-dramatic' ? 'italic' : 'normal',
-              fontSize:    'clamp(28px, 4vw, 58px)',
-              fontWeight:  800,
-              color:       '#f9f9f9',
-              textShadow:  '0 4px 28px rgba(0,0,0,0.85)',
-              textAlign:   'center',
-              maxWidth:    '70vw',
-              lineHeight:  1.1,
-              margin:      0,
+              color: '#f9f9f9',
+              fontSize: '4vw',
+              fontWeight: 'bold',
+              textShadow: '0 2px 12px rgba(0,0,0,0.9)',
+              letterSpacing: 2,
+              margin: 0,
             }}
           >
             {title}
           </h1>
         )}
+      </div>
 
-        <div className="flex items-center gap-3">
-
-          {/* Regarder */}
+      {/* ContentMeta — exact Detail.js: max-width 874px */}
+      <div style={{ maxWidth: 874 }}>
+        {/* Controls — exact Detail.js */}
+        <div
+          style={{
+            alignItems: 'center',
+            display: 'flex',
+            flexFlow: 'row nowrap',
+            margin: '24px 0',
+            minHeight: 56,
+          }}
+        >
+          {/* Play button */}
           <button
             type="button"
             onClick={onPlay}
             disabled={isPlayLoading}
-            className="flex items-center gap-2 px-7 py-3 rounded-full
-                       text-black text-sm font-bold bg-white
-                       hover:bg-white/90 transition-all duration-200 hover:scale-[1.03]
-                       cursor-pointer shadow-xl disabled:opacity-80 disabled:cursor-not-allowed disabled:hover:scale-100"
+            style={{
+              fontSize: 15,
+              margin: '0 22px 0 0',
+              padding: '0 24px',
+              height: 56,
+              borderRadius: 4,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              letterSpacing: '1.8px',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              background: 'rgb(249,249,249)',
+              border: 'none',
+              color: 'rgb(0,0,0)',
+              fontWeight: 'bold',
+              transition: 'background 0.3s',
+              gap: 8,
+            }}
           >
             {isPlayLoading ? (
-              <>
-                <Loader2 size={16} className="animate-spin" />
-                Recherche...
-              </>
+              <Loader2 size={18} className="animate-spin" />
             ) : (
-              <>
-                <Play size={16} className="fill-black" />
-                Regarder
-              </>
+              <Play size={18} style={{ fill: 'black' }} />
             )}
+            <span>{isPlayLoading ? 'Recherche...' : 'Play'}</span>
           </button>
 
-          {/* Ajouter à ma liste */}
+          {/* Trailer / Download button */}
+          <button
+            type="button"
+            onClick={onDownload}
+            style={{
+              fontSize: 15,
+              margin: '0 22px 0 0',
+              padding: '0 24px',
+              height: 56,
+              borderRadius: 4,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              letterSpacing: '1.8px',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              background: 'rgba(0,0,0,0.3)',
+              border: '1px solid rgb(249,249,249)',
+              color: 'rgb(249,249,249)',
+              fontWeight: 'bold',
+              transition: 'background 0.3s',
+              gap: 8,
+            }}
+          >
+            <Download size={18} />
+            <span>Sources</span>
+          </button>
+
+          {/* AddList button — circle with + */}
           <button
             type="button"
             onClick={onToggleFavorite}
             disabled={isAddingToList}
-            title={isFavorite ? 'Dans ma liste' : 'Ajouter à ma liste'}
-            className="w-11 h-11 rounded-full border-2 flex items-center justify-center
-                       transition-all duration-200 cursor-pointer text-white
-                       hover:scale-[1.05] disabled:opacity-50"
             style={{
-              borderColor:     isFavorite ? 'var(--accent, #0072D2)' : 'rgba(255,255,255,0.5)',
-              backgroundColor: isFavorite
-                ? 'color-mix(in srgb, var(--accent, #0072D2) 25%, transparent)'
-                : 'rgba(0,0,0,0.35)',
+              marginRight: 16,
+              height: 44,
+              width: 44,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: isFavorite ? 'rgba(249,249,249,0.15)' : 'rgba(0,0,0,0.6)',
+              borderRadius: '50%',
+              border: `2px solid ${isFavorite ? '#f9f9f9' : 'white'}`,
+              cursor: 'pointer',
+              transition: 'border-color 0.3s, background-color 0.3s',
+              color: '#f9f9f9',
+              padding: 0,
+              flexShrink: 0,
             }}
           >
             {isFavorite ? <Check size={18} /> : <Plus size={18} />}
           </button>
-
-          {/* Télécharger */}
-          <button
-            type="button"
-            onClick={onDownload}
-            title="Télécharger"
-            className="w-11 h-11 rounded-full border-2 border-white/40 bg-black/35
-                       flex items-center justify-center text-white
-                       hover:border-white hover:bg-black/55 hover:scale-[1.05]
-                       transition-all duration-200 cursor-pointer"
-          >
-            <Download size={18} />
-          </button>
         </div>
+
+        {/* SubTitle — exact Detail.js */}
+        <div style={{ color: 'rgb(249,249,249)', fontSize: 15, minHeight: 20 }}>
+          {subTitle}
+        </div>
+
+        {/* Description — exact Detail.js */}
+        {item.overview && (
+          <div style={{ lineHeight: 1.4, fontSize: 20, padding: '16px 0', color: 'rgb(249,249,249)' }}>
+            {item.overview}
+          </div>
+        )}
+
+        {/* GenreTags — exact Detail.js */}
+        {genreNames.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 8, paddingBottom: 40 }}>
+            {genreNames.map((name) => (
+              <span
+                key={name}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 20,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  letterSpacing: '0.5px',
+                  color: '#f9f9f9',
+                  background: '#0063e533',
+                  border: '1px solid #0063e566',
+                }}
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
-    </section>
+    </>
   );
 };
