@@ -54,14 +54,3 @@ export function useRemoveFromList() {
     },
   });
 }
-
-/** Creates a new custom list under the active profile and refreshes the list index so it appears instantly. */
-export function useCreateList() {
-  const qc        = useQueryClient();
-  const profileId = useProfileStore((s) => s.activeProfile?.id);
-
-  return useMutation({
-    mutationFn: (name: string) => endpoints.lists.create(profileId!, name),
-    onSuccess:  () => qc.invalidateQueries({ queryKey: ['lists', profileId] }),
-  });
-}
