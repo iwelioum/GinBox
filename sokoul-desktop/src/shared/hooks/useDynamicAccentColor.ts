@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 import { Vibrant } from 'node-vibrant/browser';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 /** Extracts a palette from the current poster and injects CSS custom properties so the entire page theme adapts to the content being viewed. */
 export function useDynamicAccentColor(posterUrl: string | null) {
@@ -11,7 +12,7 @@ export function useDynamicAccentColor(posterUrl: string | null) {
 
     const fullUrl = posterUrl.startsWith('http')
       ? posterUrl
-      : `https://image.tmdb.org/t/p/w185${posterUrl}`;
+      : `${TMDB_IMAGE_BASE}w185${posterUrl}`;
 
     let cancelled = false;
 

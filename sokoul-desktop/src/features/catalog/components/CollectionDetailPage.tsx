@@ -6,6 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery }               from '@tanstack/react-query';
 import { ArrowLeft, Play }        from 'lucide-react';
 import { endpoints }              from '@/shared/api/client';
+import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
 
 export default function CollectionDetailPage() {
   const { id }   = useParams<{ id: string }>();
@@ -45,7 +46,7 @@ export default function CollectionDetailPage() {
   }
 
   const backdrop = data.backdrop_path
-    ? `https://image.tmdb.org/t/p/original${data.backdrop_path}`
+    ? `${TMDB_IMAGE_BASE}original${data.backdrop_path}`
     : null;
 
   return (
@@ -119,7 +120,7 @@ export default function CollectionDetailPage() {
                       <img
                         src={film.poster.startsWith('http')
                           ? film.poster
-                          : `https://image.tmdb.org/t/p/w342${film.poster}`}
+                          : `${TMDB_IMAGE_BASE}w342${film.poster}`}
                         alt={film.name ?? ''}
                         loading="lazy"
                         className="w-full h-full object-cover
@@ -128,7 +129,7 @@ export default function CollectionDetailPage() {
                       />
                     ) : film.poster_path ? (
                       <img
-                        src={`https://image.tmdb.org/t/p/w342${film.poster_path}`}
+                        src={`${TMDB_IMAGE_BASE}w342${film.poster_path}`}
                         alt={film.name ?? ''}
                         loading="lazy"
                         className="w-full h-full object-cover

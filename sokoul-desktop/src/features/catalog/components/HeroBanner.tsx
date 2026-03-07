@@ -21,10 +21,10 @@ import { Play, Info }               from 'lucide-react';
 import { endpoints }                from '@/shared/api/client';
 import { extractLogo }              from '@/shared/utils/tmdb';
 import type { CatalogMeta }         from '@/shared/types';
+import { TMDB_IMAGE_BASE }         from '@/shared/constants/tmdb';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const TMDB          = 'https://image.tmdb.org/t/p/';
 const AUTOPLAY_MS   = 7000;
 const MAX_SLIDES    = 8;
 const DEFAULT_TINT  = 'rgba(4,7,20,0.97)';
@@ -36,7 +36,7 @@ function imgUrl(path: string | undefined | null, size = 'original'): string | nu
   if (path.startsWith('http')) {
     return path.replace('/w500/', '/original/').replace('/w1280/', '/original/');
   }
-  return `${TMDB}${size}${path.startsWith('/') ? '' : '/'}${path}`;
+  return `${TMDB_IMAGE_BASE}${size}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
 function getYear(item: CatalogMeta): string {

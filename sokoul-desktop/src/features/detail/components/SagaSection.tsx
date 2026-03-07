@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 interface CollectionPart {
   id:           number;
@@ -23,8 +24,6 @@ interface SagaSectionProps {
   collection: unknown;
   currentId:  number;
 }
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
 
 export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId }) => {
   const { t } = useTranslation();

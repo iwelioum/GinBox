@@ -37,8 +37,7 @@ import { SimilarSection }  from './SimilarSection';
 
 import { Button } from '../../../shared/components/ui/Button';
 import type { ContentType, PlaybackEntry, Source } from '../../../shared/types/index';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 const DetailPage: React.FC = () => {
   const { type, id } = useParams<{ type: ContentType; id: string }>();
@@ -213,7 +212,7 @@ const DetailPage: React.FC = () => {
       }
 
       const { data } = await endpoints.debrid.unrestrict(best.magnet, best.cached_rd);
-      const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : (item.poster ?? '');
+      const posterUrl = item.poster_path ? `${TMDB_IMAGE_BASE}w500${item.poster_path}` : (item.poster ?? '');
       const ratingStr = item.vote_average != null ? String(item.vote_average.toFixed(1)) : '';
       const resumeMs = resumeAt && resumeAt > 0 ? resumeAt : 0;
       const startAtParam = resumeMs > 0
@@ -288,7 +287,7 @@ const DetailPage: React.FC = () => {
       }
 
       const { data } = await endpoints.debrid.unrestrict(best.magnet, best.cached_rd);
-      const posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : (item.poster ?? '');
+      const posterUrl = item.poster_path ? `${TMDB_IMAGE_BASE}w500${item.poster_path}` : (item.poster ?? '');
       const ratingStr = item.vote_average != null ? String(item.vote_average.toFixed(1)) : '';
       const playerUrl =
         `/player?url=${encodeURIComponent(data.stream_url)}` +

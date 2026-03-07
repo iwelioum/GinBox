@@ -6,8 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 interface SimilarSectionProps {
   items?: CatalogMeta[];

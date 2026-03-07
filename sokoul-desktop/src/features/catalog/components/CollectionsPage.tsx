@@ -8,6 +8,7 @@ import { useInfiniteQuery }       from '@tanstack/react-query';
 import { Search, Film, ChevronRight } from 'lucide-react';
 import { endpoints }              from '@/shared/api/client';
 import type { CollectionItem }    from '../../../shared/types/index';
+import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
 
 const CATEGORIES = [
   { key: 'all',     label: 'All' },
@@ -204,13 +205,13 @@ function CollectionCard({
   const backdrop = collection.backdrop_path
     ? (collection.backdrop_path.startsWith('http')
         ? collection.backdrop_path
-        : `https://image.tmdb.org/t/p/original${collection.backdrop_path}`)
+        : `${TMDB_IMAGE_BASE}original${collection.backdrop_path}`)
     : null;
 
   const poster = collection.poster_path
     ? (collection.poster_path.startsWith('http')
         ? collection.poster_path
-        : `https://image.tmdb.org/t/p/w342${collection.poster_path}`)
+        : `${TMDB_IMAGE_BASE}w342${collection.poster_path}`)
     : null;
 
   return (

@@ -17,6 +17,7 @@ import { useProfileStore } from '@/stores/profileStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
 import { parseTorrentName, pickBestSource } from '../../../shared/utils/parsing';
 import { extractErrorMessage } from '../../../shared/utils/error';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 function formatCacheAge(cachedAt: number): string {
   const age = Math.floor(Date.now() / 1000) - cachedAt;
@@ -447,7 +448,7 @@ export default function SourcesPage() {
   const [resumePrompt, setResumePrompt] = useState<{ streamUrl: string; resumeMs: number } | null>(null);
 
   const buildPlayerUrl = (streamUrl: string, startAtSeconds = 0) => {
-    const posterUrl  = meta?.poster_path ? `https://image.tmdb.org/t/p/w500${meta.poster_path}` : (meta?.poster ?? '');
+    const posterUrl  = meta?.poster_path ? `${TMDB_IMAGE_BASE}w500${meta.poster_path}` : (meta?.poster ?? '');
     const ratingStr  = meta?.vote_average != null ? String(meta.vote_average.toFixed(1)) : '';
     const returnToParam = shouldReturnToDetail ? `&returnTo=${encodeURIComponent(returnToDetailPath)}` : '';
     const startAtParam  = startAtSeconds > 0 ? `&startAt=${encodeURIComponent(String(startAtSeconds))}` : '';

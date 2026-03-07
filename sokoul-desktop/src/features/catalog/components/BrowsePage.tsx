@@ -12,6 +12,7 @@ import { endpoints }                      from '@/shared/api/client';
 import type { CatalogMeta, ContentType, UserProgressEntry, PlaybackEntry } from '@/shared/types';
 import { useProfileStore }                from '@/stores/profileStore';
 import { extractLogo }                    from '@/shared/utils/tmdb';
+import { TMDB_IMAGE_BASE }               from '@/shared/constants/tmdb';
 import {
   classifyContentKind,
   expandGenres,
@@ -151,7 +152,7 @@ function resolveCardArtwork(item: EnrichedItem): string | null {
   const artwork = item.backdrop_path || item.background || item.poster_path || item.poster;
   if (!artwork) return null;
   if (artwork.startsWith('http')) return artwork;
-  return `https://image.tmdb.org/t/p/w500${artwork.startsWith('/') ? '' : '/'}${artwork}`;
+  return `${TMDB_IMAGE_BASE}w500${artwork.startsWith('/') ? '' : '/'}${artwork}`;
 }
 
 function resolveContentTypeFromItem(
@@ -197,7 +198,7 @@ function EditorialCard({
 
   const artwork = rawArtwork.startsWith('http')
     ? rawArtwork.replace('/w500/', '/w780/')
-    : `https://image.tmdb.org/t/p/w780${rawArtwork.startsWith('/') ? '' : '/'}${rawArtwork}`;
+    : `${TMDB_IMAGE_BASE}w780${rawArtwork.startsWith('/') ? '' : '/'}${rawArtwork}`;
 
   return (
     <button
@@ -394,7 +395,7 @@ function BrowseHero({
   const bgImg  = rawBg
     ? (rawBg.startsWith('http')
         ? rawBg.replace('/w500/', '/original/')
-        : `https://image.tmdb.org/t/p/original${rawBg.startsWith('/') ? '' : '/'}${rawBg}`)
+        : `${TMDB_IMAGE_BASE}original${rawBg.startsWith('/') ? '' : '/'}${rawBg}`)
     : null;
 
   const title    = current.title || current.name || '';

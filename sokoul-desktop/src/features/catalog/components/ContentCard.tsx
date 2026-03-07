@@ -11,13 +11,12 @@ import type { CatalogMeta } from '@/shared/types';
 import { endpoints }   from '@/shared/api/client';
 import { getLogo, type FanartResponse } from '@/shared/utils/fanart';
 import { getTopPosterUrl }              from '@/shared/utils/topPosters';
-
-const TMDB = 'https://image.tmdb.org/t/p/';
+import { TMDB_IMAGE_BASE }             from '@/shared/constants/tmdb';
 
 function imgUrl(path: string | undefined | null, size = 'w780'): string | null {
   if (!path) return null;
   if (path.startsWith('http')) return path.replace('/w500/', `/${size}/`);
-  return `${TMDB}${size}${path.startsWith('/') ? '' : '/'}${path}`;
+  return `${TMDB_IMAGE_BASE}${size}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
 // ── Types ─────────────────────────────────────────────────────────────────────

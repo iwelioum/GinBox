@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { EnrichedItem } from './CatalogFilters';
 import { calcHoverPosition } from '@/shared/utils/hoverCardPosition';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 const KIND_LABELS: Record<string, string> = {
   movie:       'Movie',
@@ -29,9 +30,9 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   const { top, left, transformOrigin } = calcHoverPosition(anchorRect);
 
   const backdropUrl = item.backdrop_path
-    ? `https://image.tmdb.org/t/p/w500${item.backdrop_path}`
+    ? `${TMDB_IMAGE_BASE}w500${item.backdrop_path}`
     : item.poster_path
-      ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
+      ? `${TMDB_IMAGE_BASE}w342${item.poster_path}`
       : null;
 
   const title    = item.title ?? item.name ?? '';

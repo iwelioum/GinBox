@@ -13,8 +13,7 @@ import { ContentRail } from './ContentRail';
 import { Spinner } from '../../../shared/components/ui/Spinner';
 import { Button } from '../../../shared/components/ui/Button';
 import type { CatalogMeta } from '../../../shared/types/index';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 interface ActorLocationState {
   name?: string;

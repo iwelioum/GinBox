@@ -7,8 +7,7 @@ import Tilt from 'react-parallax-tilt';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
 import { GLASS_VARIANTS } from '../../../shared/utils/glassStyles';
-
-const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 interface InfoSectionProps {
   item:  CatalogMeta;

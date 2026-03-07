@@ -3,10 +3,10 @@
 // fallback_url: redirects transparently to TMDB if Top Posters has no image.
 
 import type { CatalogMeta } from '../types';
+import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 const BASE      = 'https://api.top-streaming.stream';
 const APIKEY    = import.meta.env.VITE_TOP_POSTERS_KEY as string | undefined;
-const TMDB_W500 = 'https://image.tmdb.org/t/p/w500';
 
 /** Extracts a numeric TMDB ID from the various ID formats used in the app. */
 function extractTmdbId(id: string): string | null {
@@ -42,7 +42,7 @@ export function getTopPosterUrl(item: CatalogMeta): string | null {
   if (rawPath) {
     fallbackUrl = rawPath.startsWith('http')
       ? rawPath
-      : `${TMDB_W500}${rawPath.startsWith('/') ? '' : '/'}${rawPath}`;
+      : `${TMDB_IMAGE_BASE}w500${rawPath.startsWith('/') ? '' : '/'}${rawPath}`;
   }
 
   const params = fallbackUrl ? `?fallback_url=${encodeURIComponent(fallbackUrl)}` : '';
