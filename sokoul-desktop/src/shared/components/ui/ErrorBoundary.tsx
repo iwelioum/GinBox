@@ -6,6 +6,7 @@
  */
 
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import i18n from '@/shared/i18n';
 
 interface ErrorBoundaryProps {
   /** Label shown in the fallback UI to identify which area crashed */
@@ -49,14 +50,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return (
       <div className="flex min-h-[200px] flex-col items-center justify-center gap-4 p-8 text-center text-white/70">
         <p className="text-lg font-semibold text-white/90">
-          {this.props.area ? `Erreur dans ${this.props.area}` : 'Une erreur est survenue'}
+          {this.props.area ? `Error in ${this.props.area}` : 'An error occurred'}
         </p>
         <p className="max-w-md text-sm">{error.message}</p>
         <button
           onClick={this.handleReset}
           className="cursor-pointer rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
         >
-          Reessayer
+          {i18n.t('common.retry')}
         </button>
       </div>
     );
