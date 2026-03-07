@@ -1,5 +1,0 @@
-{
-    "include": ["./PTT"],
-    "exclude": ["./tests"],
-    "reportMissingImports": true,
-}

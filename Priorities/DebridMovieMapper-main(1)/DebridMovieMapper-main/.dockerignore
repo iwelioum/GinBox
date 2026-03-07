@@ -1,6 +1,0 @@
-target/
-metadata.db/
-.env
-.git/
-.idea/
-run.log
