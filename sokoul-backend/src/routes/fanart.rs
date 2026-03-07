@@ -1,8 +1,8 @@
 // ══════════════════════════════════════════════════════════
-// fanart.rs — Logo HD depuis Fanart.tv
-// Accepte deux formats :
-//   GET /fanart/:type/:id  (ex: /fanart/movie/tmdb:550)
-//   GET /fanart/:id        (ex: /fanart/tt0137523 — legacy)
+// fanart.rs — HD Logo from Fanart.tv
+// Accepts two formats:
+//   GET /fanart/:type/:id  (e.g. /fanart/movie/tmdb:550)
+//   GET /fanart/:id        (e.g. /fanart/tt0137523 — legacy)
 // ══════════════════════════════════════════════════════════
 
 use axum::{
@@ -19,14 +19,17 @@ use crate::services::fanart;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        // Logo avec cache SQLite : /fanart/:type/:id/logo
+        // Logo with SQLite cache: /fanart/:type/:id/logo
         .route("/:content_type/:id/logo", get(get_logo_handler))
-        // Format préféré du frontend : /fanart/:type/:id
+        // Preferred frontend format: /fanart/:type/:id
         .route("/:content_type/:id", get(get_fanart_handler))
 }
 
 // ── GET /fanart/:type/:id ─────────────────────────────────
-// Ce handler retourne maintenant la réponse JSON complète de Fanart.tv
+// Returns the full Fanart.tv JSON response.
+// IMPORTANT: Fanart.tv /v3/movies/{id} expects a TMDB ID,
+//            but /v3/tv/{id} expects a TVDB ID.
+//            For series, we first resolve the TVDB ID via TMDB external_ids.
 pub async fn get_fanart_handler(
     Path((content_type, id)): Path<(String, String)>,
     State(state): State<Arc<AppState>>,
@@ -34,20 +37,39 @@ pub async fn get_fanart_handler(
 
     let is_movie = content_type != "series" && content_type != "tv";
 
-    // L'ID peut être "tmdb:12345" ou juste "12345"
-    let tmdb_id: Option<i64> = if let Some(s) = id.strip_prefix("tmdb:") {
-        s.parse().ok()
-    } else {
-        id.parse().ok()
+    // The ID can be "tmdb:12345" or just "12345"
+    let tmdb_id: i64 = {
+        let raw = id.strip_prefix("tmdb:").unwrap_or(&id);
+        match raw.parse::<i64>() {
+            Ok(v) => v,
+            Err(_) => return Ok(Json(Value::Null)),
+        }
     };
 
-    // Si on n'a pas un tmdb_id valide, on ne peut rien faire.
-    let Some(tmdb_id) = tmdb_id else {
-        return Ok(Json(Value::Null));
+    // For series, Fanart.tv requires the TVDB ID (not the TMDB ID).
+    // We resolve it via the TMDB external_ids endpoint.
+    let fanart_id: i64 = if is_movie {
+        tmdb_id
+    } else {
+        let ext_url = format!(
+            "https://api.themoviedb.org/3/tv/{tmdb_id}/external_ids?api_key={}",
+            state.tmdb_key
+        );
+        let ext: Value = state.http_client
+            .get(&ext_url)
+            .send().await
+            .map_err(|e| AppError::NetworkError(e.to_string()))?
+            .json().await
+            .unwrap_or(Value::Null);
+
+        match ext["tvdb_id"].as_i64().filter(|&v| v > 0) {
+            Some(tvdb) => tvdb,
+            None => return Ok(Json(Value::Null)), // no TVDB ID → Fanart.tv cannot do anything
+        }
     };
 
     let fanart_data = fanart::fetch_all_fanart_data(
-        tmdb_id,
+        fanart_id,
         is_movie,
         &state.fanart_key,
         &state.http_client,
@@ -57,8 +79,8 @@ pub async fn get_fanart_handler(
 }
 
 // ── GET /fanart/:type/:id/logo ─────────────────────────────────
-// Retourne le meilleur logo HD (fr > en > autre) avec cache SQLite 30 jours.
-// Nécessite un IMDB ID résolu via TMDB external_ids.
+// Returns the best HD logo (fr > en > other) with 30-day SQLite cache.
+// Requires an IMDB ID resolved via TMDB external_ids.
 pub async fn get_logo_handler(
     Path((content_type, id)): Path<(String, String)>,
     State(state): State<Arc<AppState>>,
@@ -75,7 +97,7 @@ pub async fn get_logo_handler(
         return Ok(Json(Value::Null));
     };
 
-    // Résout l'IMDB ID (clé de cache) via TMDB
+    // Resolve IMDB ID (cache key) via TMDB
     let kind = if is_movie { "movie" } else { "tv" };
     let ext_url = format!(
         "https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids?api_key={}",
@@ -91,13 +113,13 @@ pub async fn get_logo_handler(
         _ => return Ok(Json(Value::Null)),
     };
 
-    // Vérifie le cache SQLite (cache négatif inclus : logo_url == "")
+    // Check SQLite cache (negative cache included: logo_url == "")
     if let Ok(Some(cached)) = fanart::get_cached_logo(&imdb_id, &state.db).await {
         let v = if cached.is_empty() { Value::Null } else { Value::String(cached) };
         return Ok(Json(v));
     }
 
-    // Cache miss : fetch Fanart.tv + mise en cache
+    // Cache miss: fetch Fanart.tv + cache result
     let logo = fanart::fetch_and_cache_logo(
         &imdb_id, tmdb_id, is_movie,
         &state.fanart_key, &state.http_client, &state.db,

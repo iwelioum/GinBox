@@ -72,7 +72,7 @@ fn build_query(base_query: &str, content_type: &ContentType, season: Option<u32>
 
     match (season, episode) {
         (Some(s), Some(e)) => format!("{} S{:02}E{:02}", base_query, s, e),
-        (Some(s), None) => format!("{} Saison {}", base_query, s),
+        (Some(s), None) => format!("{} Season {}", base_query, s),
         _ => base_query.to_string(),
     }
 }

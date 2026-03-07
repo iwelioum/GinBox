@@ -1,4 +1,5 @@
 pub mod artwork_providers;
+pub mod artwork_resolver;
 pub mod cache;
 pub mod fanart;
 pub mod prowlarr;

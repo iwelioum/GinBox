@@ -1,6 +1,7 @@
-// HeaderOverlay.tsx — Bandeau superieur du lecteur
-// Rendu dans PlayerPage (fenetre principale), pas l'overlay
+// HeaderOverlay.tsx — Player top bar
+// Rendered in PlayerPage (main window), not the overlay
 
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Subtitles, Settings } from 'lucide-react';
 
 export interface HeaderOverlayProps {
@@ -20,6 +21,7 @@ export function HeaderOverlay({
   onSubtitles,
   onSettings,
 }: HeaderOverlayProps) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -38,10 +40,10 @@ export function HeaderOverlay({
         pointerEvents:  'auto',
       }}
     >
-      {/* Bouton retour */}
+      {/* Back button */}
       <button
         onClick={onBack}
-        title="Retour"
+        title={t('player.back')}
         style={{
           background:   'transparent',
           border:       'none',
@@ -59,10 +61,10 @@ export function HeaderOverlay({
         }}
       >
         <ArrowLeft size={20} />
-        Retour
+        {t('player.back')}
       </button>
 
-      {/* Titre + métadonnées */}
+      {/* Title + metadata */}
       <div
         style={{
           flex:        1,
@@ -100,12 +102,12 @@ export function HeaderOverlay({
         )}
       </div>
 
-      {/* Boutons droite */}
+      {/* Right buttons */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
         {onSubtitles && (
           <button
             onClick={onSubtitles}
-            title="Sous-titres"
+            title={t('player.subtitlesCC')}
             style={{
               background:   'transparent',
               border:       'none',
@@ -124,7 +126,7 @@ export function HeaderOverlay({
         {onSettings && (
           <button
             onClick={onSettings}
-            title="Paramètres"
+            title={t('player.settings')}
             style={{
               background:   'transparent',
               border:       'none',

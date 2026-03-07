@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { endpoints } from '../../../api/client';
+import { endpoints } from '@/shared/api/client';
 import type { ContentType, Source } from '../../../shared/types/index';
 import type { PlayerInfo } from './usePlayerInfo';
 
@@ -50,7 +50,7 @@ export function useSwitchSource({
   const groupedSources = useMemo(() => {
     const groups: Record<string, Source[]> = {};
     for (const source of sources) {
-      const key = source.quality ?? 'Autre';
+      const key = source.quality ?? 'Other';
       if (!groups[key]) groups[key] = [];
       groups[key].push(source);
     }
@@ -72,13 +72,13 @@ export function useSwitchSource({
   const handleRefreshSources = useCallback(async () => {
     if (refreshingSources || switchingSource) return;
     if (!playerInfo.contentId) {
-      setSwitchError('Impossible d\u2019actualiser: contenu inconnu.');
+      setSwitchError('Unable to refresh: unknown content.');
       return;
     }
 
     const normalizedType = playerInfo.contentType === 'tv' ? 'series' : playerInfo.contentType;
     if (normalizedType !== 'movie' && normalizedType !== 'series') {
-      setSwitchError('Type de contenu invalide pour actualiser les sources.');
+      setSwitchError('Invalid content type for refreshing sources.');
       return;
     }
 
@@ -110,11 +110,11 @@ export function useSwitchSource({
       }
 
       if (refreshed.length === 0) {
-        setSwitchError('Aucune source trouvee apres actualisation.');
+        setSwitchError('No sources found after refresh.');
       }
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } }; message?: string };
-      setSwitchError(axiosErr?.response?.data?.error ?? axiosErr?.message ?? 'Actualisation des sources impossible');
+      setSwitchError(axiosErr?.response?.data?.error ?? axiosErr?.message ?? 'Unable to refresh sources');
     } finally {
       setRefreshingSources(false);
     }
@@ -123,7 +123,7 @@ export function useSwitchSource({
   const handleSwitchSource = useCallback(async (source: Source) => {
     if (switchingSource) return;
     if (!source.magnet) {
-      setSwitchError('Source invalide: lien indisponible.');
+      setSwitchError('Invalid source: link unavailable.');
       return;
     }
 
@@ -138,7 +138,7 @@ export function useSwitchSource({
       setCurrentSource(source);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { error?: string } }; message?: string };
-      setSwitchError(axiosErr?.response?.data?.error ?? axiosErr?.message ?? 'Impossible de charger cette source');
+      setSwitchError(axiosErr?.response?.data?.error ?? axiosErr?.message ?? 'Unable to load this source');
     } finally {
       setSwitchingSource(false);
     }

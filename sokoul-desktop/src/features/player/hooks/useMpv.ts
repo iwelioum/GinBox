@@ -1,8 +1,8 @@
-// useMpv.ts — Hook React pour contrôler MPV via window.mpv
-// Aucun import Electron/Node — délègue uniquement à preload
+// useMpv.ts — React hook to control MPV via window.mpv
+// No Electron/Node imports — delegates only to preload
 
 import { useState, useEffect, useRef } from 'react';
-import type { MpvTrack } from '../../../ipc';
+import type { MpvTrack } from '@/shared/types/ipc';
 
 /**
  * Wraps the Electron preload IPC bridge to control the native MPV process.
@@ -18,8 +18,8 @@ export function useMpv() {
 
   const tracksLoadedRef = useRef(false);
 
-  // main.js envoie cet événement après mpv:launch et mpv:kill
-  // → évite de polling quand MPV n'est pas démarré
+  // main.js sends this event after mpv:launch and mpv:kill
+  // → avoids polling when MPV is not started
   useEffect(() => {
     const unsub = window.mpv?.onActive?.((active: boolean) => {
       if (active) {
@@ -37,9 +37,9 @@ export function useMpv() {
     return () => unsub?.();
   }, []);
 
-  // ── Polling position / durée / état pause (seulement quand isActive) ──
-  // Intervalle 250ms → barre de progression fluide (4 mises à jour/s)
-  // et isPlaying synchronisé avec l'état réel de MPV (évite les désync)
+  // ── Polling position / duration / pause state (only when isActive) ──
+  // 250ms interval → smooth progress bar (4 updates/s)
+  // and isPlaying synced with actual MPV state (prevents desync)
   useEffect(() => {
     if (!isActive) return;
 
@@ -55,7 +55,7 @@ export function useMpv() {
         if (typeof dur?.data    === 'number')  setDuration(dur.data);
         if (typeof paused?.data === 'boolean') setIsPlaying(!paused.data);
       } catch {
-        // Ignorer silencieusement — main.js retourne null si MPV n'est pas prêt
+        // Silently ignore — main.js returns null if MPV is not ready
       }
     }, 250);
 
@@ -74,7 +74,7 @@ export function useMpv() {
     setAudioTracks([]);
     setSubTracks([]);
     await window.mpv?.launch(url);
-    setIsActive(true);  // PlayerPage active le polling directement
+    setIsActive(true);  // PlayerPage activates polling directly
   }
 
   async function waitUntilReady(retries = 20, delayMs = 150): Promise<boolean> {
@@ -123,7 +123,7 @@ export function useMpv() {
       setAudioTracks(res.data.filter(t => t.type === 'audio'));
       setSubTracks(res.data.filter(t => t.type === 'sub'));
     } catch {
-      // Ignorer silencieusement
+      // Silently ignore
     }
   }
 

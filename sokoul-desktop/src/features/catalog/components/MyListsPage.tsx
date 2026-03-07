@@ -1,16 +1,18 @@
-// MyListsPage.tsx — Rôle: Affiche les listes de l'utilisateur
-// RÈGLES : Sélection liste + rendu items
+// MyListsPage.tsx — Role: Displays user lists
+// RULES: List selection + items rendering
 
 import { useState, useEffect }           from 'react'
+import { useTranslation }                from 'react-i18next'
 import { motion }                        from 'framer-motion'
 import { useLists, useListItems }        from '../../../shared/hooks/useLists'
 import { ContentCard }                   from './ContentCard'
 import type { UserList, ListItem, CatalogMeta } from '../../../shared/types/index'
 
 export default function MyListsPage() {
+  const { t } = useTranslation()
   const { data: lists = [] } = useLists()
 
-  // Sélectionner la première liste au chargement
+  // Select the first list on load
   const [selectedListId, setSelectedListId] = useState<number | null>(null)
 
   useEffect(() => {
@@ -32,17 +34,17 @@ export default function MyListsPage() {
       color: 'var(--color-text-primary)'
     }}>
 
-      {/* Titre page */}
+      {/* Page title */}
       <h1 style={{
         fontSize:      'clamp(1.5rem, 3vw, 2rem)',
         fontWeight:    700,
         marginBottom:  '1.5rem',
         letterSpacing: '-0.02em',
       }}>
-        Mes listes
+        {t('lists.heading')}
       </h1>
 
-      {/* Sélecteur de liste — onglets pills */}
+      {/* List selector — pill tabs */}
       <div style={{
         display:      'flex',
         gap:          '0.5rem',
@@ -72,9 +74,9 @@ export default function MyListsPage() {
         ))}
       </div>
 
-      {/* Contenu de la liste sélectionnée */}
+      {/* Selected list content */}
       {itemsLoading ? (
-        <p style={{ color: 'var(--color-text-secondary)' }}>Chargement...</p>
+        <p style={{ color: 'var(--color-text-secondary)' }}>{t('lists.loading')}</p>
       ) : items.length === 0 ? (
         <div style={{
           padding:   '4rem',
@@ -82,10 +84,10 @@ export default function MyListsPage() {
           color:     'var(--color-text-muted)',
         }}>
           <p style={{ fontSize: '1.1rem' }}>
-            {activeList ? `"${activeList.name}" est vide.` : 'Aucune liste.'}
+            {activeList ? t('lists.listEmpty', { name: activeList.name }) : t('lists.noLists')}
           </p>
           <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-            Ajoutez des contenus depuis la page de détails.
+            {t('lists.addFromDetail')}
           </p>
         </div>
       ) : (

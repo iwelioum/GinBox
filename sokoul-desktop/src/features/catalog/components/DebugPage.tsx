@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Trash2, Copy, Bug, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-import { useLogStore } from '../../../shared/stores/logStore';
+import { useLogStore } from '@/stores/logStore';
 
 export default function DebugPage() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function DebugPage() {
   const copyToClipboard = () => {
     const text = logs.map(l => `[${new Date(l.timestamp).toLocaleTimeString()}] [${l.level.toUpperCase()}] ${l.category}: ${l.message} ${l.data ? JSON.stringify(l.data) : ''}`).join('\n');
     navigator.clipboard.writeText(text);
-    alert('Logs copiés dans le presse-papier !');
+    alert('Logs copied to clipboard!');
   };
 
   return (
@@ -21,8 +21,8 @@ export default function DebugPage() {
           <h1 className="text-lg font-bold flex items-center gap-2 text-red-400"><Bug /> DIAGNOSTIC</h1>
         </div>
         <div className="flex gap-2">
-          <button onClick={copyToClipboard} className="flex items-center gap-2 px-3 py-1.5 bg-blue-600/80 hover:bg-blue-500 rounded text-xs"><Copy size={14} /> Copier</button>
-          <button onClick={clear} className="flex items-center gap-2 px-3 py-1.5 bg-red-600/80 hover:bg-red-500 rounded text-xs"><Trash2 size={14} /> Vider</button>
+          <button onClick={copyToClipboard} className="flex items-center gap-2 px-3 py-1.5 bg-blue-600/80 hover:bg-blue-500 rounded text-xs"><Copy size={14} /> Copy</button>
+          <button onClick={clear} className="flex items-center gap-2 px-3 py-1.5 bg-red-600/80 hover:bg-red-500 rounded text-xs"><Trash2 size={14} /> Clear</button>
         </div>
       </div>
 
@@ -30,8 +30,8 @@ export default function DebugPage() {
         {logs.length === 0 && (
           <div className="text-center text-gray-500 mt-20 flex flex-col items-center">
             <CheckCircle size={48} className="mb-4 opacity-20" />
-            <p>Aucun log enregistré.</p>
-            <p className="text-xs mt-2">Naviguez dans l'app pour générer des événements.</p>
+            <p>No logs recorded.</p>
+            <p className="text-xs mt-2">Navigate the app to generate events.</p>
           </div>
         )}
         

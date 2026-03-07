@@ -4,6 +4,7 @@
  */
 
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ListVideo, RefreshCw, Wifi } from 'lucide-react';
 import type { Source } from '../../../shared/types/index';
 import { parseTorrentName } from '../../../shared/utils/parsing';
@@ -17,18 +18,19 @@ const SubIcon = () => (
 );
 
 function AudioBadges({ title }: { title: string }) {
+  const { t } = useTranslation();
   const parsed = parseTorrentName(title);
   if (parsed.isMultiSuspect) return (
     <>
-      <span className="text-sm leading-none" title="Audio francais">FR</span>
-      <span className="text-sm leading-none" title="Audio anglais">EN</span>
+      <span className="text-sm leading-none" title={t('player.audioFrench')}>FR</span>
+      <span className="text-sm leading-none" title={t('player.audioEnglish')}>EN</span>
     </>
   );
   if (parsed.hasFrenchAudio) return (
-    <span className="text-sm leading-none" title="Audio francais">FR</span>
+    <span className="text-sm leading-none" title={t('player.audioFrench')}>FR</span>
   );
   if (parsed.hasSubFr) return (
-    <span className="inline-flex items-center gap-0.5" title="VO sous-titree francais">
+    <span className="inline-flex items-center gap-0.5" title={t('player.voWithFrenchSubs')}>
       <span className="text-sm leading-none">EN</span>
       <span className="text-white/30 text-[9px] mx-0.5">/</span>
       <span className="text-sm leading-none">FR</span>
@@ -61,6 +63,7 @@ export function SourcePanel({
   onRefreshSources,
   onClose,
 }: SourcePanelProps) {
+  const { t } = useTranslation();
   return (
     <div
       className="absolute top-0 right-0 h-full w-[340px] z-40 bg-black/85 backdrop-blur-xl border-l border-white/10 flex flex-col"
@@ -68,7 +71,7 @@ export function SourcePanel({
       style={{ pointerEvents: 'auto' }}
     >
       <div className="flex items-center justify-between p-4 border-b border-white/10">
-        <span className="text-sm font-semibold text-white">Sources disponibles</span>
+        <span className="text-sm font-semibold text-white">{t('player.availableSources')}</span>
         <div className="flex items-center gap-2">
           <button
             onClick={onRefreshSources}
@@ -76,7 +79,7 @@ export function SourcePanel({
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] text-white/75 border border-white/15 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-3 h-3 ${refreshingSources ? 'animate-spin' : ''}`} />
-            {refreshingSources ? 'Actualisation...' : 'Actualiser'}
+            {refreshingSources ? t('player.refreshing') : t('player.refreshButton')}
           </button>
           <button onClick={onClose} className="text-white/40 hover:text-white transition-colors">
             X
@@ -128,7 +131,7 @@ export function SourcePanel({
         ))}
 
         {sources.length === 0 && (
-          <div className="p-4 text-xs text-white/50">Aucune source disponible.</div>
+          <div className="p-4 text-xs text-white/50">{t('player.noSourcesAvailable')}</div>
         )}
       </div>
     </div>
@@ -142,6 +145,7 @@ interface SourceButtonProps {
 
 /** Floating button in overlay top-right corner to open the source panel */
 export function SourceButton({ sourceCount, onClick }: SourceButtonProps) {
+  const { t } = useTranslation();
   return (
     <button
       onClick={onClick}
@@ -149,7 +153,7 @@ export function SourceButton({ sourceCount, onClick }: SourceButtonProps) {
       style={{ pointerEvents: 'auto' }}
     >
       <ListVideo className="w-4 h-4" />
-      Sources
+      {t('player.sourcesButton')}
       <span className="text-white/35">({sourceCount})</span>
     </button>
   );

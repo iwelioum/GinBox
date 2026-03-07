@@ -14,19 +14,19 @@ use crate::services::{tmdb, artwork_providers};
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        // Routes spécifiques AVANT les génériques
-        .route("/person/:id/movies",   get(person_movies_handler))
-        .route("/:type/meta/:id",      get(meta_handler))
-        .route("/:type/:id/credits",   get(credits_handler))
-        .route("/:type/:id/images",    get(images_handler))
-        // Route générique à 2 segments en dernier
-        .route("/:type/:id",           get(catalog_handler))
+        // Specific routes BEFORE generic ones
+        .route("/person/:id/movies",   get(get_person_movies))
+        .route("/:type/meta/:id",      get(get_meta))
+        .route("/:type/:id/credits",   get(get_credits))
+        .route("/:type/:id/images",    get(get_images))
+        // Generic 2-segment route last
+        .route("/:type/:id",           get(get_catalog))
 }
 
-/// Router pour GET /search?q=...&type=...
+/// Router for GET /search?q=...&type=...
 pub fn search_router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/", get(search_handler))
+        .route("/", get(get_search))
 }
 
 #[derive(Deserialize)]
@@ -41,8 +41,8 @@ pub struct CatalogQuery {
 }
 
 // ── GET /catalog/:type/:id ────────────────────────────────────────────────────
-// Catalogue : popular / genre / search
-pub async fn catalog_handler(
+// Catalog: popular / genre / search
+pub async fn get_catalog(
     Path((content_type, id)): Path<(ContentType, String)>,
     Query(query): Query<CatalogQuery>,
     State(state): State<Arc<AppState>>,
@@ -52,18 +52,18 @@ pub async fn catalog_handler(
         "popular"   => tmdb::fetch_popular_catalog(&content_type, page, &state).await?,
         "top_rated" => tmdb::fetch_top_rated_catalog(&content_type, page, &state).await?,
         "genre"   => {
-            let genre_str = query.genre.ok_or_else(|| AppError::NotFound("?genre requis".into()))?;
+            let genre_str = query.genre.ok_or_else(|| AppError::NotFound("?genre required".into()))?;
             let genre_id: u32 = genre_str.parse()
-                .map_err(|_| AppError::BadRequest(format!("genre invalide : {genre_str}")))?;
+                .map_err(|_| AppError::BadRequest(format!("invalid genre: {genre_str}")))?;
             tmdb::fetch_genre_catalog(genre_id, &content_type, page, &state).await?
         }
         "language" => {
-            let lang = query.language.ok_or_else(|| AppError::NotFound("?language requis".into()))?;
+            let lang = query.language.ok_or_else(|| AppError::NotFound("?language required".into()))?;
             tmdb::fetch_discover_catalog(&content_type, page, &state,
                 None, Some(&lang), None, None, None).await?
         }
         "keyword" => {
-            let kw = query.keyword.ok_or_else(|| AppError::NotFound("?keyword requis".into()))?;
+            let kw = query.keyword.ok_or_else(|| AppError::NotFound("?keyword required".into()))?;
             tmdb::fetch_discover_catalog(&content_type, page, &state,
                 None, None, Some(&kw), None, None).await?
         }
@@ -74,17 +74,17 @@ pub async fn catalog_handler(
                 query.year_lte.as_deref()).await?
         }
         "search"  => {
-            let q = query.q.ok_or_else(|| AppError::NotFound("?q requis".into()))?;
+            let q = query.q.ok_or_else(|| AppError::NotFound("?q required".into()))?;
             tmdb::search_catalog(&q, &content_type, &state).await?
         }
-        other => return Err(AppError::NotFound(format!("Catalogue '{}' introuvable", other))),
+        other => return Err(AppError::NotFound(format!("Catalog '{}' not found", other))),
     };
     Ok(Json(json!(result)))
 }
 
 // ── GET /catalog/:type/meta/:id ───────────────────────────────────────────────
-// Fiche complète d'un film ou d'une série
-pub async fn meta_handler(
+// Complete profile of a movie or TV series
+pub async fn get_meta(
     Path((content_type, id)): Path<(ContentType, String)>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -93,8 +93,8 @@ pub async fn meta_handler(
 }
 
 // ── GET /catalog/:type/:id/credits ────────────────────────────────────────────
-// Casting (20 acteurs principaux)
-pub async fn credits_handler(
+// Cast (20 main actors)
+pub async fn get_credits(
     Path((content_type, id)): Path<(ContentType, String)>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -103,7 +103,7 @@ pub async fn credits_handler(
 }
 
 // ── GET /search?q=...&type=... ─────────────────────────────────────────────────
-// Recherche multi (films + séries) ou par type spécifique
+// Multi-search (movies + series) or by specific type
 #[derive(Deserialize)]
 pub struct SearchQuery {
     pub q:    String,
@@ -111,7 +111,7 @@ pub struct SearchQuery {
     pub kind: Option<String>,
 }
 
-pub async fn search_handler(
+pub async fn get_search(
     Query(query): Query<SearchQuery>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -126,7 +126,7 @@ pub async fn search_handler(
             cat.metas
         }
         _ => {
-            // multi : films + séries, fusionnés
+            // multi: movies + series, merged
             let (movies, series) = tokio::join!(
                 tmdb::search_catalog(&query.q, &ContentType::Movie, &state),
                 tmdb::search_catalog(&query.q, &ContentType::Series, &state),
@@ -141,8 +141,8 @@ pub async fn search_handler(
 }
 
 // ── GET /catalog/person/:id/movies ─────────────────────────────────────────────
-// Filmographie d'un acteur (par ID TMDB de personne)
-pub async fn person_movies_handler(
+// Filmography of an actor (by TMDB person ID)
+pub async fn get_person_movies(
     Path(person_id): Path<String>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -150,7 +150,7 @@ pub async fn person_movies_handler(
     Ok(Json(json!({ "metas": metas })))
 }
 
-pub async fn images_handler(
+pub async fn get_images(
     Path((content_type, id)): Path<(ContentType, String)>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<UnifiedImages>, AppError> {

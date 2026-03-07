@@ -3,31 +3,31 @@ use crate::models::{ContentType, Meta, Stream};
 use sqlx::{FromRow, SqlitePool};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const META_CACHE_TTL_SECONDS: u64 = 604_800; // 7 j  — métadonnées TMDB
+const META_CACHE_TTL_SECONDS: u64 = 604_800; // 7 days — TMDB metadata
 
 // ── Streams ──────────────────────────────────────────────────────────────────
 
-/// Résultat du cache avec timestamp pour calcul de fraîcheur côté appelant.
+/// Cache result with timestamp for freshness calculation by the caller.
 pub struct StreamCacheResult {
     pub streams:   Vec<Stream>,
     pub cached_at: u64, // timestamp UNIX (secondes)
 }
 
-/// TTL dynamique selon l'ancienneté du contenu (année de sortie).
-/// Sans date précise, on approxime à l'année.
+/// Dynamic TTL based on content age (release year).
+/// Without a precise date, we approximate to the year.
 pub fn compute_stream_ttl(release_year: Option<u32>) -> u64 {
     let now_secs = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_secs();
     let current_year = (1970 + now_secs / (365 * 24 * 3600)) as u32;
 
     let Some(year) = release_year else {
-        return 86_400; // 24 h par défaut
+        return 86_400; // 24 h default
     };
 
     let age = current_year.saturating_sub(year);
     match age {
-        0 => 6 * 3600,      // sorti cette année → 6 h
-        1 => 86_400,        // 1 an → 24 h
-        _ => 7 * 86_400,    // plus ancien → 7 jours
+        0 => 6 * 3600,      // released this year → 6 h
+        1 => 86_400,        // 1 year old → 24 h
+        _ => 7 * 86_400,    // older → 7 days
     }
 }
 
@@ -42,18 +42,19 @@ struct DbStream {
     language:   Option<String>,
     codec:      Option<String>,
     title:      Option<String>,
+    language_variant: Option<String>,
     cached_at:  i64,
 }
 
-/// Retourne tous les streams en cache pour `content_id` (sans filtre TTL).
-/// Le TTL est vérifié par l'appelant via `compute_stream_ttl`.
+/// Returns all cached streams for `content_id` (without TTL filter).
+/// The TTL is checked by the caller via `compute_stream_ttl`.
 pub async fn get_streams_from_cache(
     content_id: &str,
     db: &SqlitePool,
 ) -> Result<Option<StreamCacheResult>, AppError> {
     let db_streams = sqlx::query_as::<_, DbStream>(
         r#"
-        SELECT info_hash, url, file_index, quality, size_gb, seeders, language, codec, title, cached_at
+        SELECT info_hash, url, file_index, quality, size_gb, seeders, language, codec, title, language_variant, cached_at
         FROM streams
         WHERE content_id = ?
         "#,
@@ -82,6 +83,7 @@ pub async fn get_streams_from_cache(
                 seeders:  db_s.seeders.unwrap_or(0) as u32,
                 language: db_s.language.unwrap_or_else(|| "unknown".to_string()),
                 codec:    db_s.codec.unwrap_or_else(|| "unknown".to_string()),
+                language_variant: db_s.language_variant,
             },
         })
         .collect();
@@ -106,8 +108,8 @@ pub async fn cache_streams(
         sqlx::query(
             r#"
             INSERT INTO streams
-                (content_id, info_hash, url, file_index, quality, size_gb, seeders, language, codec, source, cached_at, title)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (content_id, info_hash, url, file_index, quality, size_gb, seeders, language, codec, language_variant, source, cached_at, title)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(content_id)
@@ -119,6 +121,7 @@ pub async fn cache_streams(
         .bind(stream.parsed_meta.seeders)
         .bind(&stream.parsed_meta.language)
         .bind(&stream.parsed_meta.codec)
+        .bind(&stream.parsed_meta.language_variant)
         .bind("aggregator")
         .bind(now)
         .bind(&stream.title)
@@ -130,7 +133,7 @@ pub async fn cache_streams(
     Ok(())
 }
 
-// ── Métadonnées TMDB ─────────────────────────────────────────────────────────
+// ── TMDB Metadata ─────────────────────────────────────────────────────────
 
 #[derive(FromRow, Debug)]
 struct DbMeta {
@@ -181,7 +184,7 @@ pub async fn get_cached_meta(
         description:  db_meta.description,
         year:         db_meta.year.map(|y| y as u32),
         genres,
-        videos:       None, // Séries : épisodes non stockés dans le cache meta simplifié
+        videos:       None, // Series: episodes not stored in simplified meta cache
     }))
 }
 
@@ -229,7 +232,7 @@ pub async fn cache_meta(
     Ok(())
 }
 
-// ── Nettoyage expiré ──────────────────────────────────────────────────────────
+// ── Expired cleanup ──────────────────────────────────────────────────────────
 
 #[allow(dead_code)]
 pub async fn cleanup_expired_cache(db: &SqlitePool) -> Result<u64, AppError> {

@@ -1,5 +1,5 @@
-// Extrait la couleur dominante du poster via node-vibrant
-// et l'injecte dans les variables CSS globales
+// Extracts the dominant color from the poster via node-vibrant
+// and injects it into global CSS variables
 
 import { useEffect } from 'react';
 import { Vibrant } from 'node-vibrant/browser';

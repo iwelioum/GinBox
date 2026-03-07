@@ -1,6 +1,6 @@
-// useAmbientColor.ts — Extraction couleur dominante d'une image
-// RÈGLES : Canvas 32×18px pour la perf, skip pixels trop sombres/clairs,
-//          fallback silencieux si CORS échoue.
+// useAmbientColor.ts — Dominant color extraction from an image
+// RULES: Canvas 32×18px for performance, skip pixels too dark/bright,
+//        silent fallback if CORS fails.
 
 import { useState, useEffect } from 'react';
 
@@ -18,7 +18,7 @@ export function useAmbientColor(imageUrl: string | undefined): string {
     img.onload = () => {
       if (cancelled) return;
       try {
-        // Canvas miniature pour la perf
+        // Miniature canvas for performance
         const canvas = document.createElement('canvas');
         canvas.width  = 32;
         canvas.height = 18;
@@ -31,7 +31,7 @@ export function useAmbientColor(imageUrl: string | undefined): string {
         let r = 0, g = 0, b = 0, count = 0;
         for (let i = 0; i < data.length; i += 4) {
           const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
-          // Ignorer les pixels quasi-noirs (< 25) et quasi-blancs (> 230)
+          // Ignore near-black (< 25) and near-white (> 230) pixels
           if (brightness > 25 && brightness < 230) {
             r += data[i];
             g += data[i + 1];
@@ -41,16 +41,16 @@ export function useAmbientColor(imageUrl: string | undefined): string {
         }
 
         if (count > 0 && !cancelled) {
-          // Saturer légèrement la couleur (×1.2 clamped à 255)
+          // Slightly saturate the color (×1.2 clamped to 255)
           const sat = (v: number) => Math.min(255, Math.round((v / count) * 1.2));
           setColor(`${sat(r)}, ${sat(g)}, ${sat(b)}`);
         }
       } catch {
-        // Canvas tainted (CORS) → fallback silencieux
+        // Canvas tainted (CORS) → silent fallback
       }
     };
 
-    img.onerror = () => { /* fallback silencieux */ };
+    img.onerror = () => { /* silent fallback */ };
     img.src = imageUrl;
 
     return () => { cancelled = true; };

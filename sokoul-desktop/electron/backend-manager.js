@@ -1,12 +1,12 @@
 // ══════════════════════════════════════════════════════════
-// BACKEND MANAGER — Lancement backend Rust local
-// MIGRÉ DE : GinBox (logique process adaptée pour Electron)
-// RÈGLES :
-//   → Tourne sur 127.0.0.1:3000 uniquement
-//   → Vérifie si le backend tourne AVANT de spawner (anti port 10048)
-//   → Signal "SOKOUL_BACKEND_READY" surveillé sur stdout
-//   → mainWindow défini APRÈS startBackend() via setMainWindow()
-//   → Tué sur before-quit (jamais de processus fantôme)
+// BACKEND MANAGER — Local Rust backend launcher
+// MIGRATED FROM: GinBox (process logic adapted for Electron)
+// RULES:
+//   → Runs on 127.0.0.1:3000 only
+//   → Checks if backend is running BEFORE spawning (prevents port 10048 error)
+//   → Watches for "SOKOUL_BACKEND_READY" signal on stdout
+//   → mainWindow set AFTER startBackend() via setMainWindow()
+//   → Killed on before-quit (no ghost processes)
 // ══════════════════════════════════════════════════════════
 
 const { spawn } = require('child_process')
@@ -14,7 +14,7 @@ const { app }   = require('electron')
 const http      = require('http')
 const path      = require('path')
 
-// Vérifie si le backend répond déjà sur :3000 (évite l'erreur EADDRINUSE)
+// Checks if the backend is already responding on :3000 (avoids EADDRINUSE error)
 async function isBackendRunning() {
   return new Promise((resolve) => {
     const req = http.get('http://127.0.0.1:3000/health', (res) => {
@@ -28,27 +28,27 @@ async function isBackendRunning() {
 }
 
 let backendProcess = null
-let mainWindowRef  = null   // Défini après createWindow()
-let backendReady   = false  // Flag si READY reçu avant la fenêtre
+let mainWindowRef  = null   // Set after createWindow()
+let backendReady   = false  // Flag if READY received before window
 
-// Appelé depuis main.js une fois la fenêtre créée
+// Called from main.js once the window is created
 function setMainWindow(win) {
   mainWindowRef = win
-  // Si le backend était déjà prêt avant que la fenêtre soit prête,
-  // on envoie le signal maintenant.
+  // If the backend was already ready before the window was ready,
+  // send the signal now.
   if (backendReady) {
     mainWindowRef.webContents.send('backend:ready')
   }
 }
 
-// startBackend est async pour pouvoir await isBackendRunning()
+// startBackend is async to await isBackendRunning()
 async function startBackend() {
-  // ⭐ CORRECTION BUG PORT 10048 : ne pas spawner si déjà en cours
+  // ⭐ PORT 10048 BUG FIX: do not spawn if already running
   const alreadyRunning = await isBackendRunning()
   if (alreadyRunning) {
-    console.log('[Backend] Déjà démarré sur :3000 — réutilisation.')
+    console.log('[Backend] Already running on :3000 — reusing.')
     backendReady = true
-    // setMainWindow() transmettra le signal dès que la fenêtre est prête
+    // setMainWindow() will forward the signal once the window is ready
     return
   }
 
@@ -73,18 +73,18 @@ async function startBackend() {
       if (mainWindowRef) {
         mainWindowRef.webContents.send('backend:ready')
       }
-      // Sinon setMainWindow() transmettra le signal dès qu'il est appelé
+      // Otherwise setMainWindow() will forward the signal when called
     }
   })
 
   backendProcess.stderr.on('data', (data) => {
     const msg = data.toString().trim()
-    // Filtrer les messages non-critiques de tracing
+    // Filter non-critical tracing messages
     if (msg) console.error('[Backend]', msg)
   })
 
   backendProcess.on('error', (err) => {
-    console.error('[Backend] Impossible de lancer le processus :', err.message)
+    console.error('[Backend] Unable to launch process:', err.message)
     backendReady = false
     if (mainWindowRef) {
       mainWindowRef.webContents.send('backend:error', -1)

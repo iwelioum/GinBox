@@ -1,11 +1,11 @@
-// CollectionDetailPage.tsx — Films d'une saga
-// Route : /collection/:id — données TMDB live
+// CollectionDetailPage.tsx — Movies from a saga
+// Route: /collection/:id — live TMDB data
 
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery }               from '@tanstack/react-query';
 import { ArrowLeft, Play }        from 'lucide-react';
-import { endpoints }              from '../../../api/client';
+import { endpoints }              from '@/shared/api/client';
 
 export default function CollectionDetailPage() {
   const { id }   = useParams<{ id: string }>();
@@ -38,7 +38,7 @@ export default function CollectionDetailPage() {
           className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
           style={{ backgroundColor: 'var(--primary-red)', color: 'var(--bg-abyss)' }}
         >
-          <ArrowLeft size={18} /> Retour aux collections
+          <ArrowLeft size={18} /> Back to collections
         </button>
       </div>
     );
@@ -51,18 +51,18 @@ export default function CollectionDetailPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-abyss)' }}>
 
-      {/* Hero de la collection */}
+      {/* Collection hero */}
       <div className="relative h-[45vh] min-h-[300px] overflow-hidden">
         {backdrop && (
           <img src={backdrop} alt={data.name}
             className="w-full h-full object-cover object-center" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t
-                        from-[#0A0E1A] via-[#0A0E1A]/40 to-transparent" />
+                        from-[#040714] via-[#040714]/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r
-                        from-[#0A0E1A]/70 to-transparent" />
+                        from-[#040714]/70 to-transparent" />
 
-        {/* Bouton retour */}
+        {/* Back button */}
         <button
           onClick={() => navigate(-1)}
           className="absolute top-6 left-6 flex items-center gap-2
@@ -70,10 +70,10 @@ export default function CollectionDetailPage() {
                      transition-colors duration-200 z-10"
         >
           <ArrowLeft className="w-4 h-4" />
-          Retour
+          Back
         </button>
 
-        {/* Titre + infos */}
+        {/* Title + info */}
         <div className="absolute bottom-0 left-0 px-8 pb-8 z-10">
           <h1 className="text-3xl font-bold text-white mb-2">
             {data.name}
@@ -93,7 +93,7 @@ export default function CollectionDetailPage() {
         </div>
       )}
 
-      {/* Grille des films */}
+      {/* Movie grid */}
       <div className="px-8 pb-20">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em]
                        text-white/35 mb-5">
@@ -110,7 +110,7 @@ export default function CollectionDetailPage() {
                   onClick={() => navigate(`/detail/${film.type ?? 'movie'}/${film.id}`)}
                   className="group cursor-pointer text-left"
                 >
-                  {/* Affiche 2:3 */}
+                  {/* 2:3 poster */}
                   <div className="aspect-[2/3] rounded-xl overflow-hidden
                                   bg-white/[0.04] ring-1 ring-white/[0.07]
                                   group-hover:ring-white/25 mb-2
@@ -156,7 +156,7 @@ export default function CollectionDetailPage() {
           </div>
         ) : (
           <p className="text-white/30 text-sm">
-            Aucun film trouvé dans cette collection.
+            No movies found in this collection.
           </p>
         )}
       </div>

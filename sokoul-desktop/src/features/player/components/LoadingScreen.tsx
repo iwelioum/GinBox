@@ -1,8 +1,9 @@
-// LoadingScreen.tsx — Écran de chargement du lecteur
-// Progression simulée 0% → 85% pendant le buffer MPV
-// Passe à 100% quand visible=false (MPV prêt)
+// LoadingScreen.tsx — Player loading screen
+// Simulated progress 0% → 85% during MPV buffering
+// Goes to 100% when visible=false (MPV ready)
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface LoadingScreenProps {
   title:   string;
@@ -10,14 +11,15 @@ interface LoadingScreenProps {
   visible: boolean;
 }
 
-// Étapes de progression simulées — espacées de ~85ms chacune
+// Simulated progress steps — spaced ~85ms apart
 const STEPS = [10, 20, 32, 45, 56, 65, 72, 78, 83, 85] as const;
 
 export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) => {
+  const { t } = useTranslation();
   const [percent,   setPercent]   = useState(0);
   const [dismissed, setDismissed] = useState(false);
 
-  // Progression simulée pendant le chargement
+  // Simulated progress during loading
   useEffect(() => {
     if (!visible) return;
 
@@ -31,7 +33,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
     return () => timers.forEach(clearTimeout);
   }, [visible]);
 
-  // Quand MPV est prêt : passer à 100% puis masquer après la transition
+  // When MPV is ready: go to 100% then hide after the transition
   useEffect(() => {
     if (visible) return;
 
@@ -59,7 +61,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
         pointerEvents:  visible ? 'auto' : 'none',
       }}
     >
-      {/* Fond flouté */}
+      {/* Blurred background */}
       {poster && (
         <div
           style={{
@@ -74,7 +76,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
         />
       )}
 
-      {/* Contenu centré */}
+      {/* Centered content */}
       <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
         {poster && (
           <img
@@ -102,7 +104,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
           {title}
         </p>
 
-        {/* Barre de progression */}
+        {/* Progress bar */}
         <div
           style={{
             width:        200,
@@ -126,10 +128,10 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
 
         <p style={{ color: 'rgba(245,245,245,0.5)', fontSize: 12, margin: 0 }}>
           {percent < 85
-            ? `Chargement... ${percent}%`
+            ? t('player.loadingPercent', { percent })
             : percent < 100
-            ? 'Démarrage de la lecture...'
-            : 'Pret'
+            ? t('player.startingPlayback')
+            : t('player.ready')
           }
         </p>
       </div>

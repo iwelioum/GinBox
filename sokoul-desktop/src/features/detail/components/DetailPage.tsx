@@ -1,5 +1,5 @@
 // DetailPage.tsx — Disney+ detail layout
-// Backdrop plein écran · Sections Disney+ style
+// Full-screen backdrop · Disney+ style sections
 
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -14,15 +14,15 @@ import { useCreditsQuery }          from '../hooks/useCreditsQuery';
 import { useImagesQuery }           from '../hooks/useImagesQuery';
 import { useVideosQuery }           from '../hooks/useVideosQuery';
 import { useSimilarQuery }          from '../hooks/useSimilarQuery';
-import { useCollectionQuery }       from '../../catalog/hooks/useCollectionQuery';
-import { useProfileStore }          from '../../../shared/stores/profileStore';
-import { usePreferencesStore }      from '../../../shared/stores/preferencesStore';
+import { useCollectionQuery }       from '../../../shared/hooks/useCollectionQuery';
+import { useProfileStore }          from '@/stores/profileStore';
+import { usePreferencesStore }      from '@/stores/preferencesStore';
 import { getLogo, type FanartResponse } from '../../../shared/utils/fanart';
 import { pickBestSource }           from '../../../shared/utils/parsing';
 import { extractErrorMessage }      from '../../../shared/utils/error';
 import { formatDuration }           from '../../../shared/utils/time';
 import { useLists, useListItems, useAddToList, useRemoveFromList } from '../../../shared/hooks/useLists';
-import { endpoints }                from '../../../api/client';
+import { endpoints }                from '@/shared/api/client';
 
 // Sections
 import { DetailSkeleton }  from './DetailSkeleton';
@@ -204,11 +204,11 @@ const DetailPage: React.FC = () => {
 
       const best = pickBestSource(sources, prefs);
       if (!best) {
-        setPlayError('Aucune source disponible pour cet épisode.');
+        setPlayError('No source available for this episode.');
         return;
       }
       if (!best.magnet) {
-        setPlayError('Impossible de lancer cette source.');
+        setPlayError('Unable to launch this source.');
         return;
       }
 
@@ -249,7 +249,7 @@ const DetailPage: React.FC = () => {
         },
       });
     } catch (err: unknown) {
-      setPlayError(extractErrorMessage(err, 'Erreur lors du lancement'));
+      setPlayError(extractErrorMessage(err, 'Error launching playback'));
     } finally {
       setIsPlayLoading(false);
     }
@@ -279,11 +279,11 @@ const DetailPage: React.FC = () => {
 
       const best = pickBestSource(sources, prefs);
       if (!best) {
-        setPlayError('Aucune source disponible pour ce contenu.');
+        setPlayError('No source available for this content.');
         return;
       }
       if (!best.magnet) {
-        setPlayError('Impossible de lancer cette source.');
+        setPlayError('Unable to launch this source.');
         return;
       }
 
@@ -312,7 +312,7 @@ const DetailPage: React.FC = () => {
         },
       });
     } catch (err: unknown) {
-      setPlayError(extractErrorMessage(err, 'Erreur lors du lancement'));
+      setPlayError(extractErrorMessage(err, 'Error launching playback'));
     } finally {
       setIsPlayLoading(false);
     }
@@ -334,8 +334,8 @@ const DetailPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-dp-bg flex flex-col items-center justify-center
                       text-dp-text/60 gap-4">
-        <p>Erreur lors du chargement du contenu.</p>
-        <Button variant="secondary" onClick={() => navigate(-1)}>← Retour</Button>
+        <p>Error loading content.</p>
+        <Button variant="secondary" onClick={() => navigate(-1)}>← Back</Button>
       </div>
     );
   }
@@ -352,7 +352,7 @@ const DetailPage: React.FC = () => {
                   || images?.logos?.[0]
                   || null;
 
-  // Backdrop haute qualité — fond cinématique plein écran
+  // High quality backdrop — full-screen cinematic background
   const backdropRaw = item.backdrop_path || item.background;
   const bgBackdrop  = backdropRaw
     ? (backdropRaw.startsWith('http')
@@ -415,7 +415,7 @@ const DetailPage: React.FC = () => {
         }}
       >
         <ChevronLeft size={16} />
-        {type === 'movie' ? 'Films' : 'Séries'}
+        {type === 'movie' ? 'Movies' : 'Series'}
       </button>
 
       <HeroSection
@@ -445,7 +445,7 @@ const DetailPage: React.FC = () => {
           <section className="max-w-[1400px] mx-auto px-[calc(3.5vw+5px)] pb-4">
             <div className="rounded-[10px] border-[3px] border-dp-text/10 bg-black/40 p-5 flex flex-col gap-4">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold text-dp-text/85 m-0">Saison & épisode</h2>
+                <h2 className="text-sm font-semibold text-dp-text/85 m-0">Season & episode</h2>
                 {selectedEpisodeData && (
                   <span className="text-xs text-dp-text/45">
                     S{String(selectedSeason).padStart(2, '0')}E{String(selectedEpisode).padStart(2, '0')}
@@ -469,7 +469,7 @@ const DetailPage: React.FC = () => {
                         : 'bg-dp-text/10 text-dp-text/60 hover:bg-dp-text/20'
                     }`}
                   >
-                    Saison {s}
+                    Season {s}
                   </button>
                 ))}
               </div>
@@ -507,7 +507,7 @@ const DetailPage: React.FC = () => {
                             src={stillUrl}
                             className="w-full h-full object-cover"
                             loading="lazy"
-                            alt={ep.title ?? `Épisode ${ep.episode}`}
+                            alt={ep.title ?? `Episode ${ep.episode}`}
                           />
                           {progress && progress.progressPct > 0 && !progress.watched && (
                             <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-dp-text/20">
@@ -538,7 +538,7 @@ const DetailPage: React.FC = () => {
                             {ep.episode}
                           </span>
                           <span className="text-sm font-medium text-dp-text/85 truncate">
-                            {ep.title ?? `Épisode ${ep.episode}`}
+                            {ep.title ?? `Episode ${ep.episode}`}
                           </span>
                           {ep.runtime && (
                             <span className="text-xs text-dp-text/30 flex-shrink-0 ml-auto">
@@ -554,12 +554,12 @@ const DetailPage: React.FC = () => {
                         <div className="flex items-center gap-2 mt-0.5">
                           {progress?.watched && (
                             <span className="text-[10px] text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full border border-green-400/20">
-                              ✓ Vu
+                              ✓ Watched
                             </span>
                           )}
                           {canResume && (
                             <span className="text-[10px] text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded-full border border-yellow-400/20">
-                              ↩ Reprendre à {formatDuration(progress.positionMs)}
+                              ↩ Resume at {formatDuration(progress.positionMs)}
                             </span>
                           )}
                           <button
@@ -579,7 +579,7 @@ const DetailPage: React.FC = () => {
                                 : 'opacity-0 group-hover:opacity-100'
                             } ${isPlayLoading ? 'cursor-default opacity-70' : ''}`}
                           >
-                            {canResume ? '↩ Reprendre' : '▶ Lire'}
+                            {canResume ? '↩ Resume' : '▶ Play'}
                           </button>
                         </div>
                       </div>
@@ -593,22 +593,22 @@ const DetailPage: React.FC = () => {
 
         <div className="max-w-[1400px] mx-auto px-[calc(3.5vw+5px)] pt-2 pb-[100px] flex flex-col gap-[48px]">
 
-          {/* 1. BANDE-ANNONCE — en premier, mise en avant */}
+          {/* 1. TRAILER — featured first */}
           <TrailerSection videos={videos} theme={theme} />
 
-          {/* 2. STATS — chiffres animés (note, votes, budget, box-office) */}
+          {/* 2. STATS — animated counters (rating, votes, budget, box-office) */}
           <StatsSection item={item} theme={theme} />
 
-          {/* 3. CASTING — scroll horizontal */}
+          {/* 3. CAST — horizontal scroll */}
           <CastSection credits={credits} theme={theme} />
 
-          {/* 4. GALERIE — Scènes / Affiches / Logos avec lightbox */}
+          {/* 4. GALLERY — Stills / Posters / Logos with lightbox */}
           {images && <GallerySection images={images} />}
 
-          {/* 5. SAGA / COLLECTION — si appartient à une collection */}
+          {/* 5. SAGA / COLLECTION — if belongs to a collection */}
           {collection && <SagaSection collection={collection} currentId={Number(id)} />}
 
-          {/* 6. SIMILAIRES — recommandations */}
+          {/* 6. SIMILAR — recommendations */}
           <SimilarSection items={similar} theme={theme} />
 
         </div>

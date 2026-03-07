@@ -4,7 +4,7 @@ use serde_json::{json, Value};
 use sqlx::SqlitePool;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const LOGO_CACHE_TTL: i64 = 2_592_000; // 30 jours
+const LOGO_CACHE_TTL: i64 = 2_592_000; // 30 days
 
 #[derive(Deserialize, Serialize, Clone)]
 struct FanartImage {
@@ -14,13 +14,13 @@ struct FanartImage {
 
 #[derive(Deserialize, Default)]
 struct FanartApiResponse {
-    // Logos (déjà présents — ne pas supprimer)
+    // Logos (already present — do not remove)
     #[serde(default)] hdmovielogo:    Vec<FanartImage>,
     #[serde(default)] movielogo:      Vec<FanartImage>,
     #[serde(default)] hdtvlogo:       Vec<FanartImage>,
     #[serde(default)] tvlogo:         Vec<FanartImage>,
 
-    // Backgrounds / Scènes
+    // Backgrounds / Scenes
     #[serde(default)] moviebackground: Vec<FanartImage>,
     #[serde(default)] showbackground:  Vec<FanartImage>,
 
@@ -28,28 +28,28 @@ struct FanartApiResponse {
     #[serde(default)] movieposter:    Vec<FanartImage>,
     #[serde(default)] tvposter:       Vec<FanartImage>,
 
-    // Artworks stylisés (fond avec personnages)
+    // Stylized artworks (background with characters)
     #[serde(default)] hdmovieclearart: Vec<FanartImage>,
     #[serde(default)] hdclearart:      Vec<FanartImage>,
 
-    // Bannières
+    // Banners
     #[serde(default)] moviebanner:    Vec<FanartImage>,
     #[serde(default)] tvbanner:       Vec<FanartImage>,
 
-    // Affiches de saisons (TV)
+    // Season posters (TV)
     #[serde(default)] seasonposter:   Vec<FanartImage>,
 }
 
-// Nouvelle fonction qui retourne la réponse brute de l'API Fanart.tv
+// Function that returns the raw Fanart.tv API response
 pub async fn fetch_all_fanart_data(
-    tmdb_id: i64,
+    fanart_id: i64,  // TMDB ID for movies, TVDB ID for TV shows
     is_movie: bool,
     api_key: &str,
     http_client: &reqwest::Client,
 ) -> Result<Value, AppError> {
     let fanart_type = if is_movie { "movies" } else { "tv" };
     let url = format!(
-        "https://webservice.fanart.tv/v3/{fanart_type}/{tmdb_id}?api_key={api_key}"
+        "https://webservice.fanart.tv/v3/{fanart_type}/{fanart_id}?api_key={api_key}"
     );
 
     let resp = http_client.get(&url).send().await?;
@@ -58,7 +58,7 @@ pub async fn fetch_all_fanart_data(
         let data: Value = resp.json().await?;
         Ok(data)
     } else {
-        // En cas d'erreur (ex: 404), retourner un JSON null pour ne pas casser le client.
+        // In case of error (e.g. 404), return null JSON to avoid breaking the client.
         Ok(Value::Null)
     }
 }
@@ -190,14 +190,14 @@ pub async fn fetch_images(
 
     let data: FanartApiResponse = resp.json().await.unwrap_or_default();
 
-    // Backgrounds (scènes)
+    // Backgrounds (scenes)
     let backgrounds: Vec<String> = if is_movie {
         data.moviebackground.iter().map(|i| i.url.clone()).collect()
     } else {
         data.showbackground.iter().map(|i| i.url.clone()).collect()
     };
 
-    // Posters alternatifs
+    // Alternative posters
     let posters: Vec<String> = if is_movie {
         data.movieposter.iter().map(|i| i.url.clone()).collect()
     } else {
@@ -222,14 +222,14 @@ pub async fn fetch_images(
         v
     };
 
-    // Bannières
+    // Banners
     let banners: Vec<String> = if is_movie {
         data.moviebanner.iter().map(|i| i.url.clone()).collect()
     } else {
         data.tvbanner.iter().map(|i| i.url.clone()).collect()
     };
 
-    // Affiches de saisons (TV uniquement)
+    // Season posters (TV only)
     let seasons: Vec<String> = if !is_movie {
         data.seasonposter.iter().map(|i| i.url.clone()).collect()
     } else {

@@ -1,12 +1,12 @@
-// utils/extractColor.ts — Extraction couleur dominante via canvas
-// Retourne { accent, muted, dark } en hex + injecte des CSS vars
-// Fallback si échec : teintes indigo
+// utils/extractColor.ts — Dominant color extraction via canvas
+// Returns { accent, muted, dark } in hex + injects CSS vars
+// Fallback on failure: indigo tints
 
 /** Three-tier color palette extracted from content images, used to theme detail pages and cards dynamically. */
 export interface ColorPalette {
-  accent: string; // couleur la plus vive
-  muted:  string; // version sombre/saturée
-  dark:   string; // fond très sombre
+  accent: string; // most vivid color
+  muted:  string; // dark/saturated version
+  dark:   string; // very dark background
 }
 
 const FALLBACK: ColorPalette = {
@@ -24,7 +24,7 @@ function dominantFromCanvas(canvas: HTMLCanvasElement): [number, number, number]
 
   for (let i = 0; i < data.length; i += 4) {
     const alpha = data[i + 3];
-    if (alpha < 128) continue; // ignorer pixels transparents
+    if (alpha < 128) continue; // skip transparent pixels
     r += data[i];
     g += data[i + 1];
     b += data[i + 2];
@@ -75,7 +75,7 @@ export async function extractPalette(imageUrl: string): Promise<ColorPalette> {
 
     img.onerror = () => resolve(FALLBACK);
 
-    // Ajouter un cache-buster léger pour contourner CORS sur certains CDN
+    // Add a lightweight cache-buster to work around CORS on some CDNs
     img.src = imageUrl.includes('?') ? imageUrl : `${imageUrl}?w=32`;
   });
 }

@@ -1,5 +1,5 @@
-// NOM — Spinner.tsx — Rôle: Indicateur de chargement
-// RÈGLES : Doit être simple et utiliser la couleur d'accent.
+// NAME — Spinner.tsx — Role: Loading indicator
+// RULES: Must be simple and use the accent color.
 
 import * as React from 'react';
 

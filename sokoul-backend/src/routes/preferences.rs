@@ -14,7 +14,7 @@ use crate::services::preferences;
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_all_preferences))
-        .route("/set", post(set_single_preference))
+        .route("/set", post(post_preference))
 }
 
 #[derive(Deserialize)]
@@ -37,7 +37,7 @@ async fn get_all_preferences(
     Ok(Json(prefs))
 }
 
-async fn set_single_preference(
+async fn post_preference(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<SetPreferenceRequest>,
 ) -> Result<(), AppError> {

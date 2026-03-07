@@ -22,10 +22,10 @@ import {
   SwitchErrorBanner,
   LaunchErrorOverlay,
 } from './EpisodeOverlay';
-import { useProfileStore } from '../../../shared/stores/profileStore';
-import { usePreferencesStore } from '../../../shared/stores/preferencesStore';
+import { useProfileStore } from '@/stores/profileStore';
+import { usePreferencesStore } from '@/stores/preferencesStore';
 import type { Source, EpisodeVideo } from '../../../shared/types/index';
-import '../styles/player.tokens.css';
+import '@/styles/player.tokens.css';
 
 interface PlayerNavigationState {
   sources?:      Source[];
@@ -201,13 +201,13 @@ export default function PlayerPage() {
       try {
         await launch(url);
         const ready = await waitReadyRef.current(24, 150);
-        if (!ready) throw new Error('pipe MPV indisponible');
+        if (!ready) throw new Error('MPV pipe unavailable');
         if (startAt > 0) await seekToRef.current(startAt);
         await play();
         setIsLoaded(true);
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        setLaunchError(`Impossible de demarrer la lecture (${message}).`);
+        setLaunchError(`Unable to start playback (${message}).`);
         setIsLoaded(false);
         await killRef.current();
       }

@@ -1,6 +1,6 @@
-// components/detail/InfoSection.tsx — Étape 7
-// Poster holographique (Tilt 3D) + métadonnées complètes
-// Glass card adaptée au thème du genre
+// components/detail/InfoSection.tsx — Step 7
+// Holographic poster (3D Tilt) + complete metadata
+// Glass card adapted to the genre theme
 
 import * as React from 'react';
 import Tilt from 'react-parallax-tilt';
@@ -43,7 +43,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
     ? item.genres.map(g => typeof g === 'string' ? g : g.name ?? '').filter(Boolean)
     : [];
 
-  // Fallback si vraiment rien à afficher
+  // Fallback if nothing to display
   if (!posterUrl && !overview && !voteAvg && genreList.length === 0) return null;
 
   const formatRuntime = (min: number) => {
@@ -52,9 +52,9 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
   };
 
   const LANGUAGE_NAMES: Record<string, string> = {
-    en: 'Anglais', fr: 'Français', ja: 'Japonais', ko: 'Coréen',
-    es: 'Espagnol', de: 'Allemand', it: 'Italien', pt: 'Portugais',
-    zh: 'Chinois', ru: 'Russe', ar: 'Arabe', hi: 'Hindi',
+    en: 'English', fr: 'French', ja: 'Japanese', ko: 'Korean',
+    es: 'Spanish', de: 'German', it: 'Italian', pt: 'Portuguese',
+    zh: 'Chinese', ru: 'Russian', ar: 'Arabic', hi: 'Hindi',
   };
 
   const tagline = item.tagline;
@@ -90,7 +90,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
                   outlineOffset: '-2px',
                 }}
               />
-              {/* Overlay holographique arc-en-ciel */}
+              {/* Holographic rainbow overlay */}
               <div
                 className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
                 style={{
@@ -105,7 +105,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
 
         <div className="flex flex-col gap-5 flex-1 min-w-0">
 
-          {/* Titre + tagline */}
+          {/* Title + tagline */}
           <div>
             <h1 className="text-3xl font-bold text-white leading-tight mb-1">
               {title}
@@ -136,14 +136,14 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
             </div>
           )}
 
-          {/* Note + stats rapides */}
+          {/* Rating + quick stats */}
           <div className="flex items-center flex-wrap gap-4 text-sm">
             {voteAvg != null && voteAvg > 0 && (
               <div className="flex items-center gap-1.5">
                 <span className="text-yellow-400 text-xl font-bold">★</span>
                 <span className="text-white font-bold text-lg">{voteAvg.toFixed(1)}</span>
                 {voteCount && (
-                  <span className="text-white/40 text-xs">({voteCount.toLocaleString('fr-FR')} votes)</span>
+                  <span className="text-white/40 text-xs">({voteCount.toLocaleString('en-US')} votes)</span>
                 )}
               </div>
             )}
@@ -152,13 +152,13 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
             {status === 'returning' && (
               <span className="text-green-400 text-xs font-medium flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                En cours
+                Ongoing
               </span>
             )}
             {status === 'ended' && (
               <span className="text-white/30 text-xs flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/30 inline-block" />
-                Terminé
+                Ended
               </span>
             )}
           </div>
@@ -170,12 +170,12 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme }) => {
             </p>
           )}
 
-          {/* Infos secondaires */}
+          {/* Secondary info */}
           <div className="flex flex-wrap gap-x-8 gap-y-2 text-xs text-white/40 border-t border-white/10 pt-4 mt-1">
-            {director && <span><span className="text-white/60 font-medium">Réal. </span>{director}</span>}
+            {director && <span><span className="text-white/60 font-medium">Dir. </span>{director}</span>}
             {studio   && <span><span className="text-white/60 font-medium">Studio </span>{studio}</span>}
-            {country  && <span><span className="text-white/60 font-medium">Pays </span>{country}</span>}
-            {language && <span><span className="text-white/60 font-medium">Langue </span>{LANGUAGE_NAMES[language] ?? language.toUpperCase()}</span>}
+            {country  && <span><span className="text-white/60 font-medium">Country </span>{country}</span>}
+            {language && <span><span className="text-white/60 font-medium">Language </span>{LANGUAGE_NAMES[language] ?? language.toUpperCase()}</span>}
           </div>
         </div>
       </div>

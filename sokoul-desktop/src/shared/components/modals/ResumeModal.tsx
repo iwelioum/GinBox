@@ -1,7 +1,8 @@
-// NOM — ResumeModal.tsx — Rôle: Modal pour reprendre la lecture
-// RÈGLES : Doit être contrôlé de l'extérieur.
+// NAME — ResumeModal.tsx — Role: Modal to resume playback
+// RULES: Must be controlled externally.
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/shared/components/ui/Button';
 
@@ -27,6 +28,7 @@ const ResumeModal: React.FC<ResumeModalProps> = ({
   onResume,
   onRestart,
 }) => {
+  const { t } = useTranslation();
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -53,17 +55,17 @@ const ResumeModal: React.FC<ResumeModalProps> = ({
             onClick={(e) => e.stopPropagation()}
             className="bg-bg-card rounded-modal w-full max-w-md p-6 shadow-lg text-center"
           >
-            <h2 className="text-2xl font-bold text-white mb-2">Resume Playback?</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">{t('modal.resumePlayback')}</h2>
             <p className="text-text-secondary text-lg mb-6">
-              Do you want to resume from <span className="font-bold text-white">{formatTime(resumeTime)}</span>?
+              {t('modal.resumeDescription', { time: formatTime(resumeTime) })}
             </p>
             
             <div className="flex justify-center space-x-3">
               <Button variant="secondary" onClick={onRestart}>
-                Start Over
+                {t('modal.startOver')}
               </Button>
               <Button variant="primary" onClick={onResume}>
-                Resume
+                {t('modal.resume')}
               </Button>
             </div>
           </motion.div>

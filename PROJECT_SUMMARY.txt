@@ -1,0 +1,115 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    SOKOUL MONOREPO - EXECUTIVE SUMMARY                        ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+CODEBASE AT A GLANCE
+────────────────────────────────────────────────────────────────────────────────
+Total Files:        138  |  Total LOC: 19,656
+
+• Backend (Rust):         34 files    4,540 LOC
+  ├─ Routes (HTTP handlers)
+  ├─ Services (Business logic + API clients)
+  └─ Core (Models, errors, parser)
+
+• Frontend (React):       96 files   12,829 LOC
+  ├─ Features (Catalog, Detail, Player, Search)
+  ├─ Shared (Components, hooks, utils, stores)
+  └─ Electron (Main process: MPV, window, IPC management)
+
+• Styles & Config:         8 files     1,287 LOC
+
+
+OVERSIZED FILES NEEDING REFACTORING (>500 LOC)
+────────────────────────────────────────────────────────────────────────────────
+1. BrowsePage.tsx (1283 LOC)          - Split into: Hero, Filters, Sections
+2. CatalogFilters.tsx (1079 LOC)      - Split into: FilterBlocks, Selectors
+3. tmdb.rs (906 LOC)                  - Core service, monitor but necessary
+4. categories.config.ts (726 LOC)     - Consider database-backed approach
+5. SourcesPage.tsx (764 LOC)          - Extract table, header, filter subcomponents
+
+
+ARCHITECTURE OVERVIEW
+────────────────────────────────────────────────────────────────────────────────
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│              ELECTRON (JS)           │    REACT (TS)      │  RUST AXUM      │
+│                                      │                    │                 │
+│ • Window management                  │ • Catalog Browse   │ • REST API      │
+│ • IPC Bridge                         │ • Detail Page      │ • Stream Scoring│
+│ • MPV Spawning                       │ • Player UI        │ • Caching       │
+│ • Backend Spawning                   │ • Settings         │ • User State    │
+│                                      │                    │                 │
+│ ◄──Named Pipe──► MPV (C)             │ ◄──HTTP────────────► SQLite + APIs  │
+│                                      │                    │                 │
+└─────────────────────────────────────────────────────────────────────────────┘
+     Electron 31 + Dual-Window         React 18 + Zustand      Axum 0.7.5
+                                       + React Query           + SQLx + Tokio
+
+
+KEY FEATURES
+────────────────────────────────────────────────────────────────────────────────
+✓ Multi-source Stream Discovery   - Prowlarr, Torrentio, Real-Debrid
+✓ Adaptive Stream Scoring         - 3-tier: language, resolution, quality
+✓ Smart Caching                   - Dynamic TTL based on content age
+✓ Real-Debrid Integration         - Instant availability + adaptive rate limiting
+✓ Multi-Profile Support           - Separate user state per profile
+✓ Dual-Window Player              - Main video + transparent overlay controls
+✓ Advanced Filtering              - Type, genres, year, rating, language, duration
+✓ Progress Tracking               - Resume points, watch status, ratings
+✓ Trakt Integration               - Sync lists, trending, watchlist
+✓ Rich Metadata                   - TMDB, artwork providers, cast, credits
+
+
+SPECIAL FILES & CONFIGURATION
+────────────────────────────────────────────────────────────────────────────────
+✓ .github/copilot-instructions.md    (145 LOC) - Primary architecture docs
+✓ sokoul-backend/Cargo.toml          (Rust dependencies)
+✓ sokoul-desktop/package.json        (NPM dependencies)
+✓ sokoul-desktop/tsconfig.json       (Strict TS config, path alias @/*)
+✓ sokoul-desktop/vite.config.ts      (Bundler, React plugin)
+✓ sokoul-desktop/tailwind.config.js  (Theme customization)
+✓ sokoul-desktop/electron-builder.config.js  (Windows NSIS installer)
+
+
+TECHNOLOGY STACK
+────────────────────────────────────────────────────────────────────────────────
+Backend:  Rust, Axum, SQLx, SQLite, Tokio, Thiserror, Tracing
+Frontend: React 18, TypeScript, Electron 31, Vite, Tailwind CSS
+State:    Zustand (client), React Query (server)
+Routing:  HashRouter (file:// support)
+Player:   MPV (native Windows executable)
+APIs:     TMDB, Trakt, Real-Debrid, Prowlarr, Torrentio, FanArt.tv
+
+
+CRITICAL CONVENTIONS
+────────────────────────────────────────────────────────────────────────────────
+Files:        kebab-case
+Components:   PascalCase
+Hooks:        useSomething
+Services:     UPPER_SNAKE_CASE
+Backend routes: verb_noun (post_unrestrict, get_catalog)
+
+TypeScript:   STRICT MODE (no any, no @ts-ignore)
+Path Alias:   @/* → src/*
+Rust:         sqlx::query! (compile-time SQL), no println!, tracing::info!
+Features:     Cannot import each other; use shared/ for cross-feature code
+Commits:      Conventional: feat(scope): description
+
+
+BUILD COMMANDS
+────────────────────────────────────────────────────────────────────────────────
+Backend:  cargo build | cargo run | cargo check | cargo clippy
+Frontend: npm run dev | npm run build | npm run check
+Full:     npm run electron:dev | npm run electron:build
+Scripts:  scripts\\start-all.bat | scripts\\diagnose.bat
+
+
+VALIDATION BEFORE COMPLETION
+────────────────────────────────────────────────────────────────────────────────
+Frontend:  npx tsc --noEmit && npm run build
+Backend:   cargo check && cargo clippy && cargo fmt --check
+
+
+═══════════════════════════════════════════════════════════════════════════════
+For detailed file-by-file breakdown, see: PROJECT_MAP.txt
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,8 +1,9 @@
-// components/detail/GallerySection.tsx — Étape 9
-// Scroll horizontal avec yet-another-react-lightbox
-// Onglets : Scènes / Affiches / Logos
+// components/detail/GallerySection.tsx — Step 9
+// Horizontal scroll with yet-another-react-lightbox
+// Tabs: Scenes / Posters / Logos
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
@@ -21,6 +22,7 @@ interface GallerySectionProps {
 }
 
 export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = React.useState<MediaTab>('scenes');
   const [lightboxIdx, setLightboxIdx] = React.useState<number>(-1);
 
@@ -29,9 +31,9 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
   const slides = currentImages.map(url => ({ src: url }));
 
   const allTabs: { key: MediaTab; label: string; count: number }[] = [
-    { key: 'scenes',  label: 'Scènes',   count: images.scenes.length  },
-    { key: 'posters', label: 'Affiches', count: images.posters.length },
-    { key: 'logos',   label: 'Logos',    count: images.logos.length   },
+    { key: 'scenes',  label: t('detail.scenes'),   count: images.scenes.length  },
+    { key: 'posters', label: t('detail.posters'), count: images.posters.length },
+    { key: 'logos',   label: t('detail.logos'),    count: images.logos.length   },
   ];
   const tabs = allTabs.filter(t => t.count > 0);
   if (tabs.length === 0) return null;
@@ -49,10 +51,10 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
   return (
     <section className="mb-[40px]">
 
-      {/* Titre + onglets */}
+      {/* Title + tabs */}
       <div className="flex items-center gap-[20px] mb-4">
         <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest m-0">
-          Scènes & Images
+          {t('detail.scenesAndImages')}
         </h2>
         {tabs.length > 1 && (
           <div className="flex gap-2">

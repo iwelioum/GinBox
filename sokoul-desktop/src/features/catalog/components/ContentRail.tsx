@@ -2,7 +2,7 @@
 //
 // Horizontal scroll (flex, gap 12px, overflow-x auto, hidden scrollbar)
 // Title with border-left 3px solid accent
-// Interface conservée pour compatibilité avec ActorPage, BrowsePage, etc.
+// Interface preserved for compatibility with ActorPage, BrowsePage, etc.
 
 import * as React from 'react';
 import type { LucideIcon } from 'lucide-react';
@@ -25,7 +25,7 @@ interface ContentRailProps {
   className?:   string;
 }
 
-// ── Composant ─────────────────────────────────────────────────────────────────
+// ── Component ─────────────────────────────────────────────────────────────────
 
 const ContentRail: React.FC<ContentRailProps> = ({
   title,

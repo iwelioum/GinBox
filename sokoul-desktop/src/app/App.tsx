@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { ErrorBoundary } from '../shared/components/ui/ErrorBoundary';
 import ProfileSelectPage from '../features/catalog/components/ProfileSelectPage';
 import HomePage          from '../features/catalog/components/HomePage';
-import SearchPage        from '../features/catalog/components/SearchPage';
+import SearchPage        from '../features/search/components/SearchPage';
 import DetailPage        from '../features/detail/components/DetailPage';
 import SourcesPage       from '../features/detail/components/SourcesPage';
 import PlayerPage        from '../features/player/components/PlayerPage';
@@ -31,24 +31,24 @@ function App() {
   return (
     <Routes>
       {/* Player & overlay have their own error boundaries to avoid cross-feature crashes */}
-      <Route path="/profile-select" element={<ErrorBoundary area="profils"><ProfileSelectPage /></ErrorBoundary>} />
-      <Route path="/player"  element={<ErrorBoundary area="lecteur"><PlayerWrapper /></ErrorBoundary>} />
+      <Route path="/profile-select" element={<ErrorBoundary area="profiles"><ProfileSelectPage /></ErrorBoundary>} />
+      <Route path="/player"  element={<ErrorBoundary area="player"><PlayerWrapper /></ErrorBoundary>} />
       <Route path="/overlay" element={<ErrorBoundary area="overlay"><OverlayPage /></ErrorBoundary>} />
       <Route path="/debug"   element={<DebugPage />} />
 
       <Route element={<Layout />}>
-        <Route path="/"                    element={<ErrorBoundary area="accueil"><HomePage /></ErrorBoundary>} />
-        <Route path="/search"              element={<ErrorBoundary area="recherche"><SearchPage /></ErrorBoundary>} />
+        <Route path="/"                    element={<ErrorBoundary area="home"><HomePage /></ErrorBoundary>} />
+        <Route path="/search"              element={<ErrorBoundary area="search"><SearchPage /></ErrorBoundary>} />
         <Route path="/detail/:type/:id"    element={<ErrorBoundary area="detail"><DetailPage /></ErrorBoundary>} />
         <Route path="/sources/:type/:id"   element={<ErrorBoundary area="sources"><SourcesPage /></ErrorBoundary>} />
-        <Route path="/lists"               element={<ErrorBoundary area="listes"><MyListsPage /></ErrorBoundary>} />
-        <Route path="/films"               element={<ErrorBoundary area="catalogue"><BrowsePage mode="movie" /></ErrorBoundary>} />
-        <Route path="/series"              element={<ErrorBoundary area="catalogue"><BrowsePage mode="series" /></ErrorBoundary>} />
+        <Route path="/lists"               element={<ErrorBoundary area="lists"><MyListsPage /></ErrorBoundary>} />
+        <Route path="/films"               element={<ErrorBoundary area="catalog"><BrowsePage mode="movie" /></ErrorBoundary>} />
+        <Route path="/series"              element={<ErrorBoundary area="catalog"><BrowsePage mode="series" /></ErrorBoundary>} />
         <Route path="/collections"          element={<ErrorBoundary area="collections"><CollectionsPage /></ErrorBoundary>} />
         <Route path="/collection/:id"      element={<ErrorBoundary area="collection"><CollectionDetailPage /></ErrorBoundary>} />
-        <Route path="/actor/:id"           element={<ErrorBoundary area="acteur"><ActorPage /></ErrorBoundary>} />
-        <Route path="/profile"             element={<ErrorBoundary area="profil"><ProfilePage /></ErrorBoundary>} />
-        <Route path="/settings"            element={<ErrorBoundary area="parametres"><SettingsPage /></ErrorBoundary>} />
+        <Route path="/actor/:id"           element={<ErrorBoundary area="actor"><ActorPage /></ErrorBoundary>} />
+        <Route path="/profile"             element={<ErrorBoundary area="profile"><ProfilePage /></ErrorBoundary>} />
+        <Route path="/settings"            element={<ErrorBoundary area="settings"><SettingsPage /></ErrorBoundary>} />
         <Route path="/favorites"           element={<Navigate to="/lists" replace />} />
       </Route>
 

@@ -13,8 +13,8 @@ use serde::Deserialize;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/", get(list_profiles).post(create_profile))
-        .route("/:id", get(get_profile).put(update_profile).delete(delete_profile))
+        .route("/", get(get_profiles).post(post_profile))
+        .route("/:id", get(get_profile).put(put_profile).delete(delete_profile))
 }
 
 #[derive(Deserialize)]
@@ -30,12 +30,12 @@ pub struct UpdateProfileRequest {
     pub avatar_url: Option<String>,
 }
 
-async fn list_profiles(State(state): State<Arc<AppState>>) -> Result<Json<Vec<Profile>>, AppError> {
+async fn get_profiles(State(state): State<Arc<AppState>>) -> Result<Json<Vec<Profile>>, AppError> {
     let profiles = profiles::list_profiles(&state.db).await?;
     Ok(Json(profiles))
 }
 
-async fn create_profile(
+async fn post_profile(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<CreateProfileRequest>,
 ) -> Result<Json<Profile>, AppError> {
@@ -51,7 +51,7 @@ async fn get_profile(
     Ok(Json(profile))
 }
 
-async fn update_profile(
+async fn put_profile(
     Path(id): Path<i64>,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<UpdateProfileRequest>,

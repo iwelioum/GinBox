@@ -6,7 +6,7 @@
  */
 
 import { useRef, useEffect, useCallback } from 'react';
-import { endpoints } from '../../../api/client';
+import { endpoints } from '@/shared/api/client';
 import type { ContentType } from '../../../shared/types/index';
 
 const SAVE_INTERVAL_MS = 10_000;

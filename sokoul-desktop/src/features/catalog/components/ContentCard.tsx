@@ -8,8 +8,9 @@ import * as React from 'react';
 import { Link }        from 'react-router-dom';
 import { useQuery }    from '@tanstack/react-query';
 import type { CatalogMeta } from '@/shared/types';
-import { endpoints }   from '@/api/client';
+import { endpoints }   from '@/shared/api/client';
 import { getLogo, type FanartResponse } from '@/shared/utils/fanart';
+import { getTopPosterUrl }              from '@/shared/utils/topPosters';
 
 const TMDB = 'https://image.tmdb.org/t/p/';
 
@@ -29,7 +30,7 @@ interface ContentCardProps {
   onHoverLeave?: () => void;
 }
 
-// ── Composant ─────────────────────────────────────────────────────────────────
+// ── Component ─────────────────────────────────────────────────────────────────
 
 const ContentCard: React.FC<ContentCardProps> = ({
   item, variant, className, onHoverEnter, onHoverLeave,
@@ -38,26 +39,32 @@ const ContentCard: React.FC<ContentCardProps> = ({
 
   const mediaType  = item.media_type ?? item.type ?? 'movie';
   const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
-  const fanartType = (mediaType === 'series' ? 'tv' : 'movie') as 'movie' | 'tv';
+  // 'tv' and 'series' both map to the TV fanart endpoint
+  const fanartType = (mediaType === 'series' || mediaType === 'tv') ? 'tv' : 'movie' as 'movie' | 'tv';
 
-  // Fanart logo — lazy load on hover
-  const { data: fanartData } = useQuery<FanartResponse>({
+  // Fanart logo — load immediately; errors silently return null (no logo shown)
+  const { data: fanartData } = useQuery<FanartResponse | null>({
     queryKey:  ['fanart-card', fanartType, tmdbId],
-    queryFn:   () => endpoints.fanart.get(fanartType, tmdbId).then(r => r.data as FanartResponse),
-    enabled:   hovered && !!tmdbId,
+    queryFn:   async () => {
+      try { return (await endpoints.fanart.get(fanartType, tmdbId)).data as FanartResponse; }
+      catch { return null; }
+    },
+    enabled:   !!tmdbId,
     staleTime: Infinity,
   });
 
-  const logoUrl  = fanartData != null ? getLogo(fanartData, fanartType) : null;
-  const backdrop = imgUrl(item.backdrop_path ?? item.background, 'w780');
-  const poster   = imgUrl(item.poster_path ?? item.poster, 'w500');
+  const logoUrl   = fanartData != null ? getLogo(fanartData, fanartType) : null;
+  const backdrop  = imgUrl(item.backdrop_path ?? item.background, 'w780');
+  const poster    = imgUrl(item.poster_path ?? item.poster, 'w500');
+  const topPoster = getTopPosterUrl(item);
 
   const detailPath = `/detail/${mediaType}/${item.id}`;
   const title      = item.title ?? item.name ?? '';
 
-  // Poster variant: taller card
+  // Poster variant: Top Posters first (fallback_url baked in), then TMDB poster, then backdrop
+  // Landscape variant: backdrop first, Top Posters as fallback when backdrop missing
   const isPoster = variant === 'poster';
-  const src      = isPoster ? (poster ?? backdrop) : backdrop;
+  const src      = isPoster ? (topPoster ?? poster ?? backdrop) : (backdrop ?? topPoster);
   if (!src) return null;
 
   return (
@@ -112,8 +119,8 @@ const ContentCard: React.FC<ContentCardProps> = ({
             background: 'linear-gradient(to top, rgba(4,7,20,0.55) 0%, rgba(4,7,20,0.1) 40%, transparent 100%)',
           }}
         />
-        {/* Fanart logo bottom center */}
-        {logoUrl !== null && (
+        {/* Logo (fanart) — mandatory identifier; title text only when no logo */}
+        {logoUrl !== null ? (
           <img
             src={logoUrl}
             alt={title}
@@ -130,6 +137,35 @@ const ContentCard: React.FC<ContentCardProps> = ({
             }}
             loading="lazy"
           />
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 14,
+              left: 0,
+              right: 0,
+              textAlign: 'center',
+              padding: '0 12px',
+              zIndex: 2,
+            }}
+          >
+            <span
+              style={{
+                color: '#fff',
+                fontSize: isPoster ? 13 : 12,
+                fontWeight: 700,
+                textShadow: '0 2px 10px rgba(0,0,0,0.95)',
+                letterSpacing: '0.03em',
+                lineHeight: 1.3,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {title}
+            </span>
+          </div>
         )}
       </Link>
     </div>

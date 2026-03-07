@@ -1,7 +1,9 @@
-// AudioPanel.tsx — Sélecteur de piste audio
-// Positionné en absolute au-dessus de la ControlsBar (bottom: 100%)
+// AudioPanel.tsx — Audio track selector
+// Positioned absolute above the ControlsBar (bottom: 100%)
 
-import type { MpvTrack } from '../../../ipc';
+import { useTranslation } from 'react-i18next';
+import type { MpvTrack } from '@/shared/types/ipc';
+import i18n from '@/shared/i18n';
 
 interface AudioPanelProps {
   tracks:   MpvTrack[];
@@ -13,10 +15,11 @@ function trackLabel(track: MpvTrack): string {
   if (track.lang && track.codec) return `${track.lang.toUpperCase()} — ${track.codec.toUpperCase()}`;
   if (track.lang)                return track.lang.toUpperCase();
   if (track.title)               return track.title;
-  return `Piste ${track.id}`;
+  return i18n.t('player.trackLabel', { id: track.id });
 }
 
 export function AudioPanel({ tracks, onSelect, onClose }: AudioPanelProps) {
+  const { t } = useTranslation();
   return (
     <div
       style={{
@@ -33,7 +36,7 @@ export function AudioPanel({ tracks, onSelect, onClose }: AudioPanelProps) {
         boxShadow:    '0 8px 32px rgba(0,0,0,0.6)',
       }}
     >
-      {/* Titre */}
+      {/* Title */}
       <p style={{
         color:         'rgba(245,245,245,0.5)',
         fontSize:      11,
@@ -42,10 +45,10 @@ export function AudioPanel({ tracks, onSelect, onClose }: AudioPanelProps) {
         textTransform: 'uppercase',
         margin:        0,
       }}>
-        Piste audio
+        {t('player.audioTrackTitle')}
       </p>
 
-      {/* Cas : aucune piste */}
+      {/* Case: no tracks */}
       {tracks.length === 0 && (
         <p style={{
           color:   'rgba(245,245,245,0.35)',
@@ -53,11 +56,11 @@ export function AudioPanel({ tracks, onSelect, onClose }: AudioPanelProps) {
           padding: '8px 16px',
           margin:  0,
         }}>
-          Aucune piste disponible
+          {t('player.noTracksAvailable')}
         </p>
       )}
 
-      {/* Liste des pistes */}
+      {/* Track list */}
       {tracks.map(track => (
         <div
           key={track.id}
@@ -83,7 +86,7 @@ export function AudioPanel({ tracks, onSelect, onClose }: AudioPanelProps) {
               track.selected ? 'rgba(255,255,255,0.07)' : 'transparent';
           }}
         >
-          {/* Indicateur actif */}
+          {/* Active indicator */}
           <span style={{
             width:        6,
             height:       6,

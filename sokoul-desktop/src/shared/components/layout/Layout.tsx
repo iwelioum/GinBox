@@ -1,5 +1,5 @@
-// NOM — Layout.tsx — Rôle: Composant de layout commun
-// RÈGLES : Intègre TitleBar et Navbar pour les pages de contenu.
+// NAME — Layout.tsx — Role: Common layout component
+// RULES: Integrates TitleBar and Navbar for content pages.
 
 import * as React from 'react';
 import { Outlet } from 'react-router-dom'; // Import Outlet

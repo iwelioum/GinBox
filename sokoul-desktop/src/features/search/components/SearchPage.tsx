@@ -1,16 +1,18 @@
-// SearchPage.tsx — Rôle: Page de recherche de contenu
-// RÈGLES : Aucun
+// SearchPage.tsx — Role: Content search page
+// RULES: None
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon } from 'lucide-react';
-import { endpoints } from '../../../api/client';
-import { ContentCard } from './ContentCard';
+import { endpoints } from '@/shared/api/client';
+import { ContentCard } from '@/features/catalog/components/ContentCard';
 import { Spinner } from '../../../shared/components/ui/Spinner';
 import type { CatalogMeta } from '../../../shared/types/index';
 
 export default function SearchPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
@@ -46,11 +48,11 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-bg-primary text-text-primary" style={{ paddingTop: 'calc(var(--titlebar-height) + var(--navbar-height) + 2rem)', paddingLeft: 'var(--section-px)', paddingRight: 'var(--section-px)' }}>
       <div className="max-w-4xl mx-auto mb-8">
-        <h1 className="text-3xl font-bold mb-6">Rechercher</h1>
+        <h1 className="text-3xl font-bold mb-6">{t('search.heading')}</h1>
         <div className="relative">
           <input
             type="text"
-            placeholder="Rechercher des films ou séries..."
+            placeholder={t('search.placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full px-5 py-3 rounded-md bg-bg-card border border-bg-secondary focus:outline-none focus:border-accent text-lg"
@@ -67,7 +69,7 @@ export default function SearchPage() {
 
       {!isLoading && debouncedQuery && allResults.length === 0 && (
         <div className="text-center text-text-secondary mt-16">
-          <p>Aucun résultat trouvé pour &ldquo;{debouncedQuery}&rdquo;.</p>
+          <p>{t('search.noResults', { query: debouncedQuery })}</p>
         </div>
       )}
 

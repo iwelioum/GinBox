@@ -10,11 +10,11 @@ import type { CatalogMeta } from '../../../shared/types/index';
 
 function getGreeting(): string {
   const h = new Date().getHours();
-  if (h >= 5  && h < 12) return 'Bonjour — Un bon film pour bien commencer ?';
-  if (h >= 12 && h < 17) return 'Bon apres-midi — Envie de quoi ?';
-  if (h >= 17 && h < 21) return "Bonsoir — C'est l'heure du cinema.";
-  if (h >= 21 && h < 24) return 'Bonne nuit — Un dernier film ?';
-  return 'Encore debout ? Parfait.';
+  if (h >= 5  && h < 12) return 'Good morning — A good movie to start the day?';
+  if (h >= 12 && h < 17) return 'Good afternoon — What are you in the mood for?';
+  if (h >= 17 && h < 21) return "Good evening — It's movie time.";
+  if (h >= 21 && h < 24) return 'Good night — One last movie?';
+  return 'Still up? Perfect.';
 }
 
 const STALE_MS = 5 * 60_000;

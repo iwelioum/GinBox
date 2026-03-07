@@ -1,12 +1,12 @@
-// ProgressBar.tsx — Barre de progression du lecteur
-// Hover : hauteur 3px → 5px + scrubber visible
+// ProgressBar.tsx — Player progress bar
+// Hover: height 3px → 5px + scrubber visible
 
 import React, { useState } from 'react';
 import { formatTime } from '../utils/formatTime';
 
 interface ProgressBarProps {
-  position: number;  // secondes actuelles
-  duration: number;  // durée totale en secondes
+  position: number;  // current seconds
+  duration: number;  // total duration in seconds
   onSeek:   (seconds: number) => void;
 }
 
@@ -23,7 +23,7 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
 
   return (
     <div style={{ width: '100%' }}>
-      {/* Barre cliquable */}
+      {/* Clickable bar */}
       <div
         data-testid="progress-bar"
         onClick={handleClick}
@@ -39,7 +39,7 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
           transition:   'height var(--player-timing, 0.2s) var(--player-ease, ease)',
         }}
       >
-        {/* Remplissage */}
+        {/* Fill */}
         <div
           style={{
             width:        `${progress}%`,
@@ -50,7 +50,7 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
             position:     'relative',
           }}
         >
-          {/* Scrubber — visible uniquement au hover */}
+          {/* Scrubber — visible only on hover */}
           {hovered && (
             <div
               style={{
@@ -70,7 +70,7 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
         </div>
       </div>
 
-      {/* Temps courant / durée */}
+      {/* Current time / duration */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}>
         <span
           style={{

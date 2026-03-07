@@ -1,11 +1,14 @@
 // ══════════════════════════════════════════════════════════
 // routes/stream.rs — GET /sources/:type/:id
-// RÈGLES :
-//   → Retourne { "results": [Source], "cached_at": u64, "is_stale": bool }
-//   → Source = { title, quality, size_gb, seeders, language, info_hash, magnet, source, cached_rd, playable, rd_link, score }
-//   → Stale-while-revalidate : retourne l'ancien cache + rafraîchit en background
-//   → ?force=true : ignore le cache, force une nouvelle recherche
-//   → ?year=YYYY  : utilisé pour le TTL dynamique selon l'ancienneté du contenu
+// RULES:
+//   → Returns { "results": [Source], "cached_at": u64, "is_stale": bool }
+//   → Pipeline: fetch → score → dedup → filter → multi-level sort → cap 20
+//   → 3-tier scoring: language(0-600) + resolution(0-400) + source quality(0-300)
+//   → Multi-level sort: cached > language > resolution > quality > seeders > size
+//   → Dedup: info_hash then normalized filename (keep best score)
+//   → Stale-while-revalidate: return old cache + refresh in background
+//   → ?force=true: ignore cache, force new search
+//   → ?year=YYYY: used for dynamic TTL based on content age
 // ══════════════════════════════════════════════════════════
 
 use axum::{
@@ -25,24 +28,26 @@ use crate::errors::AppError;
 use crate::models::{ContentType, Source};
 use crate::services::{cache, prowlarr, tmdb, torrentio};
 
+const MAX_RESULTS: usize = 20;
+
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/:type/:id", get(stream_handler))
+        .route("/:type/:id", get(get_stream))
 }
 
 #[derive(serde::Deserialize)]
 pub(crate) struct StreamQuery {
-    /// Forcer une nouvelle recherche (ignore le cache)
+    /// Force new search (ignore cache)
     force: Option<bool>,
-    /// Année de sortie du contenu — pour le TTL dynamique
+    /// Content release year — for dynamic TTL
     year:  Option<i32>,
-    /// Saison ciblée (séries)
+    /// Target season (series)
     season: Option<u32>,
-    /// Épisode ciblé (séries)
+    /// Target episode (series)
     episode: Option<u32>,
 }
 
-pub async fn stream_handler(
+pub async fn get_stream(
     Path((content_type, id)): Path<(ContentType, String)>,
     Query(params): Query<StreamQuery>,
     State(state): State<Arc<AppState>>,
@@ -62,21 +67,19 @@ pub async fn stream_handler(
         episode.unwrap_or(0)
     );
 
-    // ── Vérification du cache (sauf si force=true) ──────────────────────────
+    // ── Cache check (unless force=true) ──────────────────────────
     if use_cache {
         if let Some(cache_result) = cache::get_streams_from_cache(&cache_key, &state.db).await? {
             let ttl = cache::compute_stream_ttl(release_year);
             let age = now.saturating_sub(cache_result.cached_at);
 
             if age < ttl {
-                // Cache frais → répondre immédiatement
+                // Fresh cache → respond immediately
                 let mut results: Vec<Source> = cache_result.streams.iter()
                     .filter_map(|s| stream_to_source(s, "cache"))
                     .collect();
-                for source in &mut results {
-                    source.score = compute_score(source);
-                }
-                results.sort_by(|a, b| b.score.cmp(&a.score));
+                score_sources(&mut results);
+                post_process_sources(&mut results);
                 return Ok(Json(json!({
                     "results":   results,
                     "cached_at": cache_result.cached_at,
@@ -84,16 +87,14 @@ pub async fn stream_handler(
                 })));
             }
 
-            // Cache périmé → stale-while-revalidate :
-            // 1. Retourner les anciens résultats immédiatement (is_stale: true)
-            // 2. Lancer une nouvelle recherche en background
+            // Stale cache → stale-while-revalidate:
+            // 1. Return old results immediately (is_stale: true)
+            // 2. Launch new search in background
             let mut stale_results: Vec<Source> = cache_result.streams.iter()
                 .filter_map(|s| stream_to_source(s, "cache"))
                 .collect();
-            for source in &mut stale_results {
-                source.score = compute_score(source);
-            }
-            stale_results.sort_by(|a, b| b.score.cmp(&a.score));
+            score_sources(&mut stale_results);
+            post_process_sources(&mut stale_results);
 
             let state_bg       = Arc::clone(&state);
             let id_bg          = id.clone();
@@ -113,7 +114,7 @@ pub async fn stream_handler(
         }
     }
 
-    // ── Aucun cache (ou force=true) → recherche fraîche ─────────────────────
+    // ── No cache (or force=true) → fresh search ─────────────────────
     let results = do_fresh_fetch(&id, &content_type, season, episode, &cache_key, &state).await?;
 
     if results.is_empty() {
@@ -131,9 +132,9 @@ pub async fn stream_handler(
     })))
 }
 
-// ── Recherche complète + mise en cache ───────────────────────────────────────
-// Retourne les sources frontend triées par score décroissant.
-// Effet de bord : met à jour le cache SQLite.
+// ── Complete search + caching ───────────────────────────────────────
+// Pipeline : fetch → convert → score → dedup → filter → sort → cap 20
+// Side effect: updates SQLite cache (raw data before dedup).
 async fn do_fresh_fetch(
     id: &str,
     content_type: &ContentType,
@@ -142,10 +143,10 @@ async fn do_fresh_fetch(
     cache_key: &str,
     state: &Arc<AppState>,
 ) -> Result<Vec<Source>, AppError> {
-    // Résolution TMDB → IMDB pour Torrentio (qui n'accepte que "tt...")
+    // TMDB → IMDB resolution for Torrentio (which only accepts "tt...")
     let imdb_id = tmdb::resolve_to_imdb_id(id, content_type, state).await;
 
-    // Titre pour Prowlarr (recherche par nom)
+    // Title for Prowlarr (search by name)
     let prowlarr_query = tmdb::resolve_title_for_prowlarr(id, content_type, state).await.ok();
     let expected_title_for_match = prowlarr_query
         .as_deref()
@@ -153,7 +154,7 @@ async fn do_fresh_fetch(
 
     let torrentio_id = imdb_id.as_deref().unwrap_or(id);
 
-    // Torrentio : timeout 20s — Prowlarr : timeout 12s (recherche indexeurs)
+    // Torrentio: timeout 20s — Prowlarr: timeout 12s (indexer search)
     let (torrentio_result, prowlarr_result) = tokio::join!(
         async {
             timeout(
@@ -180,35 +181,26 @@ async fn do_fresh_fetch(
     let torrentio_streams = torrentio_result.unwrap_or_default();
     let prowlarr_streams  = prowlarr_result.unwrap_or_default();
 
-    // Mettre en cache avant dédoublonnage (toutes les sources)
+    // Cache BEFORE dedup/filter (all raw sources)
     let all_for_cache: Vec<crate::models::Stream> = torrentio_streams.iter()
         .chain(prowlarr_streams.iter())
         .cloned()
         .collect();
 
-    // Taguer chaque stream avec son nom de source
-    let mut tagged: Vec<(crate::models::Stream, String)> = Vec::new();
-    for s in torrentio_streams { tagged.push((s, "torrentio".to_string())); }
-    for s in prowlarr_streams  { tagged.push((s, "prowlarr".to_string())); }
-
-    // Dédoublonnage par info_hash
-    let mut seen_hashes = HashSet::new();
-    let mut unique: Vec<(crate::models::Stream, String)> = Vec::new();
-    for (stream, src) in tagged {
-        if let Some(hash) = &stream.info_hash {
-            if !seen_hashes.contains(hash) {
-                seen_hashes.insert(hash.clone());
-                unique.push((stream, src));
-            }
-        } else {
-            unique.push((stream, src));
+    // Convert to Source with provider tag
+    let mut all_sources: Vec<Source> = Vec::new();
+    for s in &torrentio_streams {
+        if let Some(source) = stream_to_source(s, "torrentio") {
+            all_sources.push(source);
+        }
+    }
+    for s in &prowlarr_streams {
+        if let Some(source) = stream_to_source(s, "prowlarr") {
+            all_sources.push(source);
         }
     }
 
-    let mut all_sources: Vec<Source> = unique.iter()
-        .filter_map(|(stream, src)| stream_to_source(stream, src))
-        .collect();
-
+    // Filter series packs (keep only targeted episode)
     if matches!(content_type, ContentType::Series) {
         if let (Some(target_season), Some(target_episode)) = (season, episode) {
             let pack_regex = Regex::new(
@@ -228,20 +220,7 @@ async fn do_fresh_fetch(
         }
     }
 
-    let mut seen_url_only = HashSet::new();
-    all_sources.retain(|source| {
-        if !source.info_hash.is_empty() {
-            return true;
-        }
-        let Some(magnet) = source.magnet.as_ref() else {
-            return true;
-        };
-        if magnet.is_empty() {
-            return true;
-        }
-        seen_url_only.insert(magnet.clone())
-    });
-
+    // Title relevance filter (Prowlarr only)
     if let Some(expected_title) = expected_title_for_match.as_deref() {
         all_sources.retain(|source| {
             if source.source != "prowlarr" {
@@ -251,16 +230,21 @@ async fn do_fresh_fetch(
         });
     }
 
-    for source in &mut all_sources {
-        source.score = compute_score(source);
-        if source.source == "prowlarr" {
-            if let Some(expected_title) = expected_title_for_match.as_deref() {
-                let relevance_penalty = compute_title_relevance_penalty(&source.title, expected_title);
-                source.score = source.score.saturating_sub(relevance_penalty);
+    // Scoring
+    score_sources(&mut all_sources);
+
+    // Title relevance penalty for Prowlarr
+    if let Some(expected_title) = expected_title_for_match.as_deref() {
+        for source in &mut all_sources {
+            if source.source == "prowlarr" {
+                let penalty = compute_title_relevance_penalty(&source.title, expected_title);
+                source.score = source.score.saturating_sub(penalty);
             }
         }
     }
-    all_sources.sort_by(|a, b| b.score.cmp(&a.score));
+
+    // Post-processing pipeline: dedup → filter → multi-level sort → cap 20
+    post_process_sources(&mut all_sources);
 
     if !all_for_cache.is_empty() {
         cache::cache_streams(cache_key, &all_for_cache, &state.db).await?;
@@ -269,92 +253,229 @@ async fn do_fresh_fetch(
     Ok(all_sources)
 }
 
-// ── Helpers de tri ────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════
+// 3-tier scoring (inspired by AIOStreams precomputer.ts)
+// ══════════════════════════════════════════════════════════
 
+/// Resolution: 2160p(400) > 1080p(300) > 720p(200) > 480p(50) > other(0)
+fn resolution_score(quality: &str) -> u32 {
+    match quality.to_lowercase().as_str() {
+        "2160p" | "4k" | "uhd" => 400,
+        "1440p" | "2k"         => 350,
+        "1080p"                => 300,
+        "720p"                 => 200,
+        "480p"                 => 50,
+        _                      => 0,
+    }
+}
+
+/// Source quality: REMUX(300) > BluRay(250) > WEB-DL(200) > WEBRip(150) > HDTV(100) > other(0)
+fn quality_source_score(title: &str) -> u32 {
+    let upper = title.to_uppercase();
+    if upper.contains("REMUX") {
+        300
+    } else if upper.contains("BLURAY") || upper.contains("BLU-RAY") || upper.contains("BDREMUX") {
+        250
+    } else if upper.contains("WEB-DL") || upper.contains("WEBDL") {
+        200
+    } else if upper.contains("WEBRIP") || upper.contains("WEB-RIP") {
+        150
+    } else if upper.contains("HDTV") {
+        100
+    } else if upper.contains("DVDRIP") || upper.contains("DVD-RIP") || upper.contains("BDRIP") {
+        80
+    } else {
+        0
+    }
+}
+
+fn codec_bonus(title: &str) -> u32 {
+    let upper = title.to_uppercase();
+    if upper.contains("AV1") {
+        90
+    } else if upper.contains("HEVC") || upper.contains("X265") || upper.contains("H.265") || upper.contains("H265") {
+        80
+    } else if upper.contains("X264") || upper.contains("H.264") || upper.contains("H264") || upper.contains("AVC") {
+        60
+    } else {
+        0
+    }
+}
+
+fn hdr_bonus(title: &str) -> u32 {
+    let upper = title.to_uppercase();
+    if upper.contains("DOLBY VISION") || upper.contains("DOLBY.VISION") || upper.contains("DV HDR") {
+        120
+    } else if upper.contains("HDR10+") || upper.contains("HDR10PLUS") {
+        100
+    } else if upper.contains("HDR10") || upper.contains("HDR") {
+        80
+    } else {
+        0
+    }
+}
+
+fn cam_penalty(title: &str) -> u32 {
+    let upper = title.to_uppercase();
+    if upper.contains("HDCAM") || upper.contains("CAMRIP") || upper.contains(".CAM.") || upper.contains("-CAM-") {
+        800
+    } else if upper.contains(".TS.") || upper.contains("-TS-") || upper.contains("TELESYNC") {
+        700
+    } else if upper.contains(".SCR.") || upper.contains("-SCR-") || upper.contains("SCREENER") {
+        600
+    } else if upper.contains("HDTC") || upper.contains("HC.HD") {
+        500
+    } else {
+        0
+    }
+}
+
+/// Composite score: cache(2000) + language(0-600) + resolution(0-400) + quality(0-300)
+///                 + codec(0-90) + HDR(0-120) + seeders(0-50) + size(0-50) − penalties
 fn compute_score(source: &Source) -> u32 {
     let mut score: u32 = 0;
-    let upper_title = source.title.to_uppercase();
-    let upper_language = source.language.to_uppercase();
-    let normalized_quality = source.quality.to_lowercase();
-
-    score += match normalized_quality.as_str() {
-        "4k" | "2160p" => 1000,
-        "1080p" => 700,
-        "720p" => 400,
-        "480p" => 100,
-        _ => 50,
-    };
-
-    if upper_title.contains("BLURAY") || upper_title.contains("BLU-RAY") {
-        score += 300;
-    } else if upper_title.contains("WEB-DL") || upper_title.contains("WEBDL") {
-        score += 200;
-    } else if upper_title.contains("WEBRIP") {
-        score += 150;
-    } else if upper_title.contains("HDTV") {
-        score += 80;
-    }
-
-    if upper_title.contains("REMUX") {
-        score += 250;
-    } else if upper_title.contains("HEVC") || upper_title.contains("X265") {
-        score += 80;
-    } else if upper_title.contains("X264") || upper_title.contains("H264") {
-        score += 60;
-    }
-
-    if upper_title.contains("DV") || upper_title.contains("DOLBY VISION") {
-        score += 120;
-    } else if upper_title.contains("HDR") {
-        score += 80;
-    }
-
-    score += source.seeders.min(500) / 10;
-
-    score += match upper_language.as_str() {
-        "FR" | "TRUEFRENCH" | "VFF" => 500,
-        "MULTI" => 300,
-        "VOSTFR" => 100,
-        "EN" => 50,
-        _ => 0,
-    };
 
     if source.cached_rd {
-        score += 400;
+        score += 2000;
     }
 
-    if source.size_gb > 1.0 && source.size_gb < 60.0 {
+    score += crate::parser::language_score(&source.language, source.language_variant.as_deref());
+    score += resolution_score(&source.quality);
+    score += quality_source_score(&source.title);
+    score += codec_bonus(&source.title);
+    score += hdr_bonus(&source.title);
+    score += source.seeders.min(500) / 10;
+
+    if source.size_gb > 0.2 && source.size_gb < 60.0 {
         score += 50;
     }
 
-    if upper_title.contains("HDCAM")
-        || upper_title.contains("CAMRIP")
-        || upper_title.contains(".CAM.")
-        || upper_title.contains("-CAM-")
-    {
-        score = score.saturating_sub(800);
-    }
-    if upper_title.contains(".TS.")
-        || upper_title.contains("-TS-")
-        || upper_title.contains("TELESYNC")
-    {
-        score = score.saturating_sub(700);
-    }
-    if upper_title.contains(".SCR.")
-        || upper_title.contains("-SCR-")
-        || upper_title.contains("SCREENER")
-    {
-        score = score.saturating_sub(600);
-    }
-    if upper_title.contains("HDTC") || upper_title.contains("HC.HD") {
-        score = score.saturating_sub(500);
-    }
-    if source.seeders == 0 {
-        score = score.saturating_sub(400);
-    }
+    score = score.saturating_sub(cam_penalty(&source.title));
 
     score
 }
+
+fn score_sources(sources: &mut [Source]) {
+    for source in sources.iter_mut() {
+        source.score = compute_score(source);
+    }
+}
+
+// ══════════════════════════════════════════════════════════
+// Multi-level sort (inspired by AIOStreams sorter.ts)
+// cached > language > resolution > source quality > seeders > size
+// ══════════════════════════════════════════════════════════
+
+fn multi_level_cmp(a: &Source, b: &Source) -> std::cmp::Ordering {
+    // 1. Cached first
+    b.cached_rd.cmp(&a.cached_rd)
+        // 2. Best language score
+        .then_with(|| {
+            let la = crate::parser::language_score(&a.language, a.language_variant.as_deref());
+            let lb = crate::parser::language_score(&b.language, b.language_variant.as_deref());
+            lb.cmp(&la)
+        })
+        // 3. Best resolution
+        .then_with(|| resolution_score(&b.quality).cmp(&resolution_score(&a.quality)))
+        // 4. Best source quality
+        .then_with(|| quality_source_score(&b.title).cmp(&quality_source_score(&a.title)))
+        // 5. More seeders
+        .then_with(|| b.seeders.cmp(&a.seeders))
+        // 6. Larger file
+        .then_with(|| b.size_gb.partial_cmp(&a.size_gb).unwrap_or(std::cmp::Ordering::Equal))
+}
+
+// ══════════════════════════════════════════════════════════
+// Deduplication (inspired by AIOStreams deduplicator.ts DSU)
+// Phase 1: exact info_hash — Phase 2: normalized filename
+// Pre-sorted by score desc → retain keeps the best.
+// ══════════════════════════════════════════════════════════
+
+fn normalize_title_for_dedup(title: &str) -> String {
+    let cleaned: String = title.to_lowercase().chars()
+        .map(|c| if c.is_alphanumeric() { c } else { ' ' })
+        .collect();
+
+    const STOP_WORDS: &[&str] = &[
+        "2160p", "1080p", "720p", "480p", "4k", "uhd", "fhd",
+        "bluray", "bdrip", "brrip", "webrip", "webdl", "hdtv", "dvdrip", "dvd",
+        "remux", "x264", "x265", "h264", "h265", "hevc", "avc", "av1", "xvid",
+        "aac", "dts", "ac3", "flac", "atmos", "truehd", "eac3", "mp3",
+        "hdr", "hdr10", "dolby", "vision", "sdr",
+        "multi", "vff", "vfq", "vostfr", "french", "truefrench", "english",
+        "proper", "repack", "internal", "extended", "unrated", "directors", "cut",
+        "mkv", "avi", "mp4", "complete",
+    ];
+
+    cleaned.split_whitespace()
+        .filter(|w| {
+            w.len() > 1
+                && !STOP_WORDS.contains(w)
+                && !(w.len() == 4
+                     && w.chars().all(|c| c.is_ascii_digit())
+                     && (w.starts_with("19") || w.starts_with("20")))
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn deduplicate_sources(sources: &mut Vec<Source>) {
+    // Pre-sort by multi_level_cmp: the first occurrence is the best
+    sources.sort_by(multi_level_cmp);
+
+    let mut seen_hashes: HashSet<String> = HashSet::new();
+    let mut seen_titles: HashSet<String> = HashSet::new();
+
+    sources.retain(|source| {
+        // Phase 1 : dedup par info_hash
+        if !source.info_hash.is_empty() {
+            if !seen_hashes.insert(source.info_hash.clone()) {
+                return false;
+            }
+        }
+        // Phase 2: dedup by normalized title
+        let title_key = normalize_title_for_dedup(&source.title);
+        if title_key.len() >= 3 && !seen_titles.insert(title_key) {
+            return false;
+        }
+        true
+    });
+}
+
+// ══════════════════════════════════════════════════════════
+// Filtering (inspired by AIOStreams filterer.ts)
+// ══════════════════════════════════════════════════════════
+
+fn filter_sources(sources: &mut Vec<Source>) {
+    sources.retain(|source| {
+        // Exclude seeders==0 unless already cached on RD
+        if source.seeders == 0 && !source.cached_rd {
+            return false;
+        }
+        // Exclude too small (< 200 MB ≈ 0.195 GB)
+        if source.size_gb > 0.0 && source.size_gb < 0.195 {
+            return false;
+        }
+        // Exclude too large (> 80 GB)
+        if source.size_gb > 80.0 {
+            return false;
+        }
+        true
+    });
+}
+
+// ══════════════════════════════════════════════════════════
+// Post-processing pipeline: dedup → filter → sort → cap
+// ══════════════════════════════════════════════════════════
+
+fn post_process_sources(sources: &mut Vec<Source>) {
+    deduplicate_sources(sources);
+    filter_sources(sources);
+    sources.sort_by(multi_level_cmp);
+    sources.truncate(MAX_RESULTS);
+}
+
+// ── Helpers de pertinence titre ───────────────────────────────────────────────
 
 fn extract_expected_title(query: &str) -> String {
     let mut cleaned = query.trim().to_string();
@@ -419,21 +540,21 @@ fn compute_title_relevance_penalty(source_title: &str, expected_title: &str) -> 
     0
 }
 
-// ── Conversion Stream interne → format Source frontend ───────────────────────
+// ── Internal Stream → frontend Source format conversion ───────────────────────
 
 fn stream_to_source(stream: &crate::models::Stream, source_name: &str) -> Option<Source> {
     let info_hash = stream.info_hash.as_deref().unwrap_or("");
-    let title = stream.title.as_deref().unwrap_or("Source inconnue");
+    let title = stream.title.as_deref().unwrap_or("Unknown source");
 
-    // playable = peut être lancé via pipeline RD (besoin d'un info_hash)
-    // ou directement si l'URL est déjà streamable (torrentio/RD résolues)
+    // playable = can be launched via RD pipeline (requires info_hash)
+    // or directly if URL is already streamable (torrentio/RD resolved)
     let playable = !info_hash.is_empty() || stream.url.as_deref().map_or(false, |u| {
         u.contains("torrentio.strem.fun") ||
         u.contains("real-debrid.com") ||
         u.contains("rdeb.io")
     });
 
-    // Générer le lien magnet depuis l'info_hash, ou utiliser l'URL directe
+    // Generate magnet link from info_hash, or use direct URL
     let magnet = if !info_hash.is_empty() {
         let encoded_title = title.lines().next().unwrap_or("").replace(' ', "+");
         Some(format!("magnet:?xt=urn:btih:{}&dn={}", info_hash, encoded_title))
@@ -441,7 +562,7 @@ fn stream_to_source(stream: &crate::models::Stream, source_name: &str) -> Option
         stream.url.clone()
     };
 
-    // cached_rd = true UNIQUEMENT pour les URLs Torrentio/RD déjà résolues
+    // cached_rd = true ONLY for already resolved Torrentio/RD URLs
     let cached_rd = stream.url.as_deref().map_or(false, |u| {
         u.contains("torrentio.strem.fun") ||
         u.contains("real-debrid.com") ||
@@ -454,6 +575,7 @@ fn stream_to_source(stream: &crate::models::Stream, source_name: &str) -> Option
         size_gb: stream.parsed_meta.size_gb,
         seeders: stream.parsed_meta.seeders,
         language: stream.parsed_meta.language.clone(),
+        language_variant: stream.parsed_meta.language_variant.clone(),
         info_hash: info_hash.to_string(),
         magnet,
         source: source_name.to_string(),

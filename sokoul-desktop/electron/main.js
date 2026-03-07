@@ -1,6 +1,6 @@
 // ══════════════════════════════════════════════════════════
-// MAIN.JS — Fenêtre principale Sokoul
-// Lecteur MPV : à implémenter (phase 1+)
+// MAIN.JS — Sokoul main window
+// MPV player: to implement (phase 1+)
 // ══════════════════════════════════════════════════════════
 
 const { app, BrowserWindow, ipcMain, shell } = require('electron')
@@ -9,17 +9,17 @@ const { startBackend, stopBackend, setMainWindow } = require('./backend-manager'
 const mpvManager = require('./mpv-manager')
 const mpvIpc     = require('./mpv-ipc')
 
-// Désactive l'accélération GPU de Chromium — indispensable pour que MPV
-// puisse dessiner dans la fenêtre via --wid (sinon : audio OK, image noire)
+// Disable Chromium GPU acceleration — required for MPV to render
+// into the window via --wid (otherwise: audio OK, black screen)
 app.disableHardwareAcceleration()
 
 let mainWindow      = null
-let mainWindowHwnd  = null   // HWND natif — récupéré après chargement de la fenêtre
-let overlayWindow   = null   // Fenêtre overlay transparente — contrôles MPV
+let mainWindowHwnd  = null   // Native HWND — retrieved after window loads
+let overlayWindow   = null   // Transparent overlay window — MPV controls
 
 // ── IPC ───────────────────────────────────────────────────────────────────────
 function registerIpcHandlers() {
-  // Contrôles fenêtre principale
+  // Main window controls
   ipcMain.handle('window:minimize',      () => mainWindow?.minimize())
   ipcMain.handle('window:maximize',      () => mainWindow?.isMaximized() ? mainWindow.unmaximize() : mainWindow?.maximize())
   ipcMain.handle('window:close',         () => mainWindow?.close())
@@ -27,24 +27,9 @@ function registerIpcHandlers() {
   ipcMain.handle('window:setFullscreen', (_, flag) => mainWindow?.setFullScreen(flag))
   ipcMain.handle('shell:openExternal',   (_, url)  => shell.openExternal(url))
 
-  // ── MPV ──────────────────────────────────────────────────────────────────
-  ipcMain.handle('mpv:launch', async (_, { url }) => {
-    const result = await mpvManager.launch(url, mainWindowHwnd)
-    // Notifier l'overlay que MPV est maintenant actif
-    if (overlayWindow && !overlayWindow.isDestroyed()) {
-      overlayWindow.webContents.send('mpv:active', true)
-    }
-    return result
-  })
-
-  ipcMain.handle('mpv:kill', async () => {
-    const result = await mpvManager.kill()
-    // Notifier l'overlay que MPV est éteint
-    if (overlayWindow && !overlayWindow.isDestroyed()) {
-      overlayWindow.webContents.send('mpv:active', false)
-    }
-    return result
-  })
+  // ── MPV (notifications handled by mpv-manager via setWindows) ──────────
+  ipcMain.handle('mpv:launch', (_, { url }) => mpvManager.launch(url, mainWindowHwnd))
+  ipcMain.handle('mpv:kill', () => mpvManager.kill())
 
   ipcMain.handle('mpv:waitUntilReady', async (_, retries = 20, delayMs = 150) => {
     const retryCount = typeof retries === 'number' && retries > 0 ? Math.floor(retries) : 20
@@ -59,18 +44,28 @@ function registerIpcHandlers() {
     }
   })
 
-  // mpv:command — catch silencieux : MPV peut ne pas tourner (polling overlay)
+  // mpv:command — silent catch: MPV may not be running (overlay polling)
   ipcMain.handle('mpv:command', async (_, cmd) => {
     try {
       return await mpvIpc.sendCommand(cmd)
     } catch {
-      return null  // MPV non disponible — l'appelant reçoit null
+      return null  // MPV unavailable — caller receives null
     }
   })
 
-  // ── Overlay — capture souris ──────────────────────────────────────────
-  // enable=true  : l'overlay capture les clics (boutons cliquables)
-  // enable=false : les clics passent à MPV (setIgnoreMouseEvents forward)
+  // Audio & subtitle tracks (filtering in main to lighten renderer)
+  ipcMain.handle('mpv:getAudioTracks', async () => {
+    try { return await mpvIpc.getAudioTracks() }
+    catch { return [] }
+  })
+  ipcMain.handle('mpv:getSubtitleTracks', async () => {
+    try { return await mpvIpc.getSubtitleTracks() }
+    catch { return [] }
+  })
+
+  // ── Overlay — mouse capture ──────────────────────────────────────────
+  // enable=true  : overlay captures clicks (clickable buttons)
+  // enable=false : clicks pass through to MPV (setIgnoreMouseEvents forward)
   ipcMain.handle('overlay:capture', (_, enable) => {
     if (!overlayWindow || overlayWindow.isDestroyed()) return
     if (enable) {
@@ -80,7 +75,7 @@ function registerIpcHandlers() {
     }
   })
 
-  // ── Retour depuis l'overlay → PlayerPage navigue vers la page détail ──
+  // ── Back from overlay → PlayerPage navigates to detail page ──
   ipcMain.handle('overlay:back', (_, data) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('player:back', data)
@@ -97,7 +92,7 @@ function registerIpcHandlers() {
   })
 }
 
-// ── Fenêtre overlay transparente (contrôles MPV) ─────────────────────────────
+// ── Transparent overlay window (MPV controls) ─────────────────────────────
 function createOverlay() {
   if (!mainWindow || mainWindow.isDestroyed()) return
 
@@ -108,14 +103,14 @@ function createOverlay() {
     y:           b.y,
     width:       b.width,
     height:      b.height,
-    show:            false,  // masqué jusqu'à ready-to-show — évite le flash au démarrage
+    show:            false,  // hidden until ready-to-show — avoids startup flash
     frame:           false,
     transparent:     true,
-    backgroundColor: '#00000000',  // Chromium démarre transparent avant tout CSS
+    backgroundColor: '#00000000',  // Chromium starts transparent before any CSS
     alwaysOnTop: false,
     skipTaskbar: true,
     resizable:   false,
-    focusable:   false,  // WS_EX_NOACTIVATE — clics capturés sans voler le focus à mainWindow
+    focusable:   false,  // WS_EX_NOACTIVATE — clicks captured without stealing focus from mainWindow
     parent:      mainWindow,
     webPreferences: {
       preload:          path.join(__dirname, 'preload.js'),
@@ -124,28 +119,28 @@ function createOverlay() {
     },
   })
 
-  // Afficher sans voler le focus dès que React est prêt
+  // Show without stealing focus once React is ready
   overlayWindow.once('ready-to-show', () => {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
       overlayWindow.showInactive()
     }
   })
 
-  // Démarre en mode passthrough — les clics vont à MPV
+  // Start in passthrough mode — clicks go to MPV
   overlayWindow.setIgnoreMouseEvents(true, { forward: true })
 
   app.isPackaged
     ? overlayWindow.loadFile(path.join(__dirname, '../dist/index.html'), { hash: '/overlay' })
     : overlayWindow.loadURL('http://localhost:5173/#/overlay')
 
-  // Helper : resync les bounds de l'overlay sur celles de mainWindow
+  // Helper: resync overlay bounds to mainWindow bounds
   function syncOverlayBounds() {
     if (!overlayWindow || overlayWindow.isDestroyed()) return
     const nb = mainWindow.getBounds()
     overlayWindow.setBounds({ x: nb.x, y: nb.y, width: nb.width, height: nb.height })
   }
 
-  // Suivre redimensionnements / déplacements / fullscreen
+  // Follow resize / move / fullscreen changes
   mainWindow.on('resize',            syncOverlayBounds)
   mainWindow.on('move',              syncOverlayBounds)
   mainWindow.on('enter-full-screen', syncOverlayBounds)
@@ -154,7 +149,7 @@ function createOverlay() {
   overlayWindow.on('closed', () => { overlayWindow = null })
 }
 
-// ── Fenêtre principale ────────────────────────────────────────────────────────
+// ── Main window ────────────────────────────────────────────────────────
 async function createWindow() {
   mainWindow = new BrowserWindow({
     width:           1280,
@@ -205,7 +200,7 @@ async function createWindow() {
     ? await mainWindow.loadFile(path.join(__dirname, '../dist/index.html'))
     : await mainWindow.loadURL('http://localhost:5173')
 
-  // Récupération du HWND après chargement — passé à MPV via --wid
+  // Retrieve HWND after loading — passed to MPV via --wid
   const hwndBuf   = mainWindow.getNativeWindowHandle()
   mainWindowHwnd  = hwndBuf.readBigInt64LE(0).toString()
   console.log(`[MAIN] HWND : ${mainWindowHwnd}`)
@@ -218,6 +213,7 @@ app.whenReady().then(async () => {
   await createWindow()
   setMainWindow(mainWindow)
   createOverlay()
+  mpvManager.setWindows(mainWindow, overlayWindow)
 })
 
 app.on('before-quit', () => {

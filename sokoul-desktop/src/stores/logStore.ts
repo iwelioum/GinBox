@@ -34,7 +34,7 @@ const getCircularReplacer = () => {
 export const useLogStore = create<LogStore>((set) => ({
   logs: [],
   addLog: (level, category, message, data) => set((state) => {
-    // Nettoyage des données pour éviter les crashs
+    // Data sanitization to prevent crashes
     let safeData = undefined;
     if (data) {
       try {
@@ -53,7 +53,7 @@ export const useLogStore = create<LogStore>((set) => ({
       data: safeData
     };
     
-    // On garde les 200 derniers logs
+    // Keep the last 200 logs
     return { logs: [newLog, ...state.logs].slice(0, 200) };
   }),
   clear: () => set({ logs: [] }),

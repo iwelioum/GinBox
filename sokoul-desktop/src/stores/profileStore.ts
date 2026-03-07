@@ -1,9 +1,9 @@
-// store/profileStore.ts — Rôle: Profil actif
-// RÈGLES : Aucun
+// store/profileStore.ts — Role: Active profile
+// RULES: None
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Profile } from '../types/index';
+import { Profile } from '@/shared/types/index';
 
 interface ProfileStore {
   activeProfile: Profile | null;

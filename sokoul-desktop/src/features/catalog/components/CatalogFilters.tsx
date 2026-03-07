@@ -1,9 +1,9 @@
-// CatalogFilters.tsx — Panneau mega-filtre combinable
-// BLOCS : Type · Genres · Période · Note & Popularité · Langue & Pays · Durée & Structure
-// RÈGLES : ET entre blocs, OU entre valeurs d'un même bloc.
-//          Genres/Lang/Pays : compteurs depuis items filtrés sans ce bloc.
-//          Note/Popularité : 3 sous-blocs indépendants.
-//          Durée : adaptatif films/séries selon Bloc 1 actif.
+// CatalogFilters.tsx — Combinable mega-filter panel
+// BLOCKS: Type · Genres · Period · Rating & Popularity · Language & Country · Duration & Structure
+// RULES: AND between blocks, OR between values within a block.
+//        Genres/Lang/Country: counts from items filtered without this block.
+//        Rating/Popularity: 3 independent sub-blocks.
+//        Duration: adaptive movies/series based on active Block 1.
 
 import * as React from 'react';
 import { ContentKind, CONTENT_KINDS, SeriesStatus } from '@/shared/utils/contentKind';
@@ -63,7 +63,7 @@ export const YEAR_MIN = 1920;
 export const YEAR_MAX = new Date().getFullYear();
 
 const DECADE_PRESETS: { label: string; range: [number, number] }[] = [
-  { label: 'Classiques', range: [YEAR_MIN, 1979] },
+  { label: 'Classics', range: [YEAR_MIN, 1979] },
   { label: '80s',        range: [1980, 1989] },
   { label: '90s',        range: [1990, 1999] },
   { label: '2000s',      range: [2000, 2009] },
@@ -72,75 +72,75 @@ const DECADE_PRESETS: { label: string; range: [number, number] }[] = [
 ];
 
 const SERIES_STATUS_UI: { value: SeriesStatus; label: string; sublabel: string }[] = [
-  { value: 'returning', label: 'En cours',  sublabel: 'Diffusion active'      },
-  { value: 'ended',     label: 'Terminée',  sublabel: 'Série complète'         },
-  { value: 'canceled',  label: 'Annulée',   sublabel: 'Arrêtée définitivement' },
-  { value: 'planned',   label: 'À venir',   sublabel: 'Pas encore diffusée'    },
-  { value: 'inprod',    label: 'En prod.',  sublabel: 'En production'          },
+  { value: 'returning', label: 'Ongoing',    sublabel: 'Currently airing'       },
+  { value: 'ended',     label: 'Ended',      sublabel: 'Complete series'         },
+  { value: 'canceled',  label: 'Canceled',   sublabel: 'Permanently canceled'    },
+  { value: 'planned',   label: 'Upcoming',   sublabel: 'Not yet aired'           },
+  { value: 'inprod',    label: 'In prod.',   sublabel: 'In production'           },
 ];
 
 const USER_STATUS_UI: { value: UserWatchStatus; label: string; sublabel: string }[] = [
-  { value: 'plan_to_watch', label: 'Prévu',         sublabel: 'Dans ma liste'           },
-  { value: 'in_progress',   label: 'En cours',      sublabel: 'Commencé, pas terminé'    },
-  { value: 'to_resume',     label: 'À reprendre',   sublabel: 'Nouveaux épisodes dispo'  },
-  { value: 'completed',     label: 'Terminé',       sublabel: 'Vu en entier'             },
-  { value: 'on_hold',       label: 'En pause',      sublabel: 'Mis en attente'           },
-  { value: 'dropped',       label: 'Abandonné',     sublabel: 'Arrêté en cours'          },
-  { value: 'unwatched',     label: 'Non commencé',  sublabel: 'Jamais visionné'          },
+  { value: 'plan_to_watch', label: 'Planned',       sublabel: 'In my list'              },
+  { value: 'in_progress',   label: 'In progress',   sublabel: 'Started, not finished'    },
+  { value: 'to_resume',     label: 'To resume',     sublabel: 'New episodes available'   },
+  { value: 'completed',     label: 'Completed',     sublabel: 'Fully watched'            },
+  { value: 'on_hold',       label: 'On hold',       sublabel: 'Put on hold'              },
+  { value: 'dropped',       label: 'Dropped',       sublabel: 'Stopped midway'           },
+  { value: 'unwatched',     label: 'Not started',   sublabel: 'Never watched'            },
 ];
 
 const LANGUAGE_MAP: Record<string, { label: string }> = {
-  fr: { label: 'Français' },
-  en: { label: 'Anglais' },
-  ja: { label: 'Japonais' },
-  ko: { label: 'Coréen' },
-  es: { label: 'Espagnol' },
-  de: { label: 'Allemand' },
-  it: { label: 'Italien' },
-  pt: { label: 'Portugais' },
-  zh: { label: 'Chinois' },
-  ar: { label: 'Arabe' },
-  ru: { label: 'Russe' },
+  fr: { label: 'French' },
+  en: { label: 'English' },
+  ja: { label: 'Japanese' },
+  ko: { label: 'Korean' },
+  es: { label: 'Spanish' },
+  de: { label: 'German' },
+  it: { label: 'Italian' },
+  pt: { label: 'Portuguese' },
+  zh: { label: 'Chinese' },
+  ar: { label: 'Arabic' },
+  ru: { label: 'Russian' },
   hi: { label: 'Hindi' },
-  tr: { label: 'Turc' },
-  nl: { label: 'Néerlandais' },
-  sv: { label: 'Suédois' },
-  da: { label: 'Danois' },
-  no: { label: 'Norvégien' },
-  fi: { label: 'Finnois' },
-  pl: { label: 'Polonais' },
-  th: { label: 'Thaï' },
-  id: { label: 'Indonésien' },
-  he: { label: 'Hébreu' },
-  cs: { label: 'Tchèque' },
-  hu: { label: 'Hongrois' },
+  tr: { label: 'Turkish' },
+  nl: { label: 'Dutch' },
+  sv: { label: 'Swedish' },
+  da: { label: 'Danish' },
+  no: { label: 'Norwegian' },
+  fi: { label: 'Finnish' },
+  pl: { label: 'Polish' },
+  th: { label: 'Thai' },
+  id: { label: 'Indonesian' },
+  he: { label: 'Hebrew' },
+  cs: { label: 'Czech' },
+  hu: { label: 'Hungarian' },
 };
 
 const COUNTRY_MAP: Record<string, { label: string }> = {
-  US: { label: 'États-Unis' },
-  GB: { label: 'Royaume-Uni' },
+  US: { label: 'United States' },
+  GB: { label: 'United Kingdom' },
   FR: { label: 'France' },
-  JP: { label: 'Japon' },
-  KR: { label: 'Corée du Sud' },
-  DE: { label: 'Allemagne' },
-  IT: { label: 'Italie' },
-  ES: { label: 'Espagne' },
-  CN: { label: 'Chine' },
-  IN: { label: 'Inde' },
+  JP: { label: 'Japan' },
+  KR: { label: 'South Korea' },
+  DE: { label: 'Germany' },
+  IT: { label: 'Italy' },
+  ES: { label: 'Spain' },
+  CN: { label: 'China' },
+  IN: { label: 'India' },
   CA: { label: 'Canada' },
-  AU: { label: 'Australie' },
-  MX: { label: 'Mexique' },
-  BR: { label: 'Brésil' },
-  RU: { label: 'Russie' },
-  SE: { label: 'Suède' },
-  DK: { label: 'Danemark' },
-  NO: { label: 'Norvège' },
-  BE: { label: 'Belgique' },
-  NL: { label: 'Pays-Bas' },
-  PL: { label: 'Pologne' },
-  IL: { label: 'Israël' },
-  TR: { label: 'Turquie' },
-  TH: { label: 'Thaïlande' },
+  AU: { label: 'Australia' },
+  MX: { label: 'Mexico' },
+  BR: { label: 'Brazil' },
+  RU: { label: 'Russia' },
+  SE: { label: 'Sweden' },
+  DK: { label: 'Denmark' },
+  NO: { label: 'Norway' },
+  BE: { label: 'Belgium' },
+  NL: { label: 'Netherlands' },
+  PL: { label: 'Poland' },
+  IL: { label: 'Israel' },
+  TR: { label: 'Turkey' },
+  TH: { label: 'Thailand' },
 };
 
 function getLangMeta(code: string) {
@@ -155,18 +155,18 @@ const COUNTRY_VISIBLE_LIMIT = 8;
 
 const RATING_PRESETS: { label: string; min: number; color: string }[] = [
   { label: 'Excellent ≥ 8', min: 8, color: 'text-emerald-400' },
-  { label: 'Très bien ≥ 7', min: 7, color: 'text-green-400'   },
-  { label: 'Bien ≥ 6',      min: 6, color: 'text-yellow-400'  },
-  { label: 'Passable ≥ 5',  min: 5, color: 'text-orange-400'  },
-  { label: 'Tous',           min: 0, color: 'text-white/30'    },
+  { label: 'Very good ≥ 7', min: 7, color: 'text-green-400'   },
+  { label: 'Good ≥ 6',      min: 6, color: 'text-yellow-400'  },
+  { label: 'Decent ≥ 5',    min: 5, color: 'text-orange-400'  },
+  { label: 'All',            min: 0, color: 'text-white/30'    },
 ];
 
 const VOTE_PRESETS: { label: string; min: number; tooltip: string }[] = [
-  { label: '> 10 000', min: 10000, tooltip: 'Très populaire, note très fiable'   },
-  { label: '> 1 000',  min: 1000,  tooltip: 'Populaire, note fiable'             },
-  { label: '> 500',    min: 500,   tooltip: 'Note assez fiable'                  },
-  { label: '> 100',    min: 100,   tooltip: 'Note peu fiable'                    },
-  { label: 'Tous',     min: 0,     tooltip: 'Inclut les titres très peu notés'   },
+  { label: '> 10 000', min: 10000, tooltip: 'Very popular, highly reliable rating' },
+  { label: '> 1 000',  min: 1000,  tooltip: 'Popular, reliable rating'             },
+  { label: '> 500',    min: 500,   tooltip: 'Fairly reliable rating'               },
+  { label: '> 100',    min: 100,   tooltip: 'Unreliable rating'                    },
+  { label: 'All',      min: 0,     tooltip: 'Includes titles with very few ratings'},
 ];
 
 const POPULARITY_PRESETS: { label: string; topN: number | null }[] = [
@@ -174,28 +174,28 @@ const POPULARITY_PRESETS: { label: string; topN: number | null }[] = [
   { label: 'Top 100', topN: 100  },
   { label: 'Top 250', topN: 250  },
   { label: 'Top 500', topN: 500  },
-  { label: 'Tous',    topN: null },
+  { label: 'All',    topN: null },
 ];
 
 const MOVIE_RUNTIME_PRESETS: { label: string; sublabel: string; range: [number, number] }[] = [
-  { label: 'Court',     sublabel: '< 90 min',   range: [0, 89] },
+  { label: 'Short',     sublabel: '< 90 min',   range: [0, 89] },
   { label: 'Standard',  sublabel: '90–120 min', range: [90, 120] },
   { label: 'Long',      sublabel: '2h–2h30',    range: [121, 150] },
-  { label: 'Très long', sublabel: '> 2h30',     range: [151, 999] },
+  { label: 'Very long', sublabel: '> 2h30',     range: [151, 999] },
 ];
 
 const SEASONS_PRESETS: { label: string; sublabel: string; range: [number, number] }[] = [
-  { label: 'Mini-série', sublabel: '1 saison',     range: [1, 1] },
-  { label: 'Courte',     sublabel: '2–3 saisons',  range: [2, 3] },
-  { label: 'Moyenne',    sublabel: '4–6 saisons',  range: [4, 6] },
-  { label: 'Longue',     sublabel: '7–12 saisons', range: [7, 12] },
-  { label: 'Saga',       sublabel: '> 12 saisons', range: [13, 999] },
+  { label: 'Mini-series', sublabel: '1 season',      range: [1, 1] },
+  { label: 'Short',       sublabel: '2–3 seasons',   range: [2, 3] },
+  { label: 'Medium',      sublabel: '4–6 seasons',   range: [4, 6] },
+  { label: 'Long',        sublabel: '7–12 seasons',  range: [7, 12] },
+  { label: 'Saga',        sublabel: '> 12 seasons',  range: [13, 999] },
 ];
 
 const EPISODE_RUNTIME_PRESETS: { label: string; sublabel: string; range: [number, number] }[] = [
   { label: 'Sitcom', sublabel: '~20–30 min', range: [0, 35] },
   { label: 'Drama',  sublabel: '40–60 min',  range: [36, 65] },
-  { label: 'Épique', sublabel: '> 65 min',   range: [66, 999] },
+  { label: 'Epic',   sublabel: '> 65 min',   range: [66, 999] },
 ];
 
 const KIND_ICONS: Partial<Record<ContentKind, LucideIcon>> = {
@@ -292,14 +292,14 @@ export interface EnrichedItem extends CatalogMeta {
   _status:        SeriesStatus;
   _lang:          string;
   _countries:     string[];
-  _rating:        number | null;   // vote_average arrondi (null si absent)
+  _rating:        number | null;   // rounded vote_average (null if absent)
   _votes:         number;          // vote_count
-  _popularity:    number;          // score popularité TMDB
-  _popRank:       number;          // rang dans le type (films ou séries)
-  _movieRuntime:  number | null;   // runtime film (null si absent)
+  _popularity:    number;          // TMDB popularity score
+  _popRank:       number;          // rank within type (movies or series)
+  _movieRuntime:  number | null;   // movie runtime (null if absent)
   _seasonCount:   number | null;   // number_of_seasons
   _episodeCount:  number | null;   // number_of_episodes
-  _episodeRuntime: number | null;  // médiane episode_run_time
+  _episodeRuntime: number | null;  // median episode_run_time
   _isLocal:      boolean;
   _isDebrid:     boolean;
   _providers:    StreamingProvider[];
@@ -380,9 +380,9 @@ export const countActiveFilters = (f: FilterState): number => {
 
 interface CatalogFiltersProps {
   allItems:          EnrichedItem[];
-  genreItems:        EnrichedItem[];   // filtrés sans genres
-  langCountryItems:  EnrichedItem[];   // filtrés sans langue/pays
-  availabilityItems: EnrichedItem[];   // filtrés sans disponibilité
+  genreItems:        EnrichedItem[];   // filtered without genres
+  langCountryItems:  EnrichedItem[];   // filtered without language/country
+  availabilityItems: EnrichedItem[];   // filtered without availability
   filters:           FilterState;
   onChange:          (f: FilterState) => void;
   profileActive:     boolean;
@@ -426,7 +426,7 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
     filters.kinds.length > 0 &&
     filters.kinds.every((k) => k === 'movie' || k === 'short');
 
-  // Affichage adaptatif Bloc 6
+  // Adaptive display for Block 6
   const showMovieDuration =
     filters.kinds.length === 0 ||
     filters.kinds.some((k) => k === 'movie' || k === 'short' || k === 'documentary');
@@ -584,21 +584,21 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
   return (
     <div className="space-y-7 text-sm">
 
-      {/* En-tête + Reset */}
+      {/* Header + Reset */}
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold text-white/90 tracking-wide uppercase">Filtres</h2>
+        <h2 className="text-base font-bold text-white/90 tracking-wide uppercase">Filters</h2>
         {hasAnyFilter && (
           <button
             onClick={() => { onChange(DEFAULT_FILTERS); setShowAllGenres(false); setShowAllCountries(false); }}
             className="text-xs text-white/40 hover:text-white/80 transition-colors"
           >
-            Réinitialiser
+            Reset
           </button>
         )}
       </div>
 
       <section>
-        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Type de contenu</h3>
+        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Content type</h3>
         <div className="grid grid-cols-3 gap-2">
           {CONTENT_KINDS.map(({ kind, label }) => {
             const count  = kindCounts[kind] ?? 0;
@@ -642,25 +642,25 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             <button onClick={() => setShowAllGenres((v) => !v)}
               className="mt-2 text-[11px] text-white/35 hover:text-white/70 transition-colors"
             >
-              {showAllGenres ? 'Voir moins' : `Voir tous (${availableGenres.length})`}
+              {showAllGenres ? 'Show less' : `Show all (${availableGenres.length})`}
             </button>
           )}
         </section>
       )}
 
       <section>
-        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Période de sortie</h3>
+        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Release period</h3>
         <DualRangeSlider value={filters.yearRange} onChange={(r) => onChange({ ...filters, yearRange: r })} />
         <div className="flex justify-between text-[11px] text-white/40 mt-2 mb-3 font-mono">
           <span>{filters.yearRange[0]}</span>
-          <span>{filters.yearRange[1] === YEAR_MAX ? "Aujourd'hui" : filters.yearRange[1]}</span>
+          <span>{filters.yearRange[1] === YEAR_MAX ? "Today" : filters.yearRange[1]}</span>
         </div>
         <div className="flex flex-wrap gap-1.5">
           <button onClick={() => onChange({ ...filters, yearRange: [YEAR_MIN, YEAR_MAX] })}
             className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
               isDefaultYear ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
             }`}
-          >Tout</button>
+          >All</button>
           {DECADE_PRESETS.map(({ label, range }) => {
             const active = filters.yearRange[0] === range[0] && filters.yearRange[1] === range[1];
             return (
@@ -675,11 +675,11 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
       </section>
 
       <section>
-        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Note & Popularité</h3>
+        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Rating & Popularity</h3>
 
-        {/* Sous-bloc : Note TMDB */}
+        {/* Sub-block: TMDB Rating */}
         <div className="mb-5">
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Note TMDB</p>
+          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">TMDB Rating</p>
           <div className="flex flex-wrap gap-1.5 mb-2">
             {RATING_PRESETS.map(({ label, min, color }) => {
               const active = filters.ratingMin === min;
@@ -706,23 +706,23 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
               style={{ accentColor: 'white' }}
             />
             <span className="text-[10px] text-white/40 w-10 text-right font-mono">
-              {filters.ratingMin > 0 ? `≥ ${filters.ratingMin}` : 'Tous'}
+              {filters.ratingMin > 0 ? `≥ ${filters.ratingMin}` : 'All'}
             </span>
           </div>
           {filters.ratingMin > 0 && filters.votesMin === 0 && (
             <p className="text-[10px] text-amber-500/70 mt-1.5 inline-flex items-center gap-1">
               <AlertTriangle size={11} />
-              Inclut des titres avec très peu de votes
+              Includes titles with very few votes
             </p>
           )}
         </div>
 
-        {/* Sous-bloc : Fiabilité */}
+        {/* Sub-block: Reliability */}
         <div className="mb-5">
           <div className="flex items-center gap-1.5 mb-2">
-            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Fiabilité de la note</p>
+            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Rating reliability</p>
             <span
-              title="Un film avec 5 votes peut avoir 10/10. Ce filtre garantit que la note est représentative."
+              title="A movie with 5 votes can have 10/10. This filter ensures the rating is representative."
               className="text-[10px] text-white/20 cursor-help"
             >
               <Info size={11} />
@@ -742,12 +742,12 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           </div>
         </div>
 
-        {/* Sous-bloc : Popularité */}
+        {/* Sub-block: Popularity */}
         <div>
           <div className="flex items-center gap-1.5 mb-2">
-            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Popularité TMDB</p>
+            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">TMDB Popularity</p>
             <span
-              title="Classement basé sur les tendances TMDB. Indépendant de la note."
+              title="Ranking based on TMDB trends. Independent of rating."
               className="text-[10px] text-white/20 cursor-help"
             >
               <Info size={11} />
@@ -773,11 +773,11 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
       {(availableLangs.length > 1 || availableCountries.length > 0) && (
         <section>
-          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Langue & Pays</h3>
+          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Language & Country</h3>
 
           {availableLangs.length > 1 && (
             <div className="mb-4">
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Langue originale</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Original language</p>
               <div className="flex flex-wrap gap-1.5">
                 {availableLangs.map(({ code, label, count }) => {
                   const active = filters.originalLanguages.includes(code);
@@ -801,7 +801,7 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
           {availableCountries.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Pays de production</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Production country</p>
               <div className="flex flex-wrap gap-1.5">
                 {displayedCountries.map(({ code, label, count }) => {
                   const active = filters.countries.includes(code);
@@ -824,7 +824,7 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
                 <button onClick={() => setShowAllCountries((v) => !v)}
                   className="mt-2 text-[11px] text-white/35 hover:text-white/70 transition-colors"
                 >
-                  {showAllCountries ? 'Voir moins' : `Voir tous (+${availableCountries.length - COUNTRY_VISIBLE_LIMIT})`}
+                  {showAllCountries ? 'Show less' : `Show all (+${availableCountries.length - COUNTRY_VISIBLE_LIMIT})`}
                 </button>
               )}
             </div>
@@ -834,18 +834,18 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 
       {hasDurationData && (showMovieDuration || showSeriesDuration) && (
         <section>
-          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Durée & Structure</h3>
+          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Duration & Structure</h3>
 
-          {/* Films — durée */}
+          {/* Movies — duration */}
           {showMovieDuration && (
             <div className="mb-5">
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Durée du film</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Movie duration</p>
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => onChange({ ...filters, movieRuntimeRange: null })}
                   className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
                     filters.movieRuntimeRange === null ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
                   }`}
-                >Toutes</button>
+                >All</button>
                 {MOVIE_RUNTIME_PRESETS.map(({ label, sublabel, range }) => {
                   const active = filters.movieRuntimeRange?.[0] === range[0] && filters.movieRuntimeRange?.[1] === range[1];
                   const count  = allItems.filter((i) => i._movieRuntime !== null && i._movieRuntime >= range[0] && i._movieRuntime <= range[1]).length;
@@ -867,16 +867,16 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             </div>
           )}
 
-          {/* Séries — nombre de saisons */}
+          {/* Series — number of seasons */}
           {showSeriesDuration && (
             <div className="mb-5">
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Nombre de saisons</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Number of seasons</p>
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => onChange({ ...filters, seasonsRange: null })}
                   className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
                     filters.seasonsRange === null ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
                   }`}
-                >Toutes</button>
+                >All</button>
                 {SEASONS_PRESETS.map(({ label, sublabel, range }) => {
                   const active = filters.seasonsRange?.[0] === range[0] && filters.seasonsRange?.[1] === range[1];
                   const count  = allItems.filter((i) => i._seasonCount !== null && i._seasonCount >= range[0] && i._seasonCount <= range[1]).length;
@@ -898,16 +898,16 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             </div>
           )}
 
-          {/* Séries — durée d'épisode */}
+          {/* Series — episode duration */}
           {showSeriesDuration && (
             <div>
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Durée d'épisode</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Episode duration</p>
               <div className="flex flex-wrap gap-2">
                 <button onClick={() => onChange({ ...filters, episodeRtRange: null })}
                   className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
                     filters.episodeRtRange === null ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
                   }`}
-                >Toutes</button>
+                >All</button>
                 {EPISODE_RUNTIME_PRESETS.map(({ label, sublabel, range }) => {
                   const active = filters.episodeRtRange?.[0] === range[0] && filters.episodeRtRange?.[1] === range[1];
                   const count  = allItems.filter((i) => i._episodeRuntime !== null && i._episodeRuntime >= range[0] && i._episodeRuntime <= range[1]).length;
@@ -932,9 +932,9 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
       )}
       {hasAvailabilityData && (
         <section>
-          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Disponibilité</h3>
+          <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Availability</h3>
 
-          {/* Toggle "Regardable maintenant" */}
+          {/* Toggle "Watchable now" */}
           <button
             onClick={() => onChange({ ...filters, watchableNow: !filters.watchableNow })}
             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-sm mb-5 ${
@@ -945,18 +945,18 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           >
             <span className="flex items-center gap-2">
               <Play size={14} />
-              <span>Regardable maintenant</span>
+              <span>Watchable now</span>
             </span>
             <span className="text-[10px] opacity-60">Local · Debrid · Streaming</span>
           </button>
 
-          {/* Source de disponibilité */}
+          {/* Availability source */}
           <div className="mb-4">
             <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Source</p>
             <div className="flex flex-wrap gap-1.5">
               {([
-                { value: 'local'     as AvailabilitySource, label: 'Bibliothèque', icon: HardDrive, count: availabilityItems.filter((i) => i._isLocal).length    },
-                { value: 'debrid'    as AvailabilitySource, label: 'Cache Debrid', icon: Zap, count: availabilityItems.filter((i) => i._isDebrid).length   },
+                { value: 'local'     as AvailabilitySource, label: 'Library',      icon: HardDrive, count: availabilityItems.filter((i) => i._isLocal).length    },
+                { value: 'debrid'    as AvailabilitySource, label: 'Debrid Cache', icon: Zap, count: availabilityItems.filter((i) => i._isDebrid).length   },
                 { value: 'streaming' as AvailabilitySource, label: 'Streaming',    icon: Radio, count: availabilityItems.filter((i) => i._providers.length > 0).length },
               ]).map(({ value, label, icon: SourceIcon, count }) => {
                 const active = filters.availSources.includes(value);
@@ -975,15 +975,15 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             </div>
           </div>
 
-          {/* Type d'accès streaming */}
+          {/* Streaming access type */}
           {(filters.availSources.includes('streaming') || filters.availSources.length === 0) && (
             <div className="mb-4">
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Type d'accès</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Access type</p>
               <div className="flex flex-wrap gap-1.5">
                 {([
-                  { value: 'all'      as const, label: 'Tous',          icon: undefined },
-                  { value: 'sub'      as const, label: 'Abonnement', icon: BadgeCheck     },
-                  { value: 'rent_buy' as const, label: 'Location/Achat', icon: CreditCard },
+                  { value: 'all'      as const, label: 'All',             icon: undefined },
+                  { value: 'sub'      as const, label: 'Subscription',    icon: BadgeCheck     },
+                  { value: 'rent_buy' as const, label: 'Rental/Purchase', icon: CreditCard },
                 ] as const).map(({ value, label, icon: AccessIcon }) => (
                   <button key={value} onClick={() => onChange({ ...filters, streamingType: value })}
                     className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
@@ -998,10 +998,10 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
             </div>
           )}
 
-          {/* Providers spécifiques */}
+          {/* Specific providers */}
           {availableProviders.length > 0 && (
             <div>
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Plateforme</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Platform</p>
               <div className="flex flex-wrap gap-1.5">
                 {availableProviders.map(({ id, name, flag, color, count }) => {
                   const active = filters.selectedProviders.includes(id);
@@ -1025,13 +1025,13 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
       )}
 
       <section>
-        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Statut & Progression</h3>
+        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">Status & Progress</h3>
 
-        {/* Sous-bloc 1 : Statut TMDB (séries uniquement) */}
+        {/* Sub-block 1: TMDB Status (series only) */}
         {(filters.kinds.length === 0 ||
           filters.kinds.some((k) => ['tv', 'anime', 'animation', 'miniseries'].includes(k))) && (
           <div className="mb-5">
-            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Statut de la série</p>
+            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Series status</p>
             <div className="flex flex-wrap gap-2">
               {SERIES_STATUS_UI.map(({ value, label, sublabel }) => {
                 const active = filters.seriesStatuses.includes(value);
@@ -1058,10 +1058,10 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           </div>
         )}
 
-        {/* Sous-bloc 2 : Progression utilisateur */}
+        {/* Sub-block 2: User progress */}
         {profileActive ? (
           <div>
-            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">Ma progression</p>
+            <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">My progress</p>
             <div className="flex flex-wrap gap-2 mb-4">
               {USER_STATUS_UI.map(({ value, label, sublabel }) => {
                 const active = filters.userStatuses.includes(value);
@@ -1085,7 +1085,7 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
               })}
             </div>
 
-            {/* Mini barres de progression si "En cours" actif */}
+            {/* Mini progress bars if "In progress" active */}
             {filters.userStatuses.includes('in_progress') && (() => {
               const inProgressItems = allItems
                 .filter((i) => i._userStatus === 'in_progress')
@@ -1118,20 +1118,20 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10">
             <UserRound size={16} className="text-white/45" />
             <span className="text-xs text-white/40 italic">
-              Connecte-toi à un profil pour suivre ta progression
+              Sign in to a profile to track your progress
             </span>
           </div>
         )}
       </section>
       <section>
-        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Tranche d'âge</h3>
+        <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Age rating</h3>
         <div className="flex flex-wrap gap-1.5">
           {(['all', '10+', '12+', '16+', '18+', 'nc'] as AgeRating[]).map((rating) => {
             const isAll    = rating === 'all';
             const active   = isAll
               ? filters.selectedRatings.length === 0
               : filters.selectedRatings.includes(rating);
-            const label    = isAll ? 'Tous' : rating === 'nc' ? 'Non classé' : rating;
+            const label    = isAll ? 'All' : rating === 'nc' ? 'Unrated' : rating;
             return (
               <button
                 key={rating}

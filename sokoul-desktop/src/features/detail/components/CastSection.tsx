@@ -1,8 +1,9 @@
 // components/detail/CastSection.tsx
-// Photos circulaires, grayscale → couleur au hover
-// ring-[var(--accent)] au hover
+// Circular photos, grayscale → color on hover
+// ring-[var(--accent)] on hover
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { CastMember, Credits } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
@@ -24,12 +25,12 @@ const CastCard: React.FC<CastCardProps> = ({ person }) => {
         })
       }
     >
-      {/* Photo circulaire */}
+      {/* Circular photo */}
       <div
         className="w-[100px] h-[100px] rounded-full overflow-hidden
                    ring-2 ring-white/10 transition-all duration-300"
         style={{
-          // ring accent au hover via JS (pas de support Tailwind pour CSS var dans ring)
+          // accent ring on hover via JS (no Tailwind support for CSS var in ring)
         }}
         onMouseEnter={e => {
           (e.currentTarget as HTMLElement).style.boxShadow =
@@ -80,13 +81,14 @@ interface CastSectionProps {
 }
 
 export const CastSection: React.FC<CastSectionProps> = ({ cast: castProp, credits, theme: _theme }) => {
+  const { t } = useTranslation();
   const cast = castProp ?? credits?.cast ?? [];
   if (!cast || cast.length === 0) return null;
 
   return (
     <section className="mb-[40px]">
       <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-6">
-        Casting principal
+        {t('detail.mainCast')}
       </h2>
       <div
         className="flex gap-4 overflow-x-auto pb-4"

@@ -1,10 +1,12 @@
-// NOM — TitleBar.tsx — Rôle: Barre de titre custom (contrôles fenêtre)
-// RÈGLES : La barre doit être draggable, les boutons non.
+// NAME — TitleBar.tsx — Role: Custom title bar (window controls)
+// RULES: The bar must be draggable, the buttons must not be.
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Minus, Square, Copy, X } from 'lucide-react';
 
 const TitleBar: React.FC = () => {
+  const { t } = useTranslation();
   const [isMaximized, setIsMaximized] = React.useState(false);
 
   React.useEffect(() => {
@@ -33,13 +35,13 @@ const TitleBar: React.FC = () => {
       className="fixed top-0 left-0 right-0 h-8 bg-transparent z-50 flex justify-end items-center"
     >
       <div style={{ WebkitAppRegion: 'no-drag' }} className="flex items-center h-full">
-        <TitleBarButton onClick={handleMinimize} aria-label="Minimize">
+        <TitleBarButton onClick={handleMinimize} aria-label={t('window.minimize')}>
           <Minus size={16} />
         </TitleBarButton>
-        <TitleBarButton onClick={handleMaximize} aria-label={isMaximized ? 'Restore' : 'Maximize'}>
+        <TitleBarButton onClick={handleMaximize} aria-label={isMaximized ? t('window.restore') : t('window.maximize')}>
           {isMaximized ? <Copy size={14} /> : <Square size={14} />}
         </TitleBarButton>
-        <TitleBarButton onClick={handleClose} aria-label="Close" className="hover:bg-red-500">
+        <TitleBarButton onClick={handleClose} aria-label={t('window.close')} className="hover:bg-red-500">
           <X size={16} />
         </TitleBarButton>
       </div>

@@ -1,9 +1,9 @@
-// useLists.ts — Rôle: useListItems corrigé
-// RÈGLES : Aucun
+// useLists.ts — Role: Fixed useListItems
+// RULES: None
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { endpoints } from '../../api/client';
-import { useProfileStore } from '../stores/profileStore';
+import { endpoints } from '@/shared/api/client';
+import { useProfileStore } from '@/stores/profileStore';
 import type { UserList, ListItem, ContentType } from '../types/index';
 
 /** Fetches all user lists scoped to the active profile, ensuring each profile sees only its own watchlists and favorites. */

@@ -7,5 +7,6 @@ pub mod catalog;
 pub mod stream;
 pub mod debrid;
 pub mod fanart;
+pub mod artwork;
 pub mod user_progress;
 pub mod collections;

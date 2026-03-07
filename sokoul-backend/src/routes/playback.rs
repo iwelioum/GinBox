@@ -13,7 +13,7 @@ use serde::Deserialize;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/position", post(save_position))
+        .route("/position", post(post_position))
         .route("/position/:content_id", get(get_position))
         .route("/history", get(get_history))
 }
@@ -50,7 +50,7 @@ pub struct GetHistoryQuery {
     pub limit: u32,
 }
 
-async fn save_position(
+async fn post_position(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<SavePositionRequest>,
 ) -> Result<(), AppError> {

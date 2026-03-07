@@ -6,10 +6,10 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { endpoints } from '../../../api/client';
+import { endpoints } from '@/shared/api/client';
 import { pickBestSource } from '../../../shared/utils/parsing';
 import type { ContentType, Source, EpisodeVideo } from '../../../shared/types/index';
-import type { StreamPreferences } from '../../../shared/stores/preferencesStore';
+import type { StreamPreferences } from '@/stores/preferencesStore';
 
 interface UseEpisodeNavigationOptions {
   contentType:  string;
@@ -156,7 +156,7 @@ export function useEpisodeNavigation({
       const best = pickBestSource(sources, prefs);
 
       if (!best || !best.magnet) {
-        throw new Error('Aucune source valide pour cet episode.');
+        throw new Error('No valid source for this episode.');
       }
 
       const { data } = await endpoints.debrid.unrestrict(best.magnet, best.cached_rd);
@@ -173,7 +173,7 @@ export function useEpisodeNavigation({
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      setSwitchError(`Impossible de lancer l'episode (${message}).`);
+      setSwitchError(`Unable to start episode (${message}).`);
     } finally {
       setSwitchingEpisode(false);
     }

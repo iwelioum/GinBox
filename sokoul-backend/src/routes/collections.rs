@@ -13,8 +13,8 @@ use crate::services::tmdb;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/all",  get(list_collections_handler))
-        .route("/:id",  get(collection_detail_handler))
+        .route("/all",  get(get_collections))
+        .route("/:id",  get(get_collection_detail))
 }
 
 #[derive(Deserialize)]
@@ -24,7 +24,7 @@ pub struct ListQuery {
 }
 
 // GET /collections/all?page=1&limit=24
-async fn list_collections_handler(
+async fn get_collections(
     Query(query): Query<ListQuery>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -64,7 +64,7 @@ async fn list_collections_handler(
 }
 
 // GET /collections/:id
-async fn collection_detail_handler(
+async fn get_collection_detail(
     Path(id): Path<u32>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {

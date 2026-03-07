@@ -15,7 +15,7 @@ import { ControlsBar } from './ControlsBar';
 import { AudioPanel } from './AudioPanel';
 import { SubtitlesPanel } from './SubtitlesPanel';
 import { SourcePanel, SourceButton } from './SourcePanel';
-import '../styles/player.tokens.css';
+import '@/styles/player.tokens.css';
 
 export default function OverlayPage() {
   /** Force transparent background before first paint (Electron overlay requirement) */

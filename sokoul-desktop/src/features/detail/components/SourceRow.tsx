@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Source } from '../../../shared/types/index';
 import { Play, Download, Zap, Volume2, MessageSquare, AlertTriangle } from 'lucide-react';
 import { parseTorrentName } from '../../../shared/utils/parsing';
@@ -10,6 +11,7 @@ interface SourceRowProps {
 }
 
 export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
+  const { t } = useTranslation();
   const meta = parseTorrentName(source.title);
   const badgeStyle = "flex items-center gap-1.5 px-[7px] py-[3px] rounded-[4px] text-[11px] font-[800] whitespace-nowrap";
 
@@ -29,7 +31,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
           </span>
         )}
         {meta.isMultiSuspect && (
-          <span title="Audio FR non confirmé" className={`${badgeStyle} bg-orange-600 text-white`}>
+          <span title={t('detail.frAudioUnconfirmed')} className={`${badgeStyle} bg-orange-600 text-white`}>
             <AlertTriangle size={12} strokeWidth={3} /> MULTI
           </span>
         )}
@@ -39,14 +41,14 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
         {meta.hdr === 'HDR10+' && <span className={`${badgeStyle} bg-amber-600 text-white`}>HDR10+</span>}
       </div>
 
-      {/* Titre */}
+      {/* Title */}
       <div className="flex-1 min-w-0">
         <span className="text-[14px] text-white/90 truncate font-medium block">
           {source.title}
         </span>
       </div>
 
-      {/* Métadonnées */}
+      {/* Metadata */}
       <div className="hidden sm:flex items-center gap-[16px] shrink-0">
         {source.cached_rd ? (
           <span className="flex items-center gap-[4px] text-[12px] font-[700] text-[#34D399]">
@@ -77,7 +79,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
             e.stopPropagation();
             onPlay();
           }}
-          title="Lancer la lecture"
+          title={t('detail.startPlayback')}
         >
           <Play size={18} className="fill-current ml-0.5" />
         </button>
@@ -89,7 +91,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
               e.stopPropagation();
               onDownload();
             }}
-            title="Télécharger via Real-Debrid"
+            title={t('detail.downloadRealDebrid')}
           >
             <Download size={18} />
           </button>

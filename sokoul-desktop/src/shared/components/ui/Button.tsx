@@ -1,5 +1,5 @@
-// NOM — Button.tsx — Rôle: Composant bouton UI
-// RÈGLES : Doit supporter les variantes 'primary' (Lecture) et 'secondary' (Ma liste)
+// NAME — Button.tsx — Role: UI button component
+// RULES: Must support 'primary' (Play) and 'secondary' (My list) variants
 import * as React from 'react';
 import { Play } from 'lucide-react';
 

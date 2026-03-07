@@ -1,8 +1,8 @@
 import type { Source } from '../types/index';
-import type { StreamPreferences } from '../stores/preferencesStore';
+import type { StreamPreferences } from '@/stores/preferencesStore';
 
 /**
- * Métadonnées extraites d'un nom de fichier de torrent.
+ * Metadata extracted from a torrent file name.
  */
 export interface TorrentMeta {
   quality: '2160p' | '1080p' | '720p' | '480p' | 'unknown';
@@ -15,17 +15,17 @@ export interface TorrentMeta {
 }
 
 /**
- * Analyse un nom de fichier torrent pour en extraire les métadonnées de qualité,
- * langue, codec, etc. en suivant un ensemble de règles précises.
+ * Parses a torrent file name to extract quality, language,
+ * codec, etc. metadata following a set of precise rules.
  *
- * @param name Le nom de fichier du torrent.
- * @returns Un objet TorrentMeta avec les informations extraites.
+ * @param name The torrent file name.
+ * @returns A TorrentMeta object with the extracted information.
  */
 export function parseTorrentName(name: string): TorrentMeta {
   const upperName = name.toUpperCase();
   const lowerName = name.toLowerCase();
 
-  // 1. Qualité
+  // 1. Quality
   let quality: TorrentMeta['quality'] = 'unknown';
   if (upperName.includes('2160P') || upperName.includes('4K')) quality = '2160p';
   else if (upperName.includes('1080P')) quality = '1080p';
@@ -38,28 +38,28 @@ export function parseTorrentName(name: string): TorrentMeta {
   else if (upperName.includes('HDR10+')) hdr = 'HDR10+';
   else if (/\bHDR\b/.test(upperName) && !upperName.includes('SDR')) hdr = 'HDR';
 
-  // 3. Détection de la langue (FR) en suivant les règles et l'ordre spécifié
+  // 3. French language (FR) detection following specified rules and order
   let hasFrenchAudio = false;
   let hasSubFr = false;
   let isMultiSuspect = false;
   
-  // Règle 1: Priorité la plus haute pour l'audio français confirmé
+  // Rule 1: Highest priority for confirmed French audio
   if (upperName.includes('TRUEFRENCH') || upperName.includes('VFF')) {
     hasFrenchAudio = true;
   }
-  // Règle 5: VOSTFR/SUBFRENCH indique des sous-titres, et prime sur les autres tags audio FR génériques
+  // Rule 5: VOSTFR/SUBFRENCH indicates subtitles, and overrides other generic FR audio tags
   else if (upperName.includes('VOSTFR') || upperName.includes('SUBFRENCH')) {
     hasSubFr = true;
-    hasFrenchAudio = false; // Conformément à la règle
+    hasFrenchAudio = false; // As per the rule
   }
-  // Règle 2 & 3: Tags audio français standards (incluant le cas MULTI+VF/FRENCH)
+  // Rule 2 & 3: Standard French audio tags (including MULTI+VF/FRENCH case)
   else if (upperName.includes('FRENCH') || upperName.includes('.VF.') || upperName.includes('-VF-') || upperName.includes('_VF_')) {
     hasFrenchAudio = true;
   }
-  // Règle 4: MULTI "seul" (c-à-d. sans autre tag audio FR détecté par les règles précédentes)
+  // Rule 4: MULTI "alone" (i.e. without another FR audio tag detected by previous rules)
   else if (upperName.includes('MULTI')) {
     isMultiSuspect = true;
-    hasFrenchAudio = false; // Conformément à la règle
+    hasFrenchAudio = false; // As per the rule
   }
 
   // 4. Codec
@@ -76,7 +76,7 @@ export function parseTorrentName(name: string): TorrentMeta {
   let source = 'unknown';
   const sourceMatch = name.match(/-(\w+)(\.\w{3,4})?$/);
   if (sourceMatch && sourceMatch[1]) {
-    // S'assurer que le groupe n'est pas un tag technique comme un codec
+    // Ensure the group is not a technical tag like a codec
     if (!/x264|x265|h264|h265|avc|hevc/i.test(sourceMatch[1])) {
         source = sourceMatch[1];
     }

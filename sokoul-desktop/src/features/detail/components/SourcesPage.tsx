@@ -7,23 +7,23 @@ import {
   Zap, Languages, Globe, Download,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { client, endpoints } from '../../../api/client';
+import { client, endpoints } from '@/shared/api/client';
 import { Spinner } from '../../../shared/components/ui/Spinner';
-import { SourceRow } from './SourceRow'; // conservé
+import { SourceRow } from './SourceRow'; // kept
 import { ResumeModal } from '../../../shared/components/modals/ResumeModal';
 import type { CatalogMeta, ContentType, Source } from '../../../shared/types/index';
-import { useLogStore } from '../../../shared/stores/logStore';
-import { useProfileStore } from '../../../shared/stores/profileStore';
-import { usePreferencesStore } from '../../../shared/stores/preferencesStore';
+import { useLogStore } from '@/stores/logStore';
+import { useProfileStore } from '@/stores/profileStore';
+import { usePreferencesStore } from '@/stores/preferencesStore';
 import { parseTorrentName, pickBestSource } from '../../../shared/utils/parsing';
 import { extractErrorMessage } from '../../../shared/utils/error';
 
 function formatCacheAge(cachedAt: number): string {
   const age = Math.floor(Date.now() / 1000) - cachedAt;
-  if (age < 60)     return "à l'instant";
-  if (age < 3600)   return `il y a ${Math.floor(age / 60)} min`;
-  if (age < 86_400) return `il y a ${Math.floor(age / 3600)} h`;
-  return `il y a ${Math.floor(age / 86_400)} j`;
+  if (age < 60)     return "just now";
+  if (age < 3600)   return `${Math.floor(age / 60)} min ago`;
+  if (age < 86_400) return `${Math.floor(age / 3600)}h ago`;
+  return `${Math.floor(age / 86_400)}d ago`;
 }
 
 interface RefreshState { counter: number; force: boolean; }
@@ -181,7 +181,7 @@ function InlineSourceRow({
         userSelect:   'none',
       }}
     >
-      {/* Gauche : titre + badges */}
+      {/* Left: title + badges */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         <span style={{
           fontSize:      13,
@@ -202,7 +202,7 @@ function InlineSourceRow({
         </div>
       </div>
 
-      {/* Droite : taille · seeds */}
+      {/* Right: size · seeds */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         {source.size_gb > 0 && (
           <>
@@ -219,7 +219,7 @@ function InlineSourceRow({
         {onDownload && (
           <button
             onClick={e => { e.stopPropagation(); onDownload(); }}
-            title="Télécharger"
+            title="Download"
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               color: 'rgba(255,255,255,0.35)', padding: '2px 4px',
@@ -250,7 +250,7 @@ function BestSourceCard({
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
         <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(249,249,249,0.3)' }}>
-          Meilleure source disponible
+          Best available source
         </span>
         <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(249,249,249,0.88)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {t}
@@ -273,7 +273,7 @@ function BestSourceCard({
           opacity: launching ? 0.7 : 1, transition: 'opacity 0.15s',
         }}
       >
-        ▶ Lancer
+        ▶ Play
       </button>
     </div>
   );
@@ -310,7 +310,7 @@ function QualitySection({
           ({sources.length})
         </span>
       </div>
-      {/* Lignes sources */}
+      {/* Source rows */}
       <div>
         {sources.map(s => (
           <InlineSourceRow
@@ -362,10 +362,10 @@ export default function SourcesPage() {
   type SortKey = 'score' | 'quality' | 'seeders' | 'size';
   const [sortBy, setSortBy] = useState<SortKey>('score');
   const SORT_LABELS: [SortKey, string][] = [
-    ['score',   'Pertinence'],
-    ['quality', 'Qualité'],
+    ['score',   'Relevance'],
+    ['quality', 'Quality'],
     ['seeders', 'Seeds'],
-    ['size',    'Taille'],
+    ['size',    'Size'],
   ];
   const bestSource = useMemo(() => pickBestSource(sources, prefs), [sources, prefs]);
 
@@ -385,7 +385,7 @@ export default function SourcesPage() {
 
     async function loadSources() {
       setLoading(true); setFetchError(null);
-      addLog('info', 'SOURCES', 'Recherche sources démarrée', {
+      addLog('info', 'SOURCES', 'Source search started', {
         type: sourceType, id: contentId, force, season: selectedSeason, episode: selectedEpisode,
       });
       try {
@@ -399,7 +399,7 @@ export default function SourcesPage() {
         if (!isMounted) return;
 
         let loaded: Source[] = Array.isArray(data) ? data : (data.results || []);
-        addLog('success', 'SOURCES', `Sources reçues (${loaded.length})`, {
+        addLog('success', 'SOURCES', `Sources received (${loaded.length})`, {
           force, cachedAt: data.cached_at, isStale: data.is_stale,
           season: selectedSeason, episode: selectedEpisode,
         });
@@ -421,8 +421,8 @@ export default function SourcesPage() {
         setSources(loaded);
       } catch (err: unknown) {
         if (isMounted) {
-          setFetchError(extractErrorMessage(err, 'Erreur reseau'));
-          addLog('error', 'SOURCES', 'Erreur API', { err });
+          setFetchError(extractErrorMessage(err, 'Network error'));
+          addLog('error', 'SOURCES', 'API error', { err });
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -495,19 +495,19 @@ export default function SourcesPage() {
             resumeMs >= 30_000 && (durationMs <= 0 || resumeMs < durationMs - 15_000);
           if (canResume) { setResumePrompt({ streamUrl, resumeMs }); setLaunching(false); return; }
         } catch (err: unknown) {
-          addLog('warn', 'PLAYBACK', 'Reprise indisponible', { err: extractErrorMessage(err) });
+          addLog('warn', 'PLAYBACK', 'Resume unavailable', { err: extractErrorMessage(err) });
         }
       }
 
       goToPlayer(streamUrl);
     } catch (err: unknown) {
-      setLaunchError(extractErrorMessage(err, 'Erreur debrid'));
+      setLaunchError(extractErrorMessage(err, 'Debrid error'));
       setLaunching(false);
     }
   }
 
   const FILTER_GROUPS = [
-    { label: 'Qualité', tags: ['4K/2160p', '1080p', '720p', 'SD']            },
+    { label: 'Quality', tags: ['4K/2160p', '1080p', '720p', 'SD']            },
     { label: 'Audio',   tags: ['VF/FR', 'VOSTFR', 'VO', 'Multi']             },
     { label: 'Codec',   tags: ['HEVC/x265', 'AVC/x264', 'AV1', 'Remux']      },
     { label: 'Source',  tags: ['BluRay', 'WEB-DL', 'WEBRip', 'HDTV']         },
@@ -550,7 +550,7 @@ export default function SourcesPage() {
     });
   }, [sources, activeFilters]);
 
-  // Tri configurable par l'utilisateur
+  // User-configurable sorting
   const qOrder: Record<string, number> = { '2160p': 4, '1080p': 3, '720p': 2, '480p': 1, 'unknown': 0 };
   const sortedAndFiltered = useMemo(() => {
     if (sortBy === 'score') return filteredSources;
@@ -564,7 +564,7 @@ export default function SourcesPage() {
     });
   }, [filteredSources, sortBy]);
 
-  // Groupement par section qualité
+  // Grouping by quality section
   const groupedSections = useMemo(() =>
     QUALITY_SECTIONS.map(s => ({
       ...s,
@@ -580,18 +580,18 @@ export default function SourcesPage() {
   }, [bestSource]);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#0d1117] to-[#1a1d29] text-[#f9f9f9] flex flex-col z-50">
+    <div className="fixed inset-0 bg-dp-bg text-dp-text flex flex-col z-50">
 
       {/* Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-[14px] px-[28px] py-[20px] border-b border-white/5 shrink-0 bg-black/20 backdrop-blur-md">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-[14px] px-[28px] py-[20px] border-b border-dp-text/5 shrink-0 bg-dp-nav">
         <div className="flex items-center gap-[14px]">
           <button onClick={handleBack} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-white/15 bg-white/5 text-[#f9f9f9cc] text-[13px] font-[600] cursor-pointer whitespace-nowrap transition-colors hover:bg-white/10 hover:text-white">
-            <ChevronLeft size={16} /> Retour
+            <ChevronLeft size={16} /> Back
           </button>
           <h1 className="flex-1 text-[20px] font-[700] m-0 overflow-hidden text-ellipsis whitespace-nowrap">
-            {initialMode === 'download' ? `Télécharger : ${titleText}` : titleText}
+            {initialMode === 'download' ? `Download: ${titleText}` : titleText}
           </h1>
-          <button onClick={() => navigate('/debug')} className="p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40 transition-colors" title="Ouvrir la console de debug">
+          <button onClick={() => navigate('/debug')} className="p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40 transition-colors" title="Open debug console">
             <Bug size={18} />
           </button>
         </div>
@@ -601,24 +601,24 @@ export default function SourcesPage() {
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px]">
           <Spinner size={48} />
           <p className="text-white/50 text-[14px]">
-            {refreshState.force ? 'Recherche de nouvelles sources...' : 'Recherche des meilleures sources...'}
+            {refreshState.force ? 'Searching for new sources...' : 'Searching for the best sources...'}
           </p>
         </div>
       ) : fetchError ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
           <AlertTriangle size={40} className="text-red-400" />
-          <p className="text-[22px] font-[700] m-0 text-red-400">Erreur de chargement</p>
+          <p className="text-[22px] font-[700] m-0 text-red-400">Loading error</p>
           <p className="text-[14px] text-white/50 m-0 max-w-[400px] break-words">{fetchError}</p>
           <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-            <RefreshCw size={16} /> Réessayer
+            <RefreshCw size={16} /> Retry
           </button>
         </div>
       ) : sources.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
-          <p className="text-[22px] font-[700] m-0 text-white/50">Aucun flux trouvé</p>
-          <p className="text-[14px] text-white/30 m-0 max-w-[320px]">Ce contenu n'est pas disponible via Torrentio ou Prowlarr.</p>
+          <p className="text-[22px] font-[700] m-0 text-white/50">No streams found</p>
+          <p className="text-[14px] text-white/30 m-0 max-w-[320px]">This content is not available via Torrentio or Prowlarr.</p>
           <button onClick={handleForceRefresh} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-            <RefreshCw size={16} /> Relancer la recherche
+            <RefreshCw size={16} /> Restart search
           </button>
         </div>
       ) : (
@@ -633,10 +633,10 @@ export default function SourcesPage() {
             scrollbarWidth: 'none',
           }}>
 
-            {/* Trier par */}
+            {/* Sort by */}
             <div>
               <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.28)', marginBottom: 8, margin: '0 0 8px 2px' }}>
-                Trier par
+                Sort by
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {SORT_LABELS.map(([key, label]) => (
@@ -666,7 +666,7 @@ export default function SourcesPage() {
 
             <div style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
 
-            {/* Groupes de filtres */}
+            {/* Filter groups */}
             {FILTER_GROUPS.map(group => {
               const groupActive = [...activeFilters].some(t => (group.tags as readonly string[]).includes(t));
               return (
@@ -714,19 +714,19 @@ export default function SourcesPage() {
 
             <div style={{ height: 1, background: 'rgba(255,255,255,0.06)' }} />
 
-            {/* Effacer + Cache + Actualiser */}
+            {/* Clear + Cache + Refresh */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {activeFilters.size > 0 && (
                 <button
                   onClick={() => setActiveFilters(new Set())}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'underline', textAlign: 'left', padding: 0 }}
                 >
-                  Effacer tous les filtres
+                  Clear all filters
                 </button>
               )}
               {cachedAt && (
                 <p style={{ fontSize: 10, color: isStale ? '#fbbf24' : 'rgba(255,255,255,0.22)', margin: 0, lineHeight: 1.4 }}>
-                  {isStale ? 'Resultats anciens' : `Mis a jour ${formatCacheAge(cachedAt)}`}
+                  {isStale ? 'Outdated results' : `Updated ${formatCacheAge(cachedAt)}`}
                 </p>
               )}
               <button
@@ -741,7 +741,7 @@ export default function SourcesPage() {
                   transition: 'all 0.12s ease',
                 }}
               >
-                <RefreshCw size={12} /> Actualiser
+                <RefreshCw size={12} /> Refresh
               </button>
             </div>
           </aside>
@@ -752,22 +752,22 @@ export default function SourcesPage() {
           >
             {sortedAndFiltered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[50vh] gap-[14px] text-center">
-                <p className="text-[22px] font-[700] m-0 text-white/50">Aucun résultat pour ce filtre</p>
-                <p className="text-[14px] text-white/30 m-0 max-w-[320px]">Modifiez les filtres à gauche.</p>
+                <p className="text-[22px] font-[700] m-0 text-white/50">No results for this filter</p>
+                <p className="text-[14px] text-white/30 m-0 max-w-[320px]">Modify the filters on the left.</p>
                 <button onClick={() => setActiveFilters(new Set())} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-                  Voir toutes les sources
+                  View all sources
                 </button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
 
-                {/* Compteur */}
+                {/* Counter */}
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', margin: 0 }}>
                   {sortedAndFiltered.length} source{sortedAndFiltered.length !== 1 ? 's' : ''}
-                  {activeFilters.size > 0 ? ` filtrées` : ' disponibles'}
+                  {activeFilters.size > 0 ? ` filtered` : ' available'}
                 </p>
 
-                {/* Meilleure source */}
+                {/* Best source */}
                 {bestSource && (
                   <BestSourceCard
                     source={bestSource}
@@ -776,7 +776,7 @@ export default function SourcesPage() {
                   />
                 )}
 
-                {/* Sections par qualité */}
+                {/* Sections by quality */}
                 {groupedSections.map(section => (
                   <QualitySection
                     key={section.key}
@@ -799,12 +799,12 @@ export default function SourcesPage() {
         </div>
       )}
 
-      {/* Toast erreur lancement */}
+      {/* Launch error toast */}
       {launchError && (
-        <div className="absolute bottom-[24px] left-1/2 -translate-x-1/2 bg-red-900/90 text-white px-[20px] py-[14px] rounded-[10px] border border-red-500 flex items-center gap-[12px] shadow-2xl backdrop-blur-md z-50">
+        <div className="absolute bottom-[24px] left-1/2 -translate-x-1/2 bg-red-900/90 text-dp-text px-[20px] py-[14px] rounded-[4px] border border-red-500 flex items-center gap-[12px] shadow-2xl z-50">
           <AlertTriangle size={18} />
           <span className="text-[14px] font-[600]">{launchError}</span>
-          <button onClick={() => setLaunchError(null)} className="ml-[8px] px-[10px] py-[4px] bg-white/20 hover:bg-white/30 rounded text-[12px] font-[700]">✕</button>
+          <button onClick={() => setLaunchError(null)} className="ml-[8px] px-[10px] py-[4px] bg-dp-text/20 hover:bg-dp-text/30 rounded-[4px] text-[12px] font-[700]">✕</button>
         </div>
       )}
 

@@ -1,22 +1,23 @@
-// CollectionsPage.tsx — Sagas & Univers cinématographiques
-// Infinite scroll, recherche, filtres catégorie, données TMDB live
+// CollectionsPage.tsx — Sagas & Movie Universes
+// Infinite scroll, search, category filters, live TMDB data
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate }            from 'react-router-dom';
 import { useInfiniteQuery }       from '@tanstack/react-query';
 import { Search, Film, ChevronRight } from 'lucide-react';
-import { endpoints }              from '../../../api/client';
+import { endpoints }              from '@/shared/api/client';
 import type { CollectionItem }    from '../../../shared/types/index';
 
 const CATEGORIES = [
-  { key: 'all',     label: 'Tout' },
+  { key: 'all',     label: 'All' },
   { key: 'action',  label: 'Action' },
   { key: 'fantasy', label: 'Fantasy' },
   { key: 'scifi',   label: 'Sci-Fi' },
-  { key: 'horror',  label: 'Horreur' },
-  { key: 'anime',   label: 'Animé' },
-  { key: 'comedy',  label: 'Comédie' },
-  { key: 'drama',   label: 'Drame' },
+  { key: 'horror',  label: 'Horror' },
+  { key: 'anime',   label: 'Anime' },
+  { key: 'comedy',  label: 'Comedy' },
+  { key: 'drama',   label: 'Drama' },
 ] as const;
 
 function detectCategory(name: string): string {
@@ -32,6 +33,7 @@ function detectCategory(name: string): string {
 }
 
 export default function CollectionsPage() {
+  const { t } = useTranslation();
   const navigate                  = useNavigate();
   const [search,  setSearch]      = React.useState('');
   const [activeCategory, setActiveCategory] = React.useState('all');
@@ -102,7 +104,7 @@ export default function CollectionsPage() {
           <div className="w-8 h-8 border-2 border-white/20
                           border-t-white/80 rounded-full animate-spin" />
           <span className="text-white/40 text-sm">
-            Chargement des univers...
+            {t('collections.loading')}
           </span>
         </div>
       </div>
@@ -118,20 +120,20 @@ export default function CollectionsPage() {
           <div>
             <h1 className="text-3xl font-bold mb-1"
                 style={{ color: 'var(--text-main)' }}>
-              Sagas &amp; Univers
+              {t('collections.heading')}
             </h1>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              {allCollections.length} franchises cinématographiques
+              {t('collections.franchiseCount', { count: allCollections.length })}
             </p>
           </div>
 
-          {/* Barre de recherche */}
+          {/* Search bar */}
           <div className="relative w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2
                                w-4 h-4 text-white/30 pointer-events-none" />
             <input
               type="text"
-              placeholder="Rechercher une saga..."
+              placeholder={t('collections.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl
@@ -143,7 +145,7 @@ export default function CollectionsPage() {
           </div>
         </div>
 
-        {/* Filtres catégorie */}
+        {/* Category filters */}
         <div className="flex gap-2 mt-6 overflow-x-auto pb-1 scrollbar-none">
           {CATEGORIES.map(cat => (
             <button
@@ -166,8 +168,7 @@ export default function CollectionsPage() {
       <div className="px-8">
         {filtered.length === 0 ? (
           <div className="py-16 text-center text-white/30 text-sm">
-            Aucune saga trouvée
-            {search && ` pour "${search}"`}
+            {search ? t('collections.noSagaFoundFor', { search }) : t('collections.noSagaFound')}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
@@ -199,6 +200,7 @@ function CollectionCard({
   collection: CollectionItem;
   onClick:    () => void;
 }) {
+  const { t } = useTranslation();
   const backdrop = collection.backdrop_path
     ? (collection.backdrop_path.startsWith('http')
         ? collection.backdrop_path
@@ -249,18 +251,18 @@ function CollectionCard({
            style={{
              background: `linear-gradient(
                to right,
-               rgba(10,11,22,0.92) 0%,
-               rgba(10,11,22,0.60) 35%,
-               rgba(10,11,22,0.10) 65%,
+               rgba(4,7,20,0.92) 0%,
+               rgba(4,7,20,0.60) 35%,
+               rgba(4,7,20,0.10) 65%,
                transparent 100%
              )`,
            }} />
 
       {/* Gradient bas subtil */}
       <div className="absolute inset-0 bg-gradient-to-t
-                      from-[#0A0E1A]/50 via-transparent to-transparent" />
+                      from-[#040714]/50 via-transparent to-transparent" />
 
-      {/* Contenu texte — gauche */}
+      {/* Text content — left */}
       <div className="absolute inset-0 flex flex-col justify-end p-5">
         <h3 className="text-base font-bold text-white/95
                        leading-tight line-clamp-2 mb-1"
@@ -271,18 +273,18 @@ function CollectionCard({
         <div className="flex items-center gap-2 mb-2">
           {collection.parts_count > 0 && (
             <span className="text-[11px] text-white/45">
-              {collection.parts_count} film{collection.parts_count > 1 ? 's' : ''}
+              {t('collections.filmCount', { count: collection.parts_count })}
             </span>
           )}
         </div>
 
-        {/* Bouton Explorer — visible au hover */}
+        {/* Explore button — visible on hover */}
         <div className="flex items-center gap-1.5
                         opacity-0 group-hover:opacity-100
                         translate-y-1 group-hover:translate-y-0
                         transition-all duration-300">
           <span className="text-xs font-semibold text-white/80">
-            Explorer l'univers
+            {t('collections.exploreUniverse')}
           </span>
           <ChevronRight className="w-3.5 h-3.5 text-white/60" />
         </div>

@@ -1,7 +1,9 @@
-// SubtitlesPanel.tsx — Sélecteur de piste de sous-titres
-// Inclut "Désactivés" en tête de liste
+// SubtitlesPanel.tsx — Subtitle track selector
+// Includes "Disabled" at the top of the list
 
-import type { MpvTrack } from '../../../ipc';
+import { useTranslation } from 'react-i18next';
+import type { MpvTrack } from '@/shared/types/ipc';
+import i18n from '@/shared/i18n';
 
 interface SubtitlesPanelProps {
   tracks:    MpvTrack[];
@@ -14,11 +16,12 @@ function trackLabel(track: MpvTrack): string {
   if (track.lang && track.codec) return `${track.lang.toUpperCase()} — ${track.codec.toUpperCase()}`;
   if (track.lang)                return track.lang.toUpperCase();
   if (track.title)               return track.title;
-  return `Piste ${track.id}`;
+  return i18n.t('player.trackLabel', { id: track.id });
 }
 
 export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: SubtitlesPanelProps) {
-  // "Désactivés" est actif si aucune piste sub n'est sélectionnée
+  const { t } = useTranslation();
+  // "Disabled" is active if no subtitle track is selected
   const noneActive = tracks.length === 0 || tracks.every(t => !t.selected);
 
   return (
@@ -37,7 +40,7 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
         boxShadow:    '0 8px 32px rgba(0,0,0,0.6)',
       }}
     >
-      {/* Titre */}
+      {/* Title */}
       <p style={{
         color:         'rgba(245,245,245,0.5)',
         fontSize:      11,
@@ -46,10 +49,10 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
         textTransform: 'uppercase',
         margin:        0,
       }}>
-        Sous-titres
+        {t('player.subtitlesTitle')}
       </p>
 
-      {/* Option Désactivés */}
+      {/* Disabled option */}
       <div
         onClick={() => { onDisable(); onClose(); }}
         style={{
@@ -81,10 +84,10 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
           border:       '1px solid rgba(245,245,245,0.4)',
           flexShrink:   0,
         }} />
-        Désactivés
+        {t('player.disabled')}
       </div>
 
-      {/* Séparateur */}
+      {/* Separator */}
       {tracks.length > 0 && (
         <div style={{
           height:  1,
@@ -93,7 +96,7 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
         }} />
       )}
 
-      {/* Liste des pistes */}
+      {/* Track list */}
       {tracks.map(track => (
         <div
           key={track.id}
@@ -131,7 +134,7 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
         </div>
       ))}
 
-      {/* Cas : aucune piste disponible (sauf l'option désactivé) */}
+      {/* Case: no tracks available (except the disabled option) */}
       {tracks.length === 0 && (
         <p style={{
           color:   'rgba(245,245,245,0.35)',
@@ -139,7 +142,7 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
           padding: '4px 16px 0',
           margin:  0,
         }}>
-          Aucune piste disponible
+          {t('player.noTracksAvailable')}
         </p>
       )}
     </div>

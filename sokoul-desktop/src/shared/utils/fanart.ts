@@ -1,8 +1,8 @@
-// fanartFilters.ts — Utilitaires pour l'API Fanart.tv v3
-// RÈGLES : TypeScript strict, pas de librairies externes.
+// fanartFilters.ts — Utilities for the Fanart.tv v3 API
+// RULES: Strict TypeScript, no external libraries.
 
 /**
- * Représente un seul objet image retourné par l'API Fanart.
+ * Represents a single image object returned by the Fanart API.
  */
 interface FanartImage {
   id: string;
@@ -12,8 +12,8 @@ interface FanartImage {
 }
 
 /**
- * Type complet pour la réponse de l'API Fanart.tv v3,
- * couvrant à la fois les films et les séries TV.
+ * Complete type for the Fanart.tv v3 API response,
+ * covering both movies and TV series.
  */
 export interface FanartResponse {
   name: string;
@@ -21,59 +21,59 @@ export interface FanartResponse {
   imdb_id?: string;
   tvdb_id?: string;
 
-  /** Logo HD transparent avec titre stylisé. Priorité 1 pour le titre. */
+  /** Transparent HD logo with stylized title. Priority 1 for the title. */
   hdmovielogo?: FanartImage[];
-  /** Logo HD transparent pour les séries. */
+  /** Transparent HD logo for TV series. */
   hdtvlogo?: FanartImage[];
   
-  /** Logo standard, souvent moins qualitatif que la version HD. */
+  /** Standard logo, often lower quality than the HD version. */
   movielogo?: FanartImage[];
 
-  /** Affiches portrait (ratio 2:3). Peut contenir du texte. */
+  /** Portrait posters (2:3 ratio). May contain text. */
   movieposter?: FanartImage[];
-  /** Affiches portrait pour les séries. */
+  /** Portrait posters for TV series. */
   tvposter?: FanartImage[];
 
-  /** Arrière-plans HD (1920x1080) sans texte. Idéal pour les fonds. */
+  /** HD backgrounds (1920x1080) without text. Ideal for backdrops. */
   moviebackground?: FanartImage[];
-  /** Arrière-plans HD pour les séries. */
+  /** HD backgrounds for TV series. */
   showbackground?: FanartImage[];
 
-  /** Images d'art promotionnel. Peut contenir du texte. */
+  /** Promotional art images. May contain text. */
   movieart?: FanartImage[];
-  /** Bannières de séries (ratio large). */
+  /** TV series banners (wide ratio). */
   tvbanner?: FanartImage[];
   
-  /** Vignettes (thumbnails) 16:9. */
+  /** Thumbnails 16:9. */
   moviethumb?: FanartImage[];
-  /** Vignettes pour les séries. */
+  /** Thumbnails for TV series. */
   tvthumb?: FanartImage[];
   
-  /** Disques (CD/Blu-ray). */
+  /** Discs (CD/Blu-ray). */
   moviedisc?: FanartImage[];
-  /** Bannières de saison pour les séries. */
+  /** Season banners for TV series. */
   seasonbanner?: FanartImage[];
-  /** Posters de saison. */
+  /** Season posters. */
   seasonposter?: FanartImage[];
-  /** Vignettes de saison. */
+  /** Season thumbnails. */
   seasonthumb?: FanartImage[];
   
   /** "Clear Art" HD - logo + artwork transparent sans fond. */
   clearart?: FanartImage[];
-  /** HD Clear Art pour les films. */
+  /** HD Clear Art for movies. */
   hdclearart?: FanartImage[];
   /** "Clear Logo" - logo sans fond. */
   clearlogo?: FanartImage[];
 }
 
 /**
- * Retourne une liste d'URLs d'images "propres" (sans texte intégré)
- * à partir d'une réponse Fanart, idéales pour un slideshow en arrière-plan.
- * L'ordre de priorité est le suivant : showbackground > moviebackground > moviethumb > movieart.
+ * Returns a list of "clean" image URLs (without embedded text)
+ * from a Fanart response, ideal for a background slideshow.
+ * Priority order: showbackground > moviebackground > moviethumb > movieart.
  *
- * @param fanart - L'objet de réponse de l'API Fanart.tv.
- * @param mediaType - Le type de média ('movie' ou 'tv').
- * @returns Un tableau d'URLs d'images (string[]).
+ * @param fanart - The Fanart.tv API response object.
+ * @param mediaType - The media type ('movie' or 'tv').
+ * @returns An array of image URLs (string[]).
  */
 export function getCleanImages(fanart: FanartResponse | null | undefined, mediaType: 'movie' | 'tv'): string[] {
   if (!fanart) {
@@ -95,12 +95,12 @@ export function getCleanImages(fanart: FanartResponse | null | undefined, mediaT
 }
 
 /**
- * Extrait le meilleur logo HD transparent disponible (hdtvlogo ou hdmovielogo).
- * Ces logos sont parfaits pour être superposés sur une image de fond.
+ * Extracts the best available transparent HD logo (hdtvlogo or hdmovielogo).
+ * These logos are perfect for overlaying on a background image.
  *
- * @param fanart - L'objet de réponse de l'API Fanart.tv.
- * @param mediaType - Le type de média ('movie' ou 'tv').
- * @returns L'URL du logo (string) ou null si aucun n'est trouvé.
+ * @param fanart - The Fanart.tv API response object.
+ * @param mediaType - The media type ('movie' or 'tv').
+ * @returns The logo URL (string) or null if none is found.
  */
 export function getLogo(fanart: FanartResponse | null | undefined, mediaType: 'movie' | 'tv'): string | null {
   if (!fanart) {
@@ -113,9 +113,11 @@ export function getLogo(fanart: FanartResponse | null | undefined, mediaType: 'm
   if (Array.isArray(logoArray) && logoArray.length > 0 && logoArray[0].url) {
     return logoArray[0].url;
   }
-  
-  // Fallback sur d'autres types de logos si les versions HD sont absentes
-  const fallbackKeys: (keyof FanartResponse)[] = ['clearlogo', 'movielogo'];
+
+  // Fallback — exhaustive priority across both movie and TV logo keys
+  const fallbackKeys: (keyof FanartResponse)[] = mediaType === 'tv'
+    ? ['clearlogo', 'hdmovielogo', 'movielogo']
+    : ['clearlogo', 'hdtvlogo',    'movielogo'];
   for (const fbKey of fallbackKeys) {
     const fallbackArray = fanart[fbKey];
     if (Array.isArray(fallbackArray) && fallbackArray.length > 0 && fallbackArray[0].url) {
@@ -127,8 +129,8 @@ export function getLogo(fanart: FanartResponse | null | undefined, mediaType: 'm
 }
 
 /**
- * Extrait le clearart HD (png transparent) — logo + artwork sans fond.
- * Idéal pour flotter par-dessus un backdrop sur la DetailsPage.
+ * Extracts HD clear art (transparent png) — logo + artwork without background.
+ * Ideal for floating over a backdrop on the DetailsPage.
  */
 export function getClearArt(fanart: FanartResponse | null | undefined, mediaType: 'movie' | 'tv'): string | null {
   if (!fanart) return null;
@@ -147,13 +149,13 @@ export function getClearArt(fanart: FanartResponse | null | undefined, mediaType
 }
 
 /**
- * Extrait la meilleure affiche disponible au format portrait (2:3).
- * Utilise en priorité les affiches Fanart (movieposter/tvposter)
- * et se rabat sur une URL OMDB si fournie.
+ * Extracts the best available portrait poster (2:3 ratio).
+ * Prioritizes Fanart posters (movieposter/tvposter)
+ * and falls back to an OMDB URL if provided.
  *
- * @param fanart - L'objet de réponse de l'API Fanart.tv.
- * @param omdbFallback - Une URL d'affiche optionnelle depuis OMDB.
- * @returns L'URL de l'affiche (string) ou null si aucune n'est trouvée.
+ * @param fanart - The Fanart.tv API response object.
+ * @param omdbFallback - An optional poster URL from OMDB.
+ * @returns The poster URL (string) or null if none is found.
  */
 export function getPoster(fanart: FanartResponse | null | undefined, omdbFallback?: string): string | null {
   if (fanart) {
@@ -161,7 +163,7 @@ export function getPoster(fanart: FanartResponse | null | undefined, omdbFallbac
     for (const key of sources) {
       const images = fanart[key];
       if (Array.isArray(images) && images.length > 0 && images[0].url) {
-        // Idéalement, on pourrait trier par `likes` ou langue, mais on prend le premier pour l'instant.
+        // Ideally, we could sort by `likes` or language, but we take the first one for now.
         return images[0].url;
       }
     }

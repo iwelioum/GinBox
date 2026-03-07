@@ -13,11 +13,11 @@ use crate::models::{UserList, ListItem, ContentType};
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/", get(get_all_lists).post(create_new_list))
-        .route("/:id", delete(delete_user_list))
-        .route("/:id/rename", put(rename_user_list))
-        .route("/:id/items", get(get_list_items_route).post(add_item_to_list))
-        .route("/:id/items/:content_id", delete(remove_item_from_list))
+        .route("/", get(get_all_lists).post(post_new_list))
+        .route("/:id", delete(delete_list))
+        .route("/:id/rename", put(put_rename_list))
+        .route("/:id/items", get(get_list_items).post(post_list_item))
+        .route("/:id/items/:content_id", delete(delete_list_item))
         .route("/content/:content_id/status", get(get_content_lists_status))
 }
 
@@ -54,7 +54,7 @@ async fn get_all_lists(
     Ok(Json(user_lists))
 }
 
-async fn create_new_list(
+async fn post_new_list(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<CreateListRequest>,
 ) -> Result<Json<UserList>, AppError> {
@@ -62,7 +62,7 @@ async fn create_new_list(
     Ok(Json(user_list))
 }
 
-async fn delete_user_list(
+async fn delete_list(
     Path(id): Path<i64>,
     Query(query): Query<ProfileIdQuery>,
     State(state): State<Arc<AppState>>,
@@ -71,7 +71,7 @@ async fn delete_user_list(
     Ok(())
 }
 
-async fn rename_user_list(
+async fn put_rename_list(
     Path(id): Path<i64>,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<RenameListRequest>,
@@ -80,7 +80,7 @@ async fn rename_user_list(
     Ok(Json(user_list))
 }
 
-async fn get_list_items_route(
+async fn get_list_items(
     Path(id): Path<i64>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<Vec<ListItem>>, AppError> {
@@ -88,7 +88,7 @@ async fn get_list_items_route(
     Ok(Json(items))
 }
 
-async fn add_item_to_list(
+async fn post_list_item(
     Path(id): Path<i64>,
     State(state): State<Arc<AppState>>,
     Json(payload): Json<AddItemRequest>,
@@ -104,7 +104,7 @@ async fn add_item_to_list(
     Ok(Json(item))
 }
 
-async fn remove_item_from_list(
+async fn delete_list_item(
     Path((list_id, content_id)): Path<(i64, String)>,
     State(state): State<Arc<AppState>>,
 ) -> Result<(), AppError> {

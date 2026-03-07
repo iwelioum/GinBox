@@ -14,7 +14,7 @@ export function useHoverCard(delay = 300) {
 
   const onEnter = React.useCallback(
     (id: string | number, rect: DOMRect) => {
-      // Désactiver sur mobile / écrans tactiles
+      // Disable on mobile / touch screens
       if (window.matchMedia('(hover: none)').matches) return;
 
       clearTimeout(timerRef.current);

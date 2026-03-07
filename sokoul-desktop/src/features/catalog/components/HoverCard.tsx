@@ -1,18 +1,19 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { EnrichedItem } from './CatalogFilters';
 import { calcHoverPosition } from '@/shared/utils/hoverCardPosition';
 
 const KIND_LABELS: Record<string, string> = {
-  movie:       'Film',
-  tv:          'Série',
+  movie:       'Movie',
+  tv:          'Series',
   anime:       'Anime',
   animation:   'Animation',
-  documentary: 'Documentaire',
-  miniseries:  'Mini-série',
-  short:       'Court-métrage',
-  reality:     'Téléréalité',
-  special:     'Spécial',
+  documentary: 'Documentary',
+  miniseries:  'Mini-series',
+  short:       'Short film',
+  reality:     'Reality TV',
+  special:     'Special',
 };
 
 interface HoverCardProps {
@@ -24,6 +25,7 @@ interface HoverCardProps {
 export const HoverCard: React.FC<HoverCardProps> = ({
   item, anchorRect, onLeave,
 }) => {
+  const { t } = useTranslation();
   const { top, left, transformOrigin } = calcHoverPosition(anchorRect);
 
   const backdropUrl = item.backdrop_path
@@ -38,7 +40,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   const runtime  = item._movieRuntime
     ? `${Math.floor(item._movieRuntime / 60)}h${item._movieRuntime % 60 > 0 ? `${item._movieRuntime % 60}m` : ''}`
     : item._seasonCount
-      ? `${item._seasonCount} saison${item._seasonCount > 1 ? 's' : ''}`
+      ? t('common.seasonCount', { count: item._seasonCount })
       : null;
 
   return ReactDOM.createPortal(
@@ -62,40 +64,40 @@ export const HoverCard: React.FC<HoverCardProps> = ({
         ) : (
           <div className="w-full h-full flex items-center justify-center
                           text-white/10 text-4xl">
-            Film
+            Movie
           </div>
         )}
 
-        {/* Gradient overlay bas */}
+        {/* Bottom gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t
                         from-[#141827] via-transparent to-transparent" />
 
-        {/* Boutons d'action flottants */}
+        {/* Floating action buttons */}
         <div className="absolute bottom-3 left-3 right-3
                         flex items-center justify-between">
           <div className="flex gap-2">
-            {/* Bouton Lire */}
+            {/* Play button */}
             <button className="flex items-center gap-1.5 px-4 py-2
                                bg-white text-black rounded-full
                                text-xs font-bold hover:bg-white/90
                                transition-colors">
-              ▶ Lire
+              ▶ {t('common.play')}
             </button>
-            {/* Bouton + Liste */}
+            {/* + List button */}
             <button className="w-8 h-8 rounded-full bg-white/20
                                border border-white/30 text-white
                                flex items-center justify-center
                                hover:bg-white/30 transition-colors
                                text-sm font-bold"
-              title="Ajouter à ma liste"
+              title={t('detail.addToMyList')}
             >
               +
             </button>
           </div>
-          {/* Badge type */}
+          {/* Type badge */}
           {item._kind && (
             <span className="text-[10px] text-white/50 bg-black/40
-                             px-2 py-0.5 rounded-full backdrop-blur-sm">
+                             px-2 py-0.5 rounded-full ">
               {KIND_LABELS[item._kind] ?? item._kind}
             </span>
           )}
@@ -105,13 +107,13 @@ export const HoverCard: React.FC<HoverCardProps> = ({
       {/* Infos */}
       <div className="px-4 py-3 space-y-2">
 
-        {/* Titre */}
+        {/* Title */}
         <h3 className="text-sm font-semibold text-white leading-snug
                        line-clamp-1">
           {title}
         </h3>
 
-        {/* Métadonnées inline */}
+        {/* Inline metadata */}
         <div className="flex items-center gap-2 text-[11px] text-white/50 flex-wrap">
           {rating && (
             <span className="text-yellow-400 font-semibold">★ {rating}</span>
@@ -119,7 +121,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
           {year && <span>{year}</span>}
           {runtime && <span>{runtime}</span>}
           {item._status === 'returning' && (
-            <span className="text-green-400 font-medium">● En cours</span>
+            <span className="text-green-400 font-medium">● {t('common.ongoing')}</span>
           )}
         </div>
 
@@ -136,7 +138,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
           </div>
         )}
 
-        {/* Synopsis (2 lignes max) */}
+        {/* Synopsis (2 lines max) */}
         {item.overview && (
           <p className="text-[11px] text-white/40 leading-relaxed line-clamp-2">
             {item.overview}

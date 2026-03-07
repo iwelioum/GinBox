@@ -10,7 +10,7 @@ setlocal enabledelayedexpansion
 title [SOKOUL] Electron Desktop -- Vite + Electron
 color 0B
 
-for /f "delims=" %%i in ("%~dp0..\sokoul-desktop") do set "DESKTOP_DIR=%%~fi"
+for /f "delims=" %%i in ("%~dp0..\..\sokoul-desktop") do set "DESKTOP_DIR=%%~fi"
 
 echo.
 echo ==================================================
@@ -19,43 +19,43 @@ echo   App : sokoul-desktop
 echo ==================================================
 echo.
 
-:: Verification dossier
+:: Check directory
 if not exist "!DESKTOP_DIR!" (
     color 0C
-    echo   [KO] Dossier sokoul-desktop introuvable.
-    echo        Chemin attendu : !DESKTOP_DIR!
+    echo   [KO] sokoul-desktop directory not found.
+    echo        Expected path : !DESKTOP_DIR!
     pause & exit /b 1
 )
 
-:: Installation deps si absentes
+:: Install deps if missing
 if not exist "!DESKTOP_DIR!\node_modules" (
-    echo   [INFO] node_modules absent -- Installation des dependances...
+    echo   [INFO] node_modules missing -- Installing dependencies...
     cd /d "!DESKTOP_DIR!"
     call npm install
     if errorlevel 1 (
         color 0C
-        echo   [KO] npm install a echoue.
+        echo   [KO] npm install failed.
         pause & exit /b 1
     )
-    echo   [OK] Dependances installees.
+    echo   [OK] Dependencies installed.
     echo.
 )
 
-:: Verification backend
+:: Check backend
 curl -s --connect-timeout 2 http://localhost:3000/health >nul 2>&1
 if errorlevel 1 (
     color 0E
-    echo   [AVERTISSEMENT] Backend non accessible sur :3000
-    echo   Lancer start-backend.bat d abord pour de meilleures perfs.
+    echo   [WARNING] Backend not reachable on :3000
+    echo   Run start-backend.bat first for better performance.
     echo.
-    set /p CONT="   Continuer quand meme ? (O/N) : "
-    if /i not "!CONT!"=="O" exit /b 0
+    set /p CONT="   Continue anyway? (Y/N) : "
+    if /i not "!CONT!"=="Y" exit /b 0
     color 0B
     echo.
 )
 
-echo   Lancement Electron Desktop (Vite + Electron)...
-echo   La fenetre Sokoul s ouvre dans quelques secondes.
+echo   Starting Electron Desktop (Vite + Electron)...
+echo   The Sokoul window will open in a few seconds.
 echo.
 
 cd /d "!DESKTOP_DIR!"
@@ -63,7 +63,7 @@ npm run electron:dev
 
 echo.
 echo ==================================================
-echo   Electron arrete.
+echo   Electron stopped.
 echo ==================================================
 echo.
 pause

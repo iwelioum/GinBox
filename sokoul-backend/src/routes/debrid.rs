@@ -1,8 +1,9 @@
 // ══════════════════════════════════════════════════════════
-// debrid.rs — Routes Real-Debrid
-// RÈGLES :
-//   POST /debrid/:info_hash  → pipeline magnet complet (add → wait → unrestrict)
-//   POST /debrid/unrestrict  → unrestrict direct d'un lien RD-hébergé
+// debrid.rs — Real-Debrid Routes
+// RULES:
+//   POST /debrid/:info_hash  → complete magnet pipeline (add → wait → unrestrict)
+//   POST /debrid/unrestrict  → direct unrestrict of RD-hosted link
+// Enhanced responses: { stream_url, is_cached }
 // ══════════════════════════════════════════════════════════
 
 use axum::{
@@ -21,14 +22,14 @@ use crate::services::realdebrid;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        // Route spécifique AVANT la route paramétrique
-        .route("/unrestrict", post(unrestrict_handler))
-        .route("/:info_hash", post(debrid_handler))
+        // Specific route BEFORE parameterized route
+        .route("/unrestrict", post(post_unrestrict))
+        .route("/:info_hash", post(post_debrid))
 }
 
 // ── POST /debrid/:info_hash ─────────────────────────────────────────────────
-// Pipeline complet : magnet → add RD → wait downloaded → unrestrict → URL directe
-pub async fn debrid_handler(
+// Complete pipeline: magnet → add RD → cache probe → unrestrict → direct URL
+pub async fn post_debrid(
     Path(info_hash): Path<String>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<serde_json::Value>, AppError> {
@@ -40,34 +41,34 @@ pub async fn debrid_handler(
         parsed_meta: crate::parser::parse_stream_title(""),
         behavior_hints: None,
     };
-    let direct_link = realdebrid::get_direct_link(&stream_stub, &state).await?;
-    Ok(Json(json!({ "url": direct_link })))
+    let result = realdebrid::get_direct_link(&stream_stub, &state).await?;
+    Ok(Json(json!({ "url": result.url, "is_cached": result.is_cached })))
 }
 
 // ── POST /debrid/unrestrict ─────────────────────────────────────────────────
-// Corps : { "magnet": "magnet:?xt=...", "cached": true/false }
-// Retourne : { "stream_url": "<url-directe>" }
-// Point d'entrée unique depuis usePlayback.ts → endpoints.debrid.unrestrict(magnet, cached)
+// Body: { "magnet": "magnet:?xt=...", "cached": true/false }
+// Returns: { "stream_url": "<direct-url>", "is_cached": bool }
+// Single entry point from usePlayback.ts → endpoints.debrid.unrestrict(magnet, cached)
 #[derive(Deserialize)]
 pub struct UnrestrictBody {
     pub magnet: String,
-    #[allow(dead_code)]  // utilisé côté frontend pour l'UX (messages de statut)
+    #[allow(dead_code)]  // used client-side for UX (status messages)
     pub cached: bool,
 }
 
-pub async fn unrestrict_handler(
+pub async fn post_unrestrict(
     State(state): State<Arc<AppState>>,
     Json(body): Json<UnrestrictBody>,
 ) -> Result<Json<serde_json::Value>, AppError> {
     let magnet_raw = body.magnet.trim();
-    tracing::info!("Demande de débridage reçue pour: {}", magnet_raw);
+    tracing::info!("Unrestricting request received for: {}", magnet_raw);
 
-    // Cas 1 : lien magnet direct
+    // Case 1: direct magnet link
     if magnet_raw.starts_with("magnet:") {
         let info_hash = extract_info_hash(magnet_raw)
-            .ok_or_else(|| AppError::NotFound("Impossible d'extraire l'info_hash du lien magnet".into()))?;
+            .ok_or_else(|| AppError::NotFound("Unable to extract info_hash from magnet link".into()))?;
 
-        tracing::info!("Traitement magnet via info_hash: {}", info_hash);
+        tracing::info!("Processing magnet via info_hash: {}", info_hash);
         let stream_stub = Stream {
             info_hash: Some(info_hash),
             url: None,
@@ -76,30 +77,25 @@ pub async fn unrestrict_handler(
             parsed_meta: crate::parser::parse_stream_title(""),
             behavior_hints: None,
         };
-        let url = realdebrid::get_direct_link(&stream_stub, &state).await?;
-        return Ok(Json(json!({ "stream_url": url })));
+        let result = realdebrid::get_direct_link(&stream_stub, &state).await?;
+        return Ok(Json(json!({ "stream_url": result.url, "is_cached": result.is_cached })));
     }
 
-    // Cas 2 : URL HTTP (Prowlarr ou RD)
+    // Case 2: HTTP URL (Prowlarr or RD)
     if magnet_raw.starts_with("http") {
-        // Gérer les URLs localhost (Prowlarr)
+        // Handle localhost URLs (Prowlarr)
         if magnet_raw.contains("localhost") || magnet_raw.contains("127.0.0.1") {
-            tracing::info!("Lien Prowlarr détecté, tentative de téléchargement du torrent...");
+            tracing::info!("Prowlarr link detected, attempting torrent download...");
             let resp = state.http_client.get(magnet_raw).send().await
-                .map_err(|e| AppError::NetworkError(format!("Échec téléchargement Prowlarr: {}", e)))?;
+                .map_err(|e| AppError::NetworkError(format!("Failed Prowlarr download: {}", e)))?;
             
-            // Le client http de reqwest suit les redirections par défaut.
-            // Donc, si on arrive ici avec une réponse, le 301 a déjà été géré.
-            // On ne vérifie pas is_success() ici pour les 3xx qui seraient suivis.
-            // Toute erreur non-2xx sur la destination finale sera gérée par la lecture des bytes.
-
             let bytes = resp.bytes().await
-                .map_err(|e| AppError::NetworkError(format!("Échec lecture Prowlarr bytes: {}", e)))?;
+                .map_err(|e| AppError::NetworkError(format!("Failed reading Prowlarr bytes: {}", e)))?;
             
-            // Certains indexeurs renvoient un fichier texte contenant un magnet: au lieu d'un binaire torrent
+            // Some indexers return a text file containing a magnet: instead of a binary torrent
             if bytes.starts_with(b"magnet:") {
                 let magnet_str = String::from_utf8_lossy(&bytes);
-                tracing::info!("Le lien Prowlarr a renvoyé un lien magnet textuel: {}", magnet_str);
+                tracing::info!("Prowlarr link returned a text magnet link: {}", magnet_str);
                 if let Some(info_hash) = extract_info_hash(&magnet_str) {
                     let stream_stub = Stream {
                         info_hash: Some(info_hash),
@@ -109,52 +105,50 @@ pub async fn unrestrict_handler(
                         parsed_meta: crate::parser::parse_stream_title(""),
                         behavior_hints: None,
                     };
-                    let url = realdebrid::get_direct_link(&stream_stub, &state).await?;
-                    return Ok(Json(json!({ "stream_url": url })));
+                    let result = realdebrid::get_direct_link(&stream_stub, &state).await?;
+                    return Ok(Json(json!({ "stream_url": result.url, "is_cached": result.is_cached })));
                 }
             }
 
-            // Validation : un fichier .torrent bencoded commence TOUJOURS par 'd'
-            // Si Prowlarr a retourné du HTML, JSON d'erreur ou autre, on l'intercepte ici
-            // au lieu d'envoyer du contenu invalide à Real-Debrid (qui retournerait 403 wrong_parameter)
+            // Validation: a bencoded .torrent file ALWAYS starts with 'd'
             if !bytes.starts_with(b"d") {
                 let preview = String::from_utf8_lossy(&bytes[..bytes.len().min(200)]);
-                tracing::error!("Prowlarr n'a pas retourné un fichier .torrent valide ({} octets). Début: {}", bytes.len(), &preview[..preview.len().min(100)]);
+                tracing::error!("Prowlarr did not return a valid .torrent file ({} bytes). Start: {}", bytes.len(), &preview[..preview.len().min(100)]);
                 return Err(AppError::ExternalApiError(
-                    "La source Prowlarr n'a pas fourni un fichier .torrent valide (l'indexeur a peut-être retourné une erreur). Essayez une autre source.".into()
+                    "The Prowlarr source did not provide a valid .torrent file (the indexer may have returned an error). Try another source.".into()
                 ));
             }
 
-            // Sinon, traiter comme un fichier .torrent binaire
-            tracing::info!("Envoi du fichier torrent binaire à Real-Debrid ({} octets)...", bytes.len());
-            let url = realdebrid::get_direct_link_from_file(bytes.to_vec(), &state).await?;
-            return Ok(Json(json!({ "stream_url": url })));
+            // Treat as binary .torrent file
+            tracing::info!("Sending binary torrent file to Real-Debrid ({} bytes)...", bytes.len());
+            let result = realdebrid::get_direct_link_from_file(bytes.to_vec(), &state).await?;
+            return Ok(Json(json!({ "stream_url": result.url, "is_cached": result.is_cached })));
         }
 
-        // Lien déjà Real-Debrid ou rdeb.io
+        // Already Real-Debrid or rdeb.io link
         if magnet_raw.contains("real-debrid.com") || magnet_raw.contains("rdeb.io") {
-            tracing::info!("Lien Real-Debrid direct détecté, unrestrict immédiat.");
+            tracing::info!("Direct Real-Debrid link detected, immediate unrestrict.");
             let result = realdebrid::unrestrict_link(magnet_raw, &state).await?;
-            return Ok(Json(json!({ "stream_url": result.download })));
+            return Ok(Json(json!({ "stream_url": result.download, "is_cached": true })));
         }
         
-        // URL Torrentio resolve (contient /resolve/realdebrid/) ou autre lien HTTP direct
-        tracing::info!("Lien HTTP direct ou déjà résolu détecté: {}", magnet_raw);
-        return Ok(Json(json!({ "stream_url": magnet_raw })));
+        // Torrentio resolve URL (contains /resolve/realdebrid/) or other direct HTTP link
+        tracing::info!("Direct or already resolved HTTP link detected: {}", magnet_raw);
+        return Ok(Json(json!({ "stream_url": magnet_raw, "is_cached": true })));
     }
 
-    tracing::warn!("Format de lien non reconnu: {}", magnet_raw);
-    Err(AppError::NotFound("Format de lien non reconnu (doit être magnet: ou http)".into()))
+    tracing::warn!("Unrecognized link format: {}", magnet_raw);
+    Err(AppError::NotFound("Unrecognized link format (must be magnet: or http)".into()))
 }
 
-// ── Extraction info_hash depuis un lien magnet ──────────────────────────────
+// ── Extract info_hash from magnet link ──────────────────────────────
 fn extract_info_hash(magnet: &str) -> Option<String> {
-    // Format standard : magnet:?xt=urn:btih:<HASH>&...
+    // Standard format: magnet:?xt=urn:btih:<HASH>&...
     for part in magnet.split('&') {
         let part = part.trim_start_matches("magnet:?");
         if part.starts_with("xt=urn:btih:") {
             let hash = part.trim_start_matches("xt=urn:btih:");
-            // Stopper au prochain '&' si présent
+            // Stop at the next '&' if present
             let hash = hash.split('&').next().unwrap_or(hash);
             return Some(hash.to_lowercase());
         }

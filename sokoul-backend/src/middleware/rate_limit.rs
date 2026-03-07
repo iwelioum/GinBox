@@ -1,14 +1,13 @@
 // ══════════════════════════════════════════════════════════
-// rate_limit.rs — Protection contre le spam local
-// NOUVEAU
-// RÈGLES : Simple et efficace
+// rate_limit.rs — Local spam protection
+// RULES: Simple and effective
 // ══════════════════════════════════════════════════════════
 
 use tower_http::trace::TraceLayer;
 
-// Pour l'instant, on utilise TraceLayer pour le monitoring.
-// Le rate limiting complexe n'est pas critique sur un serveur 100% loopback,
-// mais utile pour éviter les boucles infinies de requêtes React en dev.
+// For now, using TraceLayer for monitoring.
+// Complex rate limiting is not critical on a 100% loopback server,
+// but useful to prevent infinite React request loops in dev.
 
 pub fn trace_layer() -> TraceLayer<tower_http::classify::SharedClassifier<tower_http::classify::ServerErrorsAsFailures>> {
     TraceLayer::new_for_http()

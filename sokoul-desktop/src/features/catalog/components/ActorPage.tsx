@@ -1,12 +1,13 @@
-// ActorPage.tsx — Page acteur premium avec filmographie
-// RÈGLES : Header immersif (backdrop flou), filmographie en rails,
-//          données récupérées via getPersonMovies.
+// ActorPage.tsx — Premium actor page with filmography
+// RULES: Immersive header (blurred backdrop), filmography in rails,
+//        data fetched via getPersonMovies.
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft } from 'lucide-react';
-import { endpoints } from '../../../api/client';
+import { endpoints } from '@/shared/api/client';
 import { useAmbientColor } from '../../../shared/hooks/useAmbientColor';
 import { ContentRail } from './ContentRail';
 import { Spinner } from '../../../shared/components/ui/Spinner';
@@ -21,6 +22,7 @@ interface ActorLocationState {
 }
 
 const ActorPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -33,23 +35,23 @@ const ActorPage: React.FC = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const name        = state.name ?? 'Acteur';
+  const name        = state.name ?? t('actor.fallbackName');
   const profilePath = state.profilePath;
   const profileUrl  = profilePath
     ? `${TMDB_IMAGE_BASE}w342${profilePath.startsWith('/') ? '' : '/'}${profilePath}`
     : undefined;
 
-  // Ambient color — backdrop généré depuis la photo de profil
+  // Ambient color — backdrop generated from the profile photo
   const ambientColor = useAmbientColor(profileUrl);
 
-  // Partitionner films / séries
+  // Partition movies / series
   const movies  = data?.metas.filter((m) => (m.type || m.media_type) === 'movie')  ?? [];
   const series  = data?.metas.filter((m) => (m.type || m.media_type) !== 'movie')  ?? [];
   const allMeta = data?.metas ?? [];
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center">
+      <div className="min-h-screen bg-[#040714] flex items-center justify-center">
         <Spinner size={48} />
       </div>
     );
@@ -57,19 +59,19 @@ const ActorPage: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0A0E1A] flex flex-col items-center justify-center text-white/60 gap-4">
-        <p>Impossible de charger la filmographie.</p>
-        <Button variant="secondary" onClick={() => navigate(-1)}>Retour</Button>
+      <div className="min-h-screen bg-[#040714] flex flex-col items-center justify-center text-white/60 gap-4">
+        <p>{t('actor.unableToLoad')}</p>
+        <Button variant="secondary" onClick={() => navigate(-1)}>{t('actor.back')}</Button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0E1A] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#040714] text-white overflow-x-hidden">
 
       <div className="relative h-[55vh] overflow-hidden">
 
-        {/* Backdrop flou : photo de profil agrandie */}
+        {/* Blurred backdrop: enlarged profile photo */}
         {profileUrl && (
           <div
             className="absolute inset-0 bg-cover bg-center scale-110"
@@ -91,23 +93,23 @@ const ActorPage: React.FC = () => {
           }}
         />
 
-        {/* Gradient bas → section body */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0A0E1A80] to-[#0A0E1A]" />
+        {/* Bottom gradient → body section */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#04071480] to-[#040714]" />
 
-        {/* Bouton retour */}
+        {/* Back button */}
         <button
           onClick={() => navigate(-1)}
           style={{ top: 'calc(var(--titlebar-height) + var(--navbar-height) + 8px)' }}
-          className="absolute left-5 z-50 flex items-center gap-1.5 px-4 py-2 bg-transparent backdrop-blur-sm text-white/90 rounded text-[13px] font-medium transition-all duration-200 hover:bg-black/60 hover:text-white"
+          className="absolute left-5 z-50 flex items-center gap-1.5 px-4 py-2 bg-transparent  text-white/90 rounded text-[13px] font-medium transition-all duration-200 hover:bg-black/60 hover:text-white"
         >
           <ChevronLeft size={18} />
-          Retour
+          {t('actor.back')}
         </button>
 
-        {/* Contenu positionné en bas */}
+        {/* Content positioned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 px-[calc(3.5vw+5px)] pb-10 flex items-end gap-6">
 
-          {/* Photo de profil */}
+          {/* Profile photo */}
           {profileUrl && (
             <img
               src={profileUrl}
@@ -122,48 +124,48 @@ const ActorPage: React.FC = () => {
             </h1>
             {allMeta.length > 0 && (
               <p className="text-white/50 text-sm font-medium">
-                {allMeta.length} titre{allMeta.length > 1 ? 's' : ''} au catalogue
+                {t('actor.titleInCatalog', { count: allMeta.length })}
               </p>
             )}
           </div>
         </div>
       </div>
 
-      <div className="bg-[#0A0E1A] pb-16">
+      <div className="bg-[#040714] pb-16">
 
         {allMeta.length === 0 && (
           <div className="text-center text-white/40 py-24">
-            Aucun titre trouvé pour cet acteur.
+            {t('actor.noTitlesFound')}
           </div>
         )}
 
-        {/* Films */}
+        {/* Movies */}
         {movies.length > 0 && (
           <div className="mt-8">
             <ContentRail
-              title="Films"
+              title={t('actor.movies')}
               items={movies}
               cardVariant="poster"
             />
           </div>
         )}
 
-        {/* Séries */}
+        {/* Series */}
         {series.length > 0 && (
           <div className="mt-4">
             <ContentRail
-              title="Séries"
+              title={t('actor.series')}
               items={series}
               cardVariant="poster"
             />
           </div>
         )}
 
-        {/* Tout (si pas de distinction film/série) */}
+        {/* All (if no movie/series distinction) */}
         {movies.length === 0 && series.length === 0 && allMeta.length > 0 && (
           <div className="mt-8">
             <ContentRail
-              title="Filmographie"
+              title={t('actor.filmography')}
               items={allMeta}
               cardVariant="poster"
             />

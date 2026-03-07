@@ -160,10 +160,11 @@ fn merge_season_fallback(primary: &mut TmdbSeason, fallback: TmdbSeason) {
     }
 }
 
-/// Convertit un genre_id TMDB en nom français.
+/// Converts a TMDB genre_id to a French genre name.
+/// Note: Genre names are intentionally kept in French as they are data values displayed in the UI.
 fn tmdb_genre_name(id: u32) -> Option<&'static str> {
     match id {
-        // Films
+        // Movies
         28    => Some("Action"),
         12    => Some("Aventure"),
         16    => Some("Animation"),
@@ -183,7 +184,7 @@ fn tmdb_genre_name(id: u32) -> Option<&'static str> {
         53    => Some("Thriller"),
         10752 => Some("Guerre"),
         37    => Some("Western"),
-        // Séries (TV only)
+        // Series (TV only)
         10759 => Some("Action & Aventure"),
         10762 => Some("Enfants"),
         10763 => Some("Actualités"),
@@ -249,8 +250,8 @@ fn normalize_list_item(item: TmdbListItem, content_type: &ContentType) -> Catalo
         content_type: content_type.clone(),
         name,
         poster: item.poster_path.map(|p| format!("{}{}", TMDB_IMAGE_BASE, p)),
-        // backdrop_path stocké comme chemin brut (ex: /abc.jpg) pour que le
-        // frontend puisse demander la qualité /original/ via toImgUrl()
+        // backdrop_path stored as raw path (e.g. /abc.jpg) so the
+        // frontend can request /original/ quality via toImgUrl()
         backdrop_path: item.backdrop_path,
         release_info,
         genres,
@@ -542,8 +543,8 @@ pub async fn fetch_meta(id: &str, content_type: &ContentType, state: &AppState) 
 }
 
 pub async fn resolve_title_for_prowlarr(id: &str, content_type: &ContentType, state: &AppState) -> Result<String, AppError> {
-    // Pour les IDs "tmdb:XXXXX", conserver le préfixe entier (ne pas splitter sur ':').
-    // Pour les IDs épisodiques "tt1234567:1:1", extraire seulement l'ID de base.
+    // For "tmdb:XXXXX" IDs, keep the full prefix (do not split on ':').
+    // For episodic IDs "tt1234567:1:1", extract only the base ID.
     let base_id = if id.starts_with("tmdb:") {
         id
     } else {
@@ -565,28 +566,28 @@ fn format_title_with_optional_year(title: &str, year: Option<u32>) -> String {
     }
 }
 
-/// Résout un ID (tmdb: ou imdb tt...) vers l'ID IMDB si disponible.
-/// Utilisé par Torrentio qui n'accepte que les IDs IMDB.
-/// Met en cache le résultat pour éviter les doubles appels TMDB.
+/// Resolves an ID (tmdb: or imdb tt...) to an IMDB ID if available.
+/// Used by Torrentio which only accepts IMDB IDs.
+/// Caches the result to avoid duplicate TMDB calls.
 pub async fn resolve_to_imdb_id(
     id: &str,
     content_type: &ContentType,
     state: &AppState,
 ) -> Option<String> {
     if id.starts_with("tt") {
-        // Déjà un ID IMDB — extraire la partie de base (sans saison/épisode)
+        // Already an IMDB ID — extract the base part (without season/episode)
         return Some(id.split(':').next().unwrap_or(id).to_string());
     }
-    // Vérification du cache DB d'abord
+    // Check DB cache first
     if let Ok(Some(meta)) = super::cache::get_cached_meta(id, &state.db).await {
         if meta.id.starts_with("tt") {
             return Some(meta.id);
         }
     }
-    // Pour tmdb:XXXXX → appeler TMDB pour obtenir l'imdb_id depuis les détails du film
+    // For tmdb:XXXXX → call TMDB to get imdb_id from movie details
     match fetch_meta(id, content_type, state).await {
         Ok(meta) => {
-            // Mettre en cache pour éviter un second appel dans resolve_title_for_prowlarr
+            // Cache to avoid a second call in resolve_title_for_prowlarr
             let _ = super::cache::cache_meta(&meta, &state.db).await;
             if meta.id.starts_with("tt") { Some(meta.id) } else { None }
         }
@@ -594,7 +595,7 @@ pub async fn resolve_to_imdb_id(
     }
 }
 
-// ── Structs internes pour les crédits TMDB ───────────────────────────────────
+// ── Internal structs for TMDB credits ───────────────────────────────────
 #[derive(Debug, Deserialize)]
 struct TmdbCastEntry {
     id: u32,
@@ -609,7 +610,7 @@ struct TmdbCreditsResponse {
     cast: Vec<TmdbCastEntry>,
 }
 
-// Résout tout format d'ID vers l'ID numérique TMDB (réutilise la logique de fetch_meta)
+// Resolves any ID format to a numeric TMDB ID (reuses fetch_meta logic)
 async fn resolve_tmdb_numeric_id(
     id: &str,
     content_type: &ContentType,
@@ -630,15 +631,15 @@ async fn resolve_tmdb_numeric_id(
             ContentType::Series => resp.tv_results,
         };
         results.first().map(|item| item.id)
-            .ok_or_else(|| AppError::NotFound(format!("ID {} introuvable dans TMDB", id)))
+            .ok_or_else(|| AppError::NotFound(format!("ID {} not found in TMDB", id)))
     } else if let Some(s) = id.strip_prefix("tmdb:") {
-        s.parse::<u32>().map_err(|_| AppError::NotFound("Format tmdb: invalide".into()))
+        s.parse::<u32>().map_err(|_| AppError::NotFound("Invalid tmdb: format".into()))
     } else {
-        id.parse::<u32>().map_err(|_| AppError::NotFound("Format d'ID invalide".into()))
+        id.parse::<u32>().map_err(|_| AppError::NotFound("Invalid ID format".into()))
     }
 }
 
-/// Récupère le casting (20 acteurs principaux) pour un film ou une série.
+/// Retrieves the cast (20 main actors) for a movie or series.
 pub async fn fetch_credits(
     id: &str,
     content_type: &ContentType,
@@ -673,7 +674,7 @@ pub async fn fetch_credits(
     Ok(crate::models::Credits { cast })
 }
 
-// ── Structs pour la filmographie d'un acteur ─────────────────────────────────
+// ── Structs for actor filmography ─────────────────────────────────
 #[derive(Debug, Deserialize)]
 struct TmdbPersonCredits {
     cast: Vec<TmdbPersonCastItem>,
@@ -691,7 +692,7 @@ struct TmdbPersonCastItem {
     media_type: Option<String>,
 }
 
-/// Récupère la filmographie d'un acteur (films + séries) par son ID TMDB de personne.
+/// Retrieves the filmography of an actor (movies + series) by their TMDB person ID.
 pub async fn fetch_person_movies(
     person_id: &str,
     state: &AppState,
@@ -756,8 +757,8 @@ pub async fn fetch_tmdb_images(
         }));
     }
 
-    // TMDB retourne { backdrops: [{file_path, vote_average}], posters: [...], logos: [...] }
-    // On extrait uniquement les file_path, triés par vote_average desc
+    // TMDB returns { backdrops: [{file_path, vote_average}], posters: [...], logos: [...] }
+    // We extract only file_path, sorted by vote_average desc
 
     #[derive(Deserialize)]
     struct TmdbImageItem {
@@ -775,7 +776,7 @@ pub async fn fetch_tmdb_images(
 
     let mut data: TmdbImagesResponse = resp.json().await.unwrap_or_default();
 
-    // Trier par qualité (vote_average desc)
+    // Sort by quality (vote_average desc)
     data.backdrops.sort_by(|a, b| b.vote_average.partial_cmp(&a.vote_average).unwrap_or(std::cmp::Ordering::Equal));
     data.posters.sort_by(  |a, b| b.vote_average.partial_cmp(&a.vote_average).unwrap_or(std::cmp::Ordering::Equal));
 

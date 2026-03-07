@@ -239,13 +239,13 @@ pub async fn get_reviews(
     id: &str,
     state: &AppState,
 ) -> Result<TraktReviewsResponse, AppError> {
-    // Résoudre l'ID IMDB : accepte tt... directement, sinon résolve via TMDB
+    // Resolve IMDB ID: accepts tt... directly, otherwise resolves via TMDB
     let trakt_id = if id.starts_with("tt") {
         id.to_string()
     } else {
-        // Extraire l'ID numérique (ex: "tmdb:12345" → "12345")
+        // Extract the numeric ID (e.g. "tmdb:12345" → "12345")
         let numeric = id.split(':').last().unwrap_or(id);
-        // Essayer de résoudre via l'API Trakt /search/tmdb
+        // Try to resolve via Trakt API /search/tmdb
         let url = format!(
             "https://api.trakt.tv/search/tmdb/{}?type={}",
             numeric,
@@ -261,7 +261,7 @@ pub async fn get_reviews(
         match res {
             Ok(r) if r.status().is_success() => {
                 let results: serde_json::Value = r.json().await.unwrap_or_default();
-                // Extraire le slug ou l'id trakt depuis la réponse
+                // Extract the slug or trakt id from the response
                 let slug = if content_type == "movie" {
                     results[0]["movie"]["ids"]["slug"].as_str()
                 } else {
@@ -275,7 +275,7 @@ pub async fn get_reviews(
 
     let media_seg = if content_type == "movie" { "movies" } else { "shows" };
 
-    // Appel ratings (public)
+    // Ratings call (public)
     let rating_url = format!("https://api.trakt.tv/{}/{}/ratings", media_seg, trakt_id);
     let rating_res = state.http_client
         .get(&rating_url)
@@ -302,7 +302,7 @@ pub async fn get_reviews(
         _ => (0.0, 0, 0),
     };
 
-    // Appel comments (public)
+    // Comments call (public)
     let comments_url = format!(
         "https://api.trakt.tv/{}/{}/comments?sort=likes&limit=3",
         media_seg, trakt_id

@@ -1,12 +1,12 @@
 // ══════════════════════════════════════════════════════════════
-// artwork_providers.rs — Agrégateur d'images multi-providers
-// Providers : TMDB · Fanart.tv · TheTVDB · Simkl · Watchmode · OMDb
+// artwork_providers.rs — Multi-provider image aggregator
+// Providers: TMDB · Fanart.tv · TheTVDB · Simkl · Watchmode · OMDb
 //
-// Règles :
-//   - Provider skippé si sa clé ENV est vide
-//   - Appels groupés en 2 étapes parallèles (ext_ids nécessaires à l'étape 2)
-//   - Fanart > TMDB > TVDB > autres (ordre de priorité dans la fusion)
-//   - Déduplification + limite par catégorie
+// Rules:
+//   - Provider skipped if its ENV key is empty
+//   - Calls grouped in 2 parallel stages (ext_ids needed for stage 2)
+//   - Fanart > TMDB > TVDB > others (priority order in merge)
+//   - Deduplication + limit per category
 // ══════════════════════════════════════════════════════════════
 
 use std::collections::HashSet;
@@ -15,28 +15,28 @@ use crate::models::{ContentType, UnifiedImages};
 use crate::services::tmdb;
 use crate::AppState;
 
-// ── Limites par catégorie ─────────────────────────────────────
+// ── Limits per category ─────────────────────────────────────
 const MAX_SCENES:  usize = 16;
 const MAX_POSTERS: usize = 12;
 const MAX_LOGOS:   usize =  8;
 const MAX_BANNERS: usize =  8;
 const MAX_SEASONS: usize = 16;
 
-// ── IDs externes (récupérés via TMDB) ────────────────────────
+// ── External IDs (retrieved via TMDB) ────────────────────────
 struct ExternalIds {
     imdb_id: Option<String>,
     tvdb_id: Option<i64>,
 }
 
-// ── Entrée publique ───────────────────────────────────────────
-/// Agrège les images de tous les providers configurés pour un contenu donné.
-/// Ne lève jamais d'erreur : un provider défaillant renvoie des listes vides.
+// ── Public entry point ───────────────────────────────────────
+/// Aggregates images from all configured providers for a given content.
+/// Never raises an error: a failing provider returns empty lists.
 pub async fn fetch_unified_images(
     tmdb_id: i64,
     is_movie: bool,
     state: &AppState,
 ) -> UnifiedImages {
-    // ── Étape 1 : tous les appels qui ne nécessitent que tmdb_id ──
+    // ── Stage 1: all calls requiring only tmdb_id ──
     let (tmdb_val, fanart_val, ext_ids, simkl_poster, watchmode_poster) = tokio::join!(
         p_tmdb(tmdb_id, is_movie, state),
         p_fanart(tmdb_id, is_movie, &state.http_client, &state.fanart_key),
@@ -45,20 +45,20 @@ pub async fn fetch_unified_images(
         p_watchmode(tmdb_id, is_movie, &state.http_client, &state.watchmode_key),
     );
 
-    // ── Étape 2 : providers nécessitant imdb_id ou tvdb_id ───────
+    // ── Stage 2: providers requiring imdb_id or tvdb_id ───────
     let (tvdb_val, omdb_poster) = tokio::join!(
         p_tvdb(ext_ids.tvdb_id, is_movie, &state.http_client, &state.tvdb_key),
         p_omdb(ext_ids.imdb_id.as_deref(), &state.http_client, &state.omdb_key),
     );
 
-    // ── Accumulation par ordre de priorité ───────────────────────
+    // ── Accumulation by priority order ───────────────────────
     let mut scenes  = Vec::<String>::new();
     let mut posters = Vec::<String>::new();
     let mut logos   = Vec::<String>::new();
     let mut banners = Vec::<String>::new();
     let mut seasons = Vec::<String>::new();
 
-    // 1. Fanart.tv (priorité maximale — images HD sans texte)
+    // 1. Fanart.tv (highest priority — HD images without text)
     urls_from_json(&fanart_val["backgrounds"], &mut scenes);
     urls_from_json(&fanart_val["posters"],     &mut posters);
     urls_from_json(&fanart_val["logos"],       &mut logos);
@@ -66,18 +66,18 @@ pub async fn fetch_unified_images(
     urls_from_json(&fanart_val["artworks"],    &mut banners); // clearart → banners
     if !is_movie { urls_from_json(&fanart_val["seasons"], &mut seasons); }
 
-    // 2. TMDB (backdrops triés par vote_average)
+    // 2. TMDB (backdrops sorted by vote_average)
     urls_from_json(&tmdb_val["backdrops"], &mut scenes);
     urls_from_json(&tmdb_val["posters"],   &mut posters);
     urls_from_json(&tmdb_val["logos"],     &mut logos);
 
-    // 3. TheTVDB (séries uniquement — tvdb_id requis)
+    // 3. TheTVDB (series only — tvdb_id required)
     urls_from_json(&tvdb_val["backgrounds"], &mut scenes);
     urls_from_json(&tvdb_val["posters"],     &mut posters);
     urls_from_json(&tvdb_val["banners"],     &mut banners);
     urls_from_json(&tvdb_val["seasons"],     &mut seasons);
 
-    // 4. Simkl, Watchmode, OMDb → posters uniquement (dernier fallback)
+    // 4. Simkl, Watchmode, OMDb → posters only (last fallback)
     push_url(&mut posters, simkl_poster);
     push_url(&mut posters, watchmode_poster);
     push_url(&mut posters, omdb_poster);
@@ -159,19 +159,19 @@ async fn p_external_ids(
     }
 }
 
-// ── TheTVDB v4 (séries uniquement) ───────────────────────────
-// Type artwork : 1=Background · 2=Poster · 6=Banner · 7=Season Poster
+// ── TheTVDB v4 (series only) ───────────────────────────
+// Artwork type: 1=Background · 2=Poster · 6=Banner · 7=Season Poster
 async fn p_tvdb(
     tvdb_id: Option<i64>,
     is_movie: bool,
     client: &reqwest::Client,
     api_key: &str,
 ) -> Value {
-    // TVDB artworks limités aux séries (mapping movie ID non trivial)
+    // TVDB artworks limited to series (movie ID mapping non-trivial)
     let Some(id) = tvdb_id else { return Value::Null; };
     if api_key.is_empty() || is_movie { return Value::Null; }
 
-    // 1. Authentification → token JWT
+    // 1. Authentication → JWT token
     let Ok(tok_resp) = client
         .post("https://api4.thetvdb.com/v4/login")
         .json(&serde_json::json!({ "apikey": api_key }))
@@ -180,9 +180,9 @@ async fn p_tvdb(
     else { return Value::Null; };
     let Ok(tok_json): Result<Value, _> = tok_resp.json().await else { return Value::Null; };
     let Some(token) = tok_json["data"]["token"].as_str() else { return Value::Null; };
-    let token = token.to_string(); // posséder la valeur avant que tok_json ne soit libéré
+    let token = token.to_string(); // own the value before tok_json is dropped
 
-    // 2. Artworks de la série
+    // 2. Series artworks
     let url = format!("https://api4.thetvdb.com/v4/series/{id}/artworks");
     let Ok(art_resp) = client.get(&url).bearer_auth(&token).send().await
         else { return Value::Null; };
@@ -234,7 +234,7 @@ async fn p_simkl(
     Some(format!("https://simkl.in/posters/{hash}_m.jpg"))
 }
 
-// ── Watchmode (2 appels séquentiels internes) ─────────────────
+// ── Watchmode (2 sequential internal calls) ─────────────────
 async fn p_watchmode(
     tmdb_id: i64,
     is_movie: bool,
@@ -244,7 +244,7 @@ async fn p_watchmode(
     if api_key.is_empty() { return None; }
     let field = if is_movie { "tmdb_movie_id" } else { "tmdb_tv_id" };
 
-    // 1. Recherche pour obtenir l'ID Watchmode
+    // 1. Search to get the Watchmode ID
     let search_url = format!(
         "https://api.watchmode.com/v1/search/\
          ?apiKey={api_key}&search_field={field}&search_value={tmdb_id}"
@@ -253,7 +253,7 @@ async fn p_watchmode(
     let Ok(json): Result<Value, _> = resp.json().await else { return None; };
     let wm_id = json["title_results"].as_array()?.first()?["id"].as_i64()?;
 
-    // 2. Détails → poster URL
+    // 2. Details → poster URL
     let details_url = format!(
         "https://api.watchmode.com/v1/title/{wm_id}/details/?apiKey={api_key}"
     );

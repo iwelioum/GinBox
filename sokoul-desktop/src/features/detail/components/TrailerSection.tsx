@@ -1,7 +1,8 @@
-// components/detail/TrailerSection.tsx — Étape 10
-// Vignette YouTube cliquable → modal iframe embed
+// components/detail/TrailerSection.tsx — Step 10
+// Clickable YouTube thumbnail → modal iframe embed
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Play } from 'lucide-react';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
@@ -12,9 +13,10 @@ interface TrailerSectionProps {
 }
 
 export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _theme }) => {
+  const { t } = useTranslation();
   const [modalOpen, setModalOpen] = React.useState(false);
 
-  // Chercher un trailer YouTube dans les videos
+  // Find a YouTube trailer in the videos
   const trailer = videos?.find(v => v.type === 'Trailer' && v.site === 'YouTube')
     ?? videos?.find(v => v.key);
 
@@ -27,10 +29,10 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
   return (
     <section className="mb-[40px]">
       <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-5">
-        Bande-annonce
+        {t('detail.trailer')}
       </h2>
 
-      {/* Vignette cliquable — large */}
+      {/* Clickable thumbnail — large */}
       <button
         type="button"
         onClick={() => setModalOpen(true)}
@@ -39,23 +41,23 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
       >
         <img
           src={thumbUrl}
-          alt="Bande-annonce"
+          alt={t('detail.trailer')}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
-        {/* Overlay sombre + texte "Bande-annonce" en bas à gauche */}
+        {/* Dark overlay + "Trailer" text at bottom left */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent
                         group-hover:from-black/50 transition-all duration-300" />
         <span className="absolute bottom-4 left-5 text-white/60 text-[11px] font-semibold
                          uppercase tracking-[0.15em]">
-          Bande-annonce officielle
+          {t('detail.officialTrailer')}
         </span>
-        {/* Bouton play centré */}
+        {/* Centered play button */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div
             className="w-20 h-20 rounded-full flex items-center justify-center
-                       bg-white/15 backdrop-blur-sm border border-white/30
-                       group-hover:scale-110 group-hover:bg-white/25
+                       bg-dp-text/15 border border-dp-text/30
+                       group-hover:scale-110 group-hover:bg-dp-text/25
                        transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
           >
             <Play size={34} className="fill-white text-white ml-1.5" />
@@ -78,7 +80,7 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
               allow="autoplay; fullscreen"
               allowFullScreen
               className="w-full h-full rounded-xl"
-              title="Bande-annonce"
+              title={t('detail.trailer')}
             />
           </div>
           <button

@@ -1,52 +1,52 @@
-// contentKind.ts — Classification sémantique du contenu
-// Déduit un type précis depuis les métadonnées TMDB brutes.
-// RÈGLES : Priorité stricte (court-métrage > documentaire > …)
-//          Genres comparés en minuscules, FR + EN acceptés.
-//          Performance : résultat à mettre en cache via useMemo.
+// contentKind.ts — Semantic content classification
+// Deduces a precise type from raw TMDB metadata.
+// RULES: Strict priority (short > documentary > ...)
+//        Genres compared in lowercase, FR + EN accepted.
+//        Performance: result should be cached via useMemo.
 
 import type { CatalogMeta } from '@/shared/types';
 
-/** Maps TMDB genre IDs to French labels, centralizing genre translation so cards and filters display consistent names regardless of API language. */
+/** Maps TMDB genre IDs to English labels, centralizing genre translation so cards and filters display consistent names regardless of API language. */
 export const GENRE_MAP: Record<number, string> = {
-  // Films
+  // Movies
   28:    'Action',
-  12:    'Aventure',
+  12:    'Adventure',
   16:    'Animation',
-  35:    'Comédie',
+  35:    'Comedy',
   80:    'Crime',
-  99:    'Documentaire',
-  18:    'Drame',
-  10751: 'Famille',
-  14:    'Fantastique',
-  36:    'Histoire',
-  27:    'Horreur',
-  10402: 'Musique',
-  9648:  'Mystère',
+  99:    'Documentary',
+  18:    'Drama',
+  10751: 'Family',
+  14:    'Fantasy',
+  36:    'History',
+  27:    'Horror',
+  10402: 'Music',
+  9648:  'Mystery',
   10749: 'Romance',
   878:   'Science-Fiction',
-  10770: 'Téléfilm',
+  10770: 'TV Movie',
   53:    'Thriller',
-  10752: 'Guerre',
+  10752: 'War',
   37:    'Western',
-  // Séries (IDs TV-only)
-  10759: 'Action & Aventure',
-  10762: 'Enfants',
-  10763: 'Actualités',
-  10764: 'Télé-réalité',
-  10765: 'Sci-Fi & Fantastique',
+  // Series (TV-only IDs)
+  10759: 'Action & Adventure',
+  10762: 'Kids',
+  10763: 'News',
+  10764: 'Reality',
+  10765: 'Sci-Fi & Fantasy',
   10766: 'Soap',
   10767: 'Talk Show',
-  10768: 'Guerre & Politique',
+  10768: 'War & Politics',
 };
 
-/** Genres combo TV → liste de genres atomiques */
+/** TV combo genres → list of atomic genres */
 export const GENRE_ALIASES: Record<string, string[]> = {
-  'Action & Aventure':    ['Action', 'Aventure'],
-  'Sci-Fi & Fantastique': ['Science-Fiction', 'Fantastique'],
-  'Guerre & Politique':   ['Guerre'],
+  'Action & Adventure':  ['Action', 'Adventure'],
+  'Sci-Fi & Fantasy':    ['Science-Fiction', 'Fantasy'],
+  'War & Politics':      ['War'],
 };
 
-/** Genre brut TMDB — soit un objet `{id, name}`, soit un string (backend) */
+/** Raw TMDB genre — either an object `{id, name}` or a string (backend) */
 export type RawGenre = { id: number; name: string } | string;
 
 function normalizeGenreName(genre: RawGenre): string {
@@ -55,8 +55,8 @@ function normalizeGenreName(genre: RawGenre): string {
 }
 
 /**
- * Convertit un tableau de genres bruts en liste de noms atomiques français,
- * en éclatant les genres combo ("Action & Aventure" → ["Action", "Aventure"]).
+ * Converts an array of raw genres into a list of atomic English genre names,
+ * splitting combo genres ("Action & Adventure" → ["Action", "Adventure"]).
  */
 export function expandGenres(genres: RawGenre[]): string[] {
   return genres.flatMap((g) => {
@@ -66,8 +66,8 @@ export function expandGenres(genres: RawGenre[]): string[] {
 }
 
 /**
- * Extrait l'année de sortie depuis n'importe quel format de CatalogMeta.
- * Retourne null si indisponible (l'item passe le filtre période).
+ * Extracts the release year from any CatalogMeta format.
+ * Returns null if unavailable (item passes the era filter).
  */
 export function extractYear(item: { year?: number; release_date?: string; releaseInfo?: string }): number | null {
   if (item.year != null && item.year > 0) return item.year;
@@ -79,13 +79,13 @@ export function extractYear(item: { year?: number; release_date?: string; releas
 
 /** Normalizes the many TMDB status strings into a fixed union so UI badges and filters can pattern-match without string comparisons. */
 export type SeriesStatus =
-  | 'returning'  // "Returning Series" — en cours
+  | 'returning'  // "Returning Series" — ongoing
   | 'ended'      // "Ended"
   | 'canceled'   // "Canceled" / "Cancelled"
-  | 'planned'    // "Planned" — annoncée
+  | 'planned'    // "Planned" — announced
   | 'inprod'     // "In Production"
   | 'pilot'      // "Pilot"
-  | 'unknown';   // null ou valeur inconnue
+  | 'unknown';   // null or unknown value
 
 /** Converts raw TMDB status strings (including typos like "Cancelled") into a discriminated union for reliable badge rendering. */
 export function normalizeStatus(raw?: string | null): SeriesStatus {
@@ -103,19 +103,19 @@ export function normalizeStatus(raw?: string | null): SeriesStatus {
 
 /** Discriminated union of content classifications that drives filtering, theming, and badge display across the catalog. */
 export type ContentKind =
-  | 'movie'        // Film classique
-  | 'short'        // Court-métrage (runtime < 40 min)
-  | 'documentary'  // Documentaire (film ou série)
-  | 'tv'           // Série TV live-action
-  | 'anime'        // Animation japonaise (films ou séries)
-  | 'animation'    // Animation non-japonaise (Disney, Pixar, etc.)
-  | 'miniseries'   // Série courte ≤ 8 épisodes ou 1 saison limitée
-  | 'reality'      // Télé-réalité, concours
+  | 'movie'        // Classic film
+  | 'short'        // Short film (runtime < 40 min)
+  | 'documentary'  // Documentary (movie or series)
+  | 'tv'           // Live-action TV series
+  | 'anime'        // Japanese animation (movies or series)
+  | 'animation'    // Non-Japanese animation (Disney, Pixar, etc.)
+  | 'miniseries'   // Short series ≤ 8 episodes or 1 limited season
+  | 'reality'      // Reality TV, competitions
   | 'talk'         // Talk shows, late night
-  | 'news'         // Journaux, news TV
-  | 'special';     // Épisode spécial, concert, stand-up
+  | 'news'         // News, TV journalism
+  | 'special';     // Special episode, concert, stand-up
 
-/** Pairs each ContentKind with a French label and emoji icon for use in filter chips and category headers. */
+/** Pairs each ContentKind with an English label and emoji icon for use in filter chips and category headers. */
 export interface ContentKindMeta {
   kind:  ContentKind;
   label: string;
@@ -124,20 +124,20 @@ export interface ContentKindMeta {
 
 /** Ordered list of content categories displayed in the catalog filter bar; order determines UI presentation priority. */
 export const CONTENT_KINDS: ContentKindMeta[] = [
-  { kind: 'movie',       label: 'Films',          icon: '🎬' },
-  { kind: 'tv',          label: 'Séries',          icon: '📺' },
-  { kind: 'anime',       label: 'Anime',           icon: '⛩️' },
-  { kind: 'animation',   label: 'Animation',       icon: '🎨' },
-  { kind: 'documentary', label: 'Documentaires',   icon: '🎥' },
-  { kind: 'miniseries',  label: 'Mini-séries',     icon: '📖' },
-  { kind: 'reality',     label: 'Télé-réalité',    icon: '🎭' },
-  { kind: 'short',       label: 'Courts-métrages', icon: '⏱️' },
-  { kind: 'special',     label: 'Spéciaux',        icon: '⭐' },
+  { kind: 'movie',       label: 'Movies',          icon: '🎬' },
+  { kind: 'tv',          label: 'Series',           icon: '📺' },
+  { kind: 'anime',       label: 'Anime',            icon: '⛩️' },
+  { kind: 'animation',   label: 'Animation',        icon: '🎨' },
+  { kind: 'documentary', label: 'Documentaries',    icon: '🎥' },
+  { kind: 'miniseries',  label: 'Miniseries',       icon: '📖' },
+  { kind: 'reality',     label: 'Reality TV',       icon: '🎭' },
+  { kind: 'short',       label: 'Short Films',      icon: '⏱️' },
+  { kind: 'special',     label: 'Specials',         icon: '⭐' },
 ];
 
 /** Infers a precise content kind from TMDB metadata using a strict priority chain (short > documentary > anime > ...) to avoid ambiguous multi-genre classification. */
 export function classifyContentKind(item: CatalogMeta): ContentKind {
-  // Normalise media_type : 'series' → 'tv' pour uniformité
+  // Normalize media_type: 'series' → 'tv' for consistency
   const rawType   = item.type || item.media_type || 'movie';
   const mediaType = rawType === 'series' ? 'tv' : rawType; // 'movie' | 'tv'
 
@@ -151,7 +151,7 @@ export function classifyContentKind(item: CatalogMeta): ContentKind {
   const episodeCount  = item.number_of_episodes ?? 0;
   const seasonCount   = item.number_of_seasons ?? 0;
 
-  // Détections de genres (FR + EN, correspondance partielle robuste)
+  // Genre detection (FR + EN, robust partial matching)
   const isAnimation   = genres.some((g) => g.includes('animation'));
   const isDocumentary = genres.some((g) => g.includes('document'));
   const isReality     = genres.some((g) =>
@@ -164,27 +164,27 @@ export function classifyContentKind(item: CatalogMeta): ContentKind {
     g.includes('actualit') || g === 'news'
   );
 
-  // 1. Court-métrage
+  // 1. Short film
   if (mediaType === 'movie' && runtime > 0 && runtime < 40) return 'short';
 
-  // 2. Documentaire (priorité sur animation)
+  // 2. Documentary (priority over animation)
   if (isDocumentary) return 'documentary';
 
-  // 3. Réalité / Talk / News (TV)
+  // 3. Reality / Talk / News (TV)
   if (isReality) return 'reality';
   if (isTalk)    return 'talk';
   if (isNews)    return 'news';
 
-  // 4. Anime : animation + origine japonaise OU langue japonaise
+  // 4. Anime: animation + Japanese origin OR Japanese language
   if (
     isAnimation &&
     (originalLang === 'ja' || originCountry.includes('JP'))
   ) return 'anime';
 
-  // 5. Animation non-japonaise
+  // 5. Non-Japanese animation
   if (isAnimation) return 'animation';
 
-  // 6. Mini-série : 1 saison + ≤ 8 épisodes, ou série terminée courte
+  // 6. Miniseries: 1 season + ≤ 8 episodes, or ended short series
   if (
     mediaType === 'tv' &&
     (
@@ -193,7 +193,7 @@ export function classifyContentKind(item: CatalogMeta): ContentKind {
     )
   ) return 'miniseries';
 
-  // 7. Spécial stand-up / concert
+  // 7. Special: stand-up / concert
   if (
     mediaType === 'movie' &&
     (
@@ -203,6 +203,6 @@ export function classifyContentKind(item: CatalogMeta): ContentKind {
     )
   ) return 'special';
 
-  // 8. Défaut
+  // 8. Default
   return mediaType === 'movie' ? 'movie' : 'tv';
 }

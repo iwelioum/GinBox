@@ -14,7 +14,7 @@ function isAxiosLikeError(err: unknown): err is AxiosLikeError {
 }
 
 /** Safely extracts a user-facing message from any thrown value, handling Axios errors, standard Errors, and unknown types so catch blocks never surface raw objects to the UI. */
-export function extractErrorMessage(err: unknown, fallback = 'Erreur inconnue'): string {
+export function extractErrorMessage(err: unknown, fallback = 'Unknown error'): string {
   if (isAxiosLikeError(err)) {
     return err.response?.data?.error ?? err.message ?? fallback;
   }

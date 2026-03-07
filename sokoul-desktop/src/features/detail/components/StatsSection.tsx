@@ -1,10 +1,10 @@
 // components/detail/StatsSection.tsx
-// Grid 2×4 · Compteurs easeOut · Barres animées var(--accent)
-// IntersectionObserver → déclenche les animations au scroll
+// Grid 2×4 · EaseOut counters · Animated bars var(--accent)
+// IntersectionObserver → triggers animations on scroll
 
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { endpoints } from '../../../api/client';
+import { endpoints } from '@/shared/api/client';
 import type { CatalogMeta, ContentType } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
 
@@ -36,7 +36,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   const raw       = useCountUp(Math.round(value * 10 ** decimals), active, 1500);
   const formatted = decimals > 0
     ? (raw / 10 ** decimals).toFixed(decimals)
-    : raw.toLocaleString('fr-FR');
+    : raw.toLocaleString('en-US');
   return (
     <span
       style={{
@@ -54,7 +54,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 interface StatEntry {
   label:    string;
   value:    number;
-  percent:  number; // 0–100 pour la barre
+  percent:  number; // 0–100 for the bar
   decimals?: number;
   suffix?:   string;
   prefix?:   string;
@@ -78,7 +78,7 @@ const StatCard: React.FC<{ stat: StatEntry; active: boolean }> = ({ stat, active
         prefix={stat.prefix ?? ''}
       />
     </span>
-    {/* Barre de progression */}
+    {/* Progress bar */}
     <div className="h-0.5 bg-white/10 rounded-full mt-1">
       <div
         className="h-full rounded-full"
@@ -102,7 +102,7 @@ interface TraktCommentData {
 }
 
 const ReviewCard: React.FC<{ review: TraktCommentData }> = ({ review }) => {
-  const date = new Date(review.createdAt).toLocaleDateString('fr-FR', {
+  const date = new Date(review.createdAt).toLocaleDateString('en-US', {
     year: 'numeric', month: 'short', day: 'numeric',
   });
   return (
@@ -122,10 +122,10 @@ const ReviewCard: React.FC<{ review: TraktCommentData }> = ({ review }) => {
 };
 
 interface StatsSectionProps {
-  // Nouvelle API
+  // New API
   item?:  CatalogMeta;
   theme?: GenreTheme;
-  // Ancienne API (compatibilité)
+  // Legacy API (compatibility)
   type?:        ContentType;
   id?:          string;
   tmdbRating?: number;
@@ -162,25 +162,25 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
     staleTime: 15 * 60 * 1000,
   });
 
-  // Normalisation → pourcentage de barre
+  // Normalization → bar percentage
   const toPercent = (val: number, max: number) =>
     Math.min(100, Math.round((val / max) * 100));
 
   const stats: StatEntry[] = [];
 
   if (tmdbRating != null && tmdbRating > 0)
-    stats.push({ label: 'Note TMDB', value: tmdbRating, decimals: 1, suffix: '/10',
+    stats.push({ label: 'TMDB Rating', value: tmdbRating, decimals: 1, suffix: '/10',
       percent: toPercent(tmdbRating, 10), color: '#f5c518' });
 
   if (tmdbVotes != null && tmdbVotes > 0)
-    stats.push({ label: 'Votes TMDB', value: tmdbVotes,
+    stats.push({ label: 'TMDB Votes', value: tmdbVotes,
       percent: toPercent(tmdbVotes, 50000) });
 
   if (trakt && trakt.votes > 0) {
-    stats.push({ label: 'Note Trakt', value: trakt.rating, decimals: 1, suffix: '/10',
+    stats.push({ label: 'Trakt Rating', value: trakt.rating, decimals: 1, suffix: '/10',
       percent: toPercent(trakt.rating, 10), color: '#ed1c24' });
     if (trakt.pctLiked > 0)
-      stats.push({ label: 'Appréciés', value: trakt.pctLiked, suffix: '%',
+      stats.push({ label: 'Liked', value: trakt.pctLiked, suffix: '%',
         percent: trakt.pctLiked, color: '#22c55e' });
   }
 
@@ -197,7 +197,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
   return (
     <section ref={sectionRef} className="mb-[40px]">
       <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-6">
-        En chiffres
+        In numbers
       </h2>
 
       {stats.length > 0 && (
@@ -211,7 +211,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
       {trakt?.comments && trakt.comments.length > 0 && (
         <div>
           <h3 className="text-[11px] font-semibold text-white/30 uppercase tracking-widest mb-4">
-            Avis Trakt
+            Trakt Reviews
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {trakt.comments.map((c: TraktCommentData) => (

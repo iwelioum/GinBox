@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════
-// main.rs — Serveur + CORS loopback + signal READY
-// NOUVEAU : Spécifique Electron/Desktop
-// RÈGLES : Loopback (127.0.0.1) obligatoire. Signal stdout.
+// main.rs — Server + CORS loopback + READY signal
+// Electron/Desktop specific
+// RULES: Loopback (127.0.0.1) mandatory. Signal stdout.
 // ══════════════════════════════════════════════════════════
 
 use axum::{routing::get, Router};
@@ -35,17 +35,19 @@ pub struct AppState {
     pub omdb_key: String,
     pub trakt_client_id: String,
     pub trakt_client_secret: String,
+    pub top_posters_key: String,
+    pub cinematerial_key: String,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // 1. Initialisation de l'environnement (fail-fast)
+    // 1. Environment initialization (fail-fast)
     dotenvy::dotenv().unwrap_or_else(|_| {
-        eprintln!("[FATAL] Le fichier .env est introuvable.");
+        eprintln!("[FATAL] The .env file is not found.");
         std::process::exit(1);
     });
 
-    // 2. Initialisation des logs
+    // 2. Log initialization
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -54,7 +56,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    // 3. Initialisation Base de données
+    // 3. Database initialization
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool = SqlitePoolOptions::new()
         .max_connections(5)
@@ -62,17 +64,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .expect("Failed to connect to database");
 
-    // PRAGMAs SQLite — ordre obligatoire : WAL d'abord
+    // SQLite PRAGMAs — mandatory order: WAL first
     sqlx::query("PRAGMA journal_mode=WAL").execute(&pool).await?;
     sqlx::query("PRAGMA synchronous=NORMAL").execute(&pool).await?;
-    sqlx::query("PRAGMA foreign_keys=ON").execute(&pool).await?;   // active ON DELETE CASCADE
-    sqlx::query("PRAGMA busy_timeout=5000").execute(&pool).await?; // 5s avant SQLITE_BUSY
+    sqlx::query("PRAGMA foreign_keys=ON").execute(&pool).await?;   // enable ON DELETE CASCADE
+    sqlx::query("PRAGMA busy_timeout=5000").execute(&pool).await?; // 5s before SQLITE_BUSY
     sqlx::query("PRAGMA temp_store=memory").execute(&pool).await?;
     sqlx::query("PRAGMA mmap_size=268435456").execute(&pool).await?; // 256 MB mmap
     sqlx::migrate!("./migrations").run(&pool).await?;
     info!("Database connected and migrations applied.");
 
-    // 4. Initialisation État Global
+    // 4. Global state initialization
     let http_client = reqwest::Client::builder()
         .timeout(std::time::Duration::from_secs(30))
         .user_agent("Sokoul/1.0.0")
@@ -92,6 +94,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         omdb_key: env::var("OMDB_API_KEY").unwrap_or_default(),
         trakt_client_id: env::var("TRAKT_CLIENT_ID").unwrap_or_default(),
         trakt_client_secret: env::var("TRAKT_CLIENT_SECRET").unwrap_or_default(),
+        top_posters_key: env::var("TOP_POSTERS_API_KEY").unwrap_or_default(),
+        cinematerial_key: env::var("CINEMATERIAL_API_KEY").unwrap_or_default(),
     });
 
     // 5. Router - Orchestration des Services
@@ -102,6 +106,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .nest("/search", routes::catalog::search_router())
         .nest("/debrid", routes::debrid::router())
         .nest("/fanart", routes::fanart::router())
+        .nest("/artwork", routes::artwork::router())
         .nest("/profiles", routes::profiles::router())
         .nest("/playback", routes::playback::router())
         .nest("/trakt", routes::trakt::router())
@@ -119,9 +124,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr: SocketAddr = format!("{}:{}", host, port).parse()?;
 
     let listener = TcpListener::bind(&addr).await?;
-    info!("Serveur Sokoul Desktop démarré sur {}", addr);
+    info!("Sokoul Desktop server started on {}", addr);
 
-    // ⭐ SIGNAL CRITIQUE POUR ELECTRON ⭐
+    // ⭐ CRITICAL SIGNAL FOR ELECTRON ⭐
     info!("SOKOUL_BACKEND_READY");
 
     axum::serve(listener, app).await?;

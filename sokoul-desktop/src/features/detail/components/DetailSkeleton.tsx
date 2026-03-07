@@ -1,5 +1,5 @@
 export const DetailSkeleton = () => (
-  <div className="min-h-screen bg-[#07080f] animate-pulse">
+  <div className="min-h-screen bg-dp-bg animate-pulse">
     <div className="h-[85vh] bg-white/5" />
     <div className="max-w-[1400px] mx-auto px-8 py-10 space-y-6">
       <div className="flex gap-8">

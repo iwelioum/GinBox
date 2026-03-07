@@ -7,7 +7,7 @@ interface VideoContainerProps {
 export const VideoContainer = ({ onClick }: VideoContainerProps) => (
   <div style={{ position: 'relative', width: '100%', height: 'calc(100% - 80px)' }}>
 
-    {/* Zone où MPV dessine — pointer-events: none obligatoire */}
+    {/* Area where MPV renders — pointer-events: none required */}
     <div
       id="video-container"
       data-testid="video-container"
@@ -19,7 +19,7 @@ export const VideoContainer = ({ onClick }: VideoContainerProps) => (
       }}
     />
 
-    {/* Couche cliquable pour toggle play/pause — par-dessus la zone MPV */}
+    {/* Clickable layer for toggle play/pause — above the MPV area */}
     <div
       data-testid="video-click-zone"
       onClick={onClick}

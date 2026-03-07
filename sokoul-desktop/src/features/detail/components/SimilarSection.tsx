@@ -1,7 +1,8 @@
-// components/detail/SimilarSection.tsx — Étape 13
-// Scroll horizontal de cards similaires
+// components/detail/SimilarSection.tsx — Step 13
+// Horizontal scroll of similar cards
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
@@ -14,6 +15,7 @@ interface SimilarSectionProps {
 }
 
 export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _theme }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const displayed = items?.slice(0, 8) ?? [];
@@ -22,7 +24,7 @@ export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _t
   return (
     <section className="mb-[40px]">
       <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">
-        Similaires
+        {t('detail.similar')}
       </h2>
       <div
         className="flex gap-3 overflow-x-auto pb-4 scroll-smooth"
@@ -54,7 +56,7 @@ export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _t
                   />
                 ) : (
                   <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/20 text-xs">
-                    Pas d'image
+                    {t('common.noImage')}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />

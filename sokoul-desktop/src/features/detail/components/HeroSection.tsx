@@ -119,7 +119,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             ) : (
               <Play size={18} style={{ fill: 'black' }} />
             )}
-            <span>{isPlayLoading ? 'Recherche...' : 'Play'}</span>
+            <span>{isPlayLoading ? 'Searching...' : 'Play'}</span>
           </button>
 
           {/* Trailer / Download button */}

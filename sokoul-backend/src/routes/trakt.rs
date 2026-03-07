@@ -13,11 +13,11 @@ use serde::Deserialize;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/auth/start", post(start_device_auth))
-        .route("/auth/poll", post(poll_device_auth))
-        .route("/scrobble/start", post(scrobble_start))
-        .route("/scrobble/pause", post(scrobble_pause))
-        .route("/scrobble/stop", post(scrobble_stop))
+        .route("/auth/start", post(post_device_auth))
+        .route("/auth/poll", post(post_poll_auth))
+        .route("/scrobble/start", post(post_scrobble_start))
+        .route("/scrobble/pause", post(post_scrobble_pause))
+        .route("/scrobble/stop", post(post_scrobble_stop))
         .route("/:content_type/:id/reviews", get(get_reviews))
 }
 
@@ -35,12 +35,12 @@ pub struct ScrobbleRequest {
     pub progress: f32,
 }
 
-async fn start_device_auth(State(state): State<Arc<AppState>>) -> Result<Json<DeviceAuthResponse>, AppError> {
+async fn post_device_auth(State(state): State<Arc<AppState>>) -> Result<Json<DeviceAuthResponse>, AppError> {
     let res = trakt::start_device_auth(&state).await?;
     Ok(Json(res))
 }
 
-async fn poll_device_auth(
+async fn post_poll_auth(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<PollAuthRequest>,
 ) -> Result<Json<TraktTokens>, AppError> {
@@ -48,7 +48,7 @@ async fn poll_device_auth(
     Ok(Json(tokens))
 }
 
-async fn scrobble_start(
+async fn post_scrobble_start(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<ScrobbleRequest>,
 ) -> Result<(), AppError> {
@@ -56,7 +56,7 @@ async fn scrobble_start(
     Ok(())
 }
 
-async fn scrobble_pause(
+async fn post_scrobble_pause(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<ScrobbleRequest>,
 ) -> Result<(), AppError> {
@@ -64,7 +64,7 @@ async fn scrobble_pause(
     Ok(())
 }
 
-async fn scrobble_stop(
+async fn post_scrobble_stop(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<ScrobbleRequest>,
 ) -> Result<(), AppError> {

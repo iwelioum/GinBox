@@ -10,7 +10,7 @@ setlocal enabledelayedexpansion
 title [SOKOUL BACKEND] Rust/Axum -- Port 3000
 color 0A
 
-set BACKEND_DIR=%~dp0..\sokoul-backend
+set BACKEND_DIR=%~dp0..\..\sokoul-backend
 
 echo.
 echo ==================================================
@@ -20,40 +20,40 @@ echo   DB   : !BACKEND_DIR!\sokoul_desktop.db
 echo ==================================================
 echo.
 
-:: Verification .env
+:: Check .env
 if not exist "%BACKEND_DIR%\.env" (
     color 0C
-    echo   [ERREUR] Fichier .env manquant dans sokoul-backend\
-    echo   Copier .env.example vers .env et remplir les valeurs.
+    echo   [ERROR] .env file missing in sokoul-backend\
+    echo   Copy .env.example to .env and fill in the values.
     echo.
     pause
     exit /b 1
 )
 
-:: Verification port 3000 libre
+:: Check port 3000 is free
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000 " ^| findstr "LISTENING"') do (
     set PID_3000=%%a
     color 0E
-    echo   [AVERTISSEMENT] Le port 3000 est occupe par le PID : !PID_3000!
-    set /p KILL_PORT="   Voulez-vous fermer ce processus ? (O/N) : "
-    if /i "!KILL_PORT!"=="O" (
+    echo   [WARNING] Port 3000 is occupied by PID : !PID_3000!
+    set /p KILL_PORT="   Do you want to kill this process? (Y/N) : "
+    if /i "!KILL_PORT!"=="Y" (
         taskkill /PID !PID_3000! /F >nul 2>&1
-        echo   [OK] Processus !PID_3000! arrete.
+        echo   [OK] Process !PID_3000! stopped.
         timeout /t 2 >nul
     ) else (
-        echo   [INFO] Tentative de lancement malgre l'occupation...
+        echo   [INFO] Attempting to start despite occupation...
     )
     color 0A
 )
 
-:: Chargement .env dans l'environnement
+:: Loading .env into environment
 for /f "usebackq tokens=1,* delims==" %%A in ("%BACKEND_DIR%\.env") do (
     set _ENVKEY=%%A
     if not "!_ENVKEY!"=="" if not "!_ENVKEY:~0,1!"=="#" set "%%A=%%B"
 )
 
-echo   Lancement cargo run...
-echo   Les logs apparaissent ci-dessous.
+echo   Starting cargo run...
+echo   Logs will appear below.
 echo   --------------------------------------------------
 echo.
 
@@ -62,8 +62,8 @@ cargo run
 
 echo.
 echo ==================================================
-echo   Backend arrete.
-echo   Consulter les logs ci-dessus pour diagnostiquer.
+echo   Backend stopped.
+echo   Check the logs above to diagnose.
 echo ==================================================
 echo.
 pause

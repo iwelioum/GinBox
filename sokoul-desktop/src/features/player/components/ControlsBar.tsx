@@ -1,6 +1,7 @@
-// ControlsBar.tsx — Barre de controles du lecteur
+// ControlsBar.tsx — Player controls bar
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Play, Pause,
   SkipBack, SkipForward,
@@ -23,7 +24,7 @@ export interface ControlsBarProps {
   onSubtitles:     () => void;
   onAudio:         () => void;
   onSettings:      () => void;
-  // onFullscreen géré en interne — plus besoin de prop externe
+  // onFullscreen handled internally — no need for external prop
 }
 
 const btnBase: React.CSSProperties = {
@@ -76,6 +77,7 @@ export function ControlsBar({
   onAudio,
   onSettings,
 }: ControlsBarProps) {
+  const { t } = useTranslation();
   const [volumeExpanded, setVolumeExpanded] = useState(false);
   const [isFs,           setIsFs]           = useState(false);
   const sz = 22;
@@ -95,15 +97,15 @@ export function ControlsBar({
         height:     36,
       }}
     >
-      <IconBtn onClick={onSkipBack}  title="Reculer de 10s">
+      <IconBtn onClick={onSkipBack}  title={t('player.rewind')}>
         <SkipBack size={sz} />
       </IconBtn>
 
-      <IconBtn onClick={isPlaying ? onPause : onPlay} title={isPlaying ? 'Pause' : 'Lecture'}>
+      <IconBtn onClick={isPlaying ? onPause : onPlay} title={isPlaying ? t('player.pause') : t('player.play')}>
         {isPlaying ? <Pause size={sz} /> : <Play size={sz} />}
       </IconBtn>
 
-      <IconBtn onClick={onSkipForward} title="Avancer de 10s">
+      <IconBtn onClick={onSkipForward} title={t('player.forward')}>
         <SkipForward size={sz} />
       </IconBtn>
 
@@ -112,7 +114,7 @@ export function ControlsBar({
         onMouseLeave={() => setVolumeExpanded(false)}
         style={{ display: 'flex', alignItems: 'center', gap: 6 }}
       >
-        <IconBtn onClick={onMuteToggle} title={isMuted ? 'Activer le son' : 'Couper le son'}>
+        <IconBtn onClick={onMuteToggle} title={isMuted ? t('player.unmute') : t('player.mute')}>
           {isMuted || volume === 0 ? <VolumeX size={sz} /> : <Volume2 size={sz} />}
         </IconBtn>
 
@@ -141,19 +143,19 @@ export function ControlsBar({
 
       <div style={{ flex: 1 }} />
 
-      <IconBtn onClick={onSubtitles} title="Sous-titres (CC)">
+      <IconBtn onClick={onSubtitles} title={t('player.subtitlesCC')}>
         <Subtitles size={sz} />
       </IconBtn>
 
-      <IconBtn onClick={onAudio} title="Piste audio">
+      <IconBtn onClick={onAudio} title={t('player.audioTrack')}>
         <Music size={sz} />
       </IconBtn>
 
-      <IconBtn onClick={handleFullscreen} title={isFs ? 'Fenêtré' : 'Plein écran'}>
+      <IconBtn onClick={handleFullscreen} title={isFs ? t('player.windowed') : t('player.fullscreen')}>
         {isFs ? <Minimize size={sz} /> : <Maximize size={sz} />}
       </IconBtn>
 
-      <IconBtn onClick={onSettings} title="Paramètres">
+      <IconBtn onClick={onSettings} title={t('player.settings')}>
         <Settings size={sz} />
       </IconBtn>
     </div>

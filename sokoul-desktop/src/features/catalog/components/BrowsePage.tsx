@@ -1,16 +1,16 @@
-// BrowsePage.tsx — Parcourir la bibliothèque avec filtres
-// HERO    : CinematicHero auto-slide 8s (top 8 items avec backdrop)
-// FILTRES : inline, juste au-dessus des sections (plus sticky)
-// SECTIONS: jusqu'à 15 sections dynamiques colorées
-// DONNÉES : popular + top_rated (films + séries)
+// BrowsePage.tsx — Browse library with filters
+// HERO    : CinematicHero auto-slide 8s (top 8 items with backdrop)
+// FILTERS : inline, just above sections (no longer sticky)
+// SECTIONS: up to 15 dynamic colored sections
+// DATA    : popular + top_rated (movies + series)
 
 import * as React from 'react';
 import { useNavigate }                    from 'react-router-dom';
 import { useQueries, useQuery }           from '@tanstack/react-query';
 import { AnimatePresence, motion }        from 'framer-motion';
-import { endpoints }                      from '@/api/client';
+import { endpoints }                      from '@/shared/api/client';
 import type { CatalogMeta, ContentType, UserProgressEntry, PlaybackEntry } from '@/shared/types';
-import { useProfileStore }                from '@/shared/stores/profileStore';
+import { useProfileStore }                from '@/stores/profileStore';
 import { extractLogo }                    from '@/shared/utils/tmdb';
 import {
   classifyContentKind,
@@ -63,9 +63,9 @@ const MORE_PAGES    = 2;
 type ContentTabValue = 'all' | 'movie' | 'tv';
 
 const TYPE_TABS: { value: ContentTabValue; label: string; icon: LucideIcon }[] = [
-  { value: 'all',   label: 'Tout',   icon: Home },
+  { value: 'all',   label: 'All',    icon: Home },
   { value: 'movie', label: 'Films',  icon: Film },
-  { value: 'tv',    label: 'Séries', icon: Tv },
+  { value: 'tv',    label: 'Series', icon: Tv },
 ];
 
 type BrowsePageMode = 'all' | 'movie' | 'series';
@@ -84,48 +84,48 @@ function buildDefaultFilters(mode: BrowsePageMode): FilterState {
 }
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'popularity', label: 'Popularité'  },
-  { value: 'rating',     label: 'Note'        },
-  { value: 'year_desc',  label: 'Plus récent' },
-  { value: 'year_asc',   label: 'Plus ancien' },
+  { value: 'popularity', label: 'Popularity'  },
+  { value: 'rating',     label: 'Rating'      },
+  { value: 'year_desc',  label: 'Newest'      },
+  { value: 'year_asc',   label: 'Oldest'      },
   { value: 'title_asc',  label: 'A → Z'       },
   { value: 'title_desc', label: 'Z → A'       },
 ];
 
 const KIND_LABELS: Record<string, string> = {
-  movie:       'Films',
-  tv:          'Séries',
-  anime:       'Animes',
+  movie:       'Movies',
+  tv:          'Series',
+  anime:       'Anime',
   animation:   'Animation',
-  miniseries:  'Mini-séries',
-  documentary: 'Documentaires',
-  reality:     'Téléréalité',
-  special:     'Spéciaux',
-  short:       'Courts-métrages',
+  miniseries:  'Miniseries',
+  documentary: 'Documentaries',
+  reality:     'Reality TV',
+  special:     'Specials',
+  short:       'Short Films',
 };
 
 const GENRE_ACCENT: Record<string, string> = {
   'Action':          '#ef4444',
   'Science-Fiction': '#6366f1',
-  'Drame':           '#a78bfa',
-  'Comédie':         '#22c55e',
+  'Drama':           '#a78bfa',
+  'Comedy':          '#22c55e',
   'Thriller':        '#f59e0b',
-  'Horreur':         '#dc2626',
+  'Horror':          '#dc2626',
   'Romance':         '#ec4899',
   'Animation':       '#fb923c',
-  'Fantastique':     '#8b5cf6',
-  'Aventure':        '#14b8a6',
-  'Mystère':         '#64748b',
+  'Fantasy':         '#8b5cf6',
+  'Adventure':       '#14b8a6',
+  'Mystery':         '#64748b',
   'Crime':           '#6b7280',
-  'Documentaire':    '#06b6d4',
-  'Histoire':        '#d97706',
-  'Guerre':          '#78716c',
-  'Musique':         '#f472b6',
-  'Famille':         '#10b981',
+  'Documentary':     '#06b6d4',
+  'History':         '#d97706',
+  'War':             '#78716c',
+  'Music':           '#f472b6',
+  'Family':          '#10b981',
   'Western':         '#a04000',
   'Sci-Fi & Fantasy':'#4361ee',
   'War & Politics':  '#546e7a',
-  'Téléréalité':     '#00bcd4',
+  'Reality TV':      '#00bcd4',
 };
 
 const FilterChip = ({ label, onRemove }: { label: string; onRemove: () => void }) => (
@@ -328,7 +328,7 @@ function EditorialRail({
             )}
           </div>
         </div>
-        <span className="text-[11px] text-white/30 font-mono">{items.length} titres</span>
+        <span className="text-[11px] text-white/30 font-mono">{items.length} titles</span>
       </div>
 
       <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
@@ -371,7 +371,7 @@ function BrowseHero({
     return () => clearInterval(t);
   }, [paused, heroItems.length]);
 
-  // Précharge les logos Fanart pour tous les items du héro
+  // Preload Fanart logos for all hero items
   const fanartQueries = useQueries({
     queries: heroItems.map(item => {
       const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
@@ -408,7 +408,7 @@ function BrowseHero({
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Backgrounds avec crossfade */}
+      {/* Backgrounds with crossfade */}
       <AnimatePresence mode="sync">
         <motion.div
           key={`bg-${safeIdx}`}
@@ -425,16 +425,16 @@ function BrowseHero({
           )}
           <div
             className="absolute inset-0"
-            style={{ background: 'linear-gradient(to right, rgba(10,11,22,0.95) 28%, rgba(10,11,22,0.45) 62%, transparent 100%)' }}
+            style={{ background: 'linear-gradient(to right, rgba(4,7,20,0.95) 28%, rgba(4,7,20,0.45) 62%, transparent 100%)' }}
           />
           <div
             className="absolute inset-0"
-            style={{ background: 'linear-gradient(to top, rgba(10,11,22,1) 0%, rgba(10,11,22,0.25) 38%, transparent 65%)' }}
+            style={{ background: 'linear-gradient(to top, rgba(4,7,20,1) 0%, rgba(4,7,20,0.25) 38%, transparent 65%)' }}
           />
         </motion.div>
       </AnimatePresence>
 
-      {/* Contenu */}
+      {/* Content */}
       <div className="absolute inset-0 flex items-end pb-16 px-10">
         <AnimatePresence mode="wait">
           <motion.div
@@ -445,7 +445,7 @@ function BrowseHero({
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="max-w-xl"
           >
-            {/* Logo ou Titre */}
+            {/* Logo or Title */}
             {heroLogo ? (
               <img
                 src={heroLogo}
@@ -473,7 +473,7 @@ function BrowseHero({
               </h1>
             )}
 
-            {/* Métadonnées */}
+            {/* Metadata */}
             <div className="flex items-center gap-2 mb-3 flex-wrap">
               {year && <span className="text-sm text-white/55">{year}</span>}
               {current._rating && (
@@ -513,20 +513,20 @@ function BrowseHero({
                 onClick={() => onPlay(current)}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-white text-black text-sm font-bold hover:bg-white/90 transition-all"
               >
-                <PlayCircle size={17} /> Regarder
+                <PlayCircle size={17} /> Watch
               </button>
               <button
                 onClick={() => onInfo(current)}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/25 bg-black/30 text-white text-sm font-semibold hover:bg-white/10 hover:border-white/50 transition-all"
               >
-                <Plus size={17} /> Plus d'infos
+                <Plus size={17} /> More info
               </button>
             </div>
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* Points de navigation */}
+      {/* Navigation dots */}
       {heroItems.length > 1 && (
         <div className="absolute bottom-5 right-10 flex items-center gap-1.5">
           {heroItems.map((_, i) => (
@@ -800,7 +800,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
   const playbackHistoryMap = React.useMemo(() => {
     const map = new Map<string, PlaybackEntry>();
     for (const e of (playbackHistoryRes ?? [])) {
-      // content_id stocké avec préfixe "tmdb:12345", item.id est "12345"
+      // content_id stored with prefix "tmdb:12345", item.id is "12345"
       const key = e.contentId.includes(':') ? e.contentId.split(':').pop()! : e.contentId;
       if (!map.has(key)) map.set(key, e);
     }
@@ -965,7 +965,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       return unique;
     };
 
-    // 1. Continuer la lecture
+    // 1. Continue watching
     const continueWatching = dedup(
       filteredItems
         .filter(i => i._userProgress > 5 && i._userProgress < 95)
@@ -974,14 +974,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (continueWatching.length > 0) {
       sections.push({
-        id: 'continue', title: 'Continuer la lecture',
-        subtitle: 'Reprends instantanément au bon moment',
+        id: 'continue', title: 'Continue watching',
+        subtitle: 'Resume instantly at the right moment',
         accentColor: '#7c3aed', icon: PlayCircle,
         items: continueWatching, showProgress: true,
       });
     }
 
-    // 2. Tendances du moment
+    // 2. Trending now
     const trending = dedup(
       [...filteredItems]
         .sort((a, b) => (b._popularity ?? 0) - (a._popularity ?? 0))
@@ -989,14 +989,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (trending.length > 0) {
       sections.push({
-        id: 'trending', title: 'Tendances du moment',
-        subtitle: 'Les titres qui captent le plus l\'attention',
+        id: 'trending', title: 'Trending now',
+        subtitle: 'The titles capturing the most attention',
         accentColor: '#f97316', icon: Flame,
         items: trending,
       });
     }
 
-    // 3. Meilleures notes (≥ 7.5)
+    // 3. Top rated (≥ 7.5)
     const topRated = dedup(
       filteredItems
         .filter(i => (i._rating ?? 0) >= 7.5)
@@ -1005,14 +1005,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (topRated.length > 0) {
       sections.push({
-        id: 'top-rated', title: 'Les mieux notés',
-        subtitle: 'Qualité critique et audience au rendez-vous',
+        id: 'top-rated', title: 'Top rated',
+        subtitle: 'Critical quality and audience acclaim',
         accentColor: '#eab308', icon: Star,
         items: topRated,
       });
     }
 
-    // 4. Sorties récentes (3 dernières années)
+    // 4. Recent releases (last 3 years)
     const recentItems = dedup(
       filteredItems
         .filter(i => i._year !== null && i._year >= currentYear - 3)
@@ -1020,14 +1020,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (recentItems.length > 0) {
       sections.push({
-        id: 'recent', title: 'Sorties récentes',
+        id: 'recent', title: 'Recent releases',
         subtitle: `Focus ${currentYear - 3}–${currentYear}`,
         accentColor: '#22c55e',
         items: recentItems,
       });
     }
 
-    // 5. Nouveautés de l'année
+    // 5. New this year
     const newItems = dedup(
       filteredItems
         .filter(i => i._year === currentYear)
@@ -1035,14 +1035,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (newItems.length > 0) {
       sections.push({
-        id: 'new-this-year', title: `Nouveautés ${currentYear}`,
-        subtitle: 'Les sorties de cette année',
+        id: 'new-this-year', title: `New in ${currentYear}`,
+        subtitle: 'This year\'s releases',
         accentColor: '#10b981',
         items: newItems,
       });
     }
 
-    // 6–20. Top 15 genres par nombre d'items
+    // 6–20. Top 15 genres by item count
     const genreCounts = new Map<string, number>();
     for (const item of filteredItems) {
       for (const genre of new Set(item._genres)) {
@@ -1065,7 +1065,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
         sections.push({
           id: `genre-${genre.toLowerCase().replace(/\s+/g, '-')}`,
           title: genre,
-          subtitle: 'Sélection éditoriale par genre',
+          subtitle: 'Editorial selection by genre',
           accentColor: GENRE_ACCENT[genre] ?? '#6b7280',
           icon: Compass,
           items: genreList,
@@ -1073,7 +1073,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       }
     }
 
-    // 21. Cinéma international (ni anglophone ni francophone)
+    // 21. International cinema (neither English nor French)
     const international = dedup(
       filteredItems
         .filter(i => i._lang !== 'en' && i._lang !== 'fr' && i._lang !== 'unknown')
@@ -1081,14 +1081,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (international.length >= 3 && sections.length < 21) {
       sections.push({
-        id: 'international', title: 'Cinéma international',
-        subtitle: 'Œuvres venues d\'ailleurs',
+        id: 'international', title: 'International cinema',
+        subtitle: 'Works from around the world',
         accentColor: '#06b6d4',
         items: international,
       });
     }
 
-    // 22. Classiques (avant 1995)
+    // 22. Classics (before 1995)
     const classics = dedup(
       filteredItems
         .filter(i => i._year !== null && i._year < 1995)
@@ -1097,14 +1097,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     );
     if (classics.length >= 3 && sections.length < 22) {
       sections.push({
-        id: 'classics', title: 'Classiques intemporels',
-        subtitle: 'Les œuvres fondatrices d\'avant 1995',
+        id: 'classics', title: 'Timeless classics',
+        subtitle: 'Foundational works from before 1995',
         accentColor: '#d97706',
         items: classics,
       });
     }
 
-    // 23. Séries en cours de diffusion (mode ≠ movie)
+    // 23. Currently airing series (mode ≠ movie)
     if (mode !== 'movie' && sections.length < 23) {
       const returning = dedup(
         filteredItems
@@ -1113,8 +1113,8 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       );
       if (returning.length >= 3) {
         sections.push({
-          id: 'returning', title: 'Séries en cours de diffusion',
-          subtitle: 'Nouvelles saisons et épisodes qui reviennent',
+          id: 'returning', title: 'Currently airing series',
+          subtitle: 'New seasons and returning episodes',
           accentColor: '#3b82f6', icon: Activity,
           items: returning,
         });
@@ -1131,14 +1131,14 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       if (animeAnim.length >= 3) {
         sections.push({
           id: 'anime-animation', title: 'Anime & Animation',
-          subtitle: 'Univers animés de tous horizons',
+          subtitle: 'Animated universes from all horizons',
           accentColor: '#fb923c',
           items: animeAnim,
         });
       }
     }
 
-    // 25. Pépites cachées (bonne note, faible popularité)
+    // 25. Hidden gems (high rating, low popularity)
     if (sections.length < 25) {
       const hidden = dedup(
         filteredItems
@@ -1148,8 +1148,8 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       );
       if (hidden.length >= 3) {
         sections.push({
-          id: 'hidden-gems', title: 'Pépites cachées',
-          subtitle: 'Des trésors que peu ont découverts',
+          id: 'hidden-gems', title: 'Hidden gems',
+          subtitle: 'Treasures few have discovered',
           accentColor: '#a78bfa',
           items: hidden,
         });
@@ -1164,7 +1164,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
 
   return (
     <div
-      className="flex flex-col min-h-screen bg-[#0A0E1A] text-white"
+      className="flex flex-col min-h-screen bg-[#040714] text-white"
       style={{ paddingTop: 'var(--navbar-height)' }}
     >
       {!isSearching && (
@@ -1179,7 +1179,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
 
         <div className="flex items-center gap-3 mb-4 flex-wrap">
 
-          {/* Tabs type (mode all uniquement) */}
+          {/* Type tabs (all mode only) */}
           {mode === 'all' && (
             <div className="flex items-center bg-white/5 p-1 rounded-xl border border-white/10">
               {TYPE_TABS.map((tab) => {
@@ -1202,10 +1202,10 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             </div>
           )}
 
-          {/* Spacer pour pousser le bouton filtres à droite */}
+          {/* Spacer to push filter button to the right */}
           <div className="flex-1" />
 
-          {/* Bouton Filtres — aligné à droite */}
+          {/* Filter button — right-aligned */}
           <button
             onClick={() => setDrawerOpen(true)}
             className={`relative flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border
@@ -1215,7 +1215,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
               }`}
           >
             <SlidersHorizontal size={15} strokeWidth={2.2} />
-            <span>Filtres</span>
+            <span>Filters</span>
             {activeFiltersCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 w-5 h-5
                                bg-blue-500 text-white text-[10px] font-bold
@@ -1229,7 +1229,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
         {activeFiltersCount > 0 && (
           <div className="flex items-center gap-2 mb-5 flex-wrap">
             <span className="text-xs text-white/30 mr-1">
-              {filteredItems.length} résultat{filteredItems.length !== 1 ? 's' : ''}
+              {filteredItems.length} result{filteredItems.length !== 1 ? 's' : ''}
             </span>
 
             {mode === 'all' && filters.kinds.length > 0 && (
@@ -1246,7 +1246,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             )}
             {(filters.yearRange[0] !== YEAR_MIN || filters.yearRange[1] !== YEAR_MAX) && (
               <FilterChip
-                label={`${filters.yearRange[0]}–${filters.yearRange[1] === YEAR_MAX ? 'Aujourd\'hui' : filters.yearRange[1]}`}
+                label={`${filters.yearRange[0]}–${filters.yearRange[1] === YEAR_MAX ? 'Today' : filters.yearRange[1]}`}
                 onRemove={() => setScopedFilters(f => ({ ...f, yearRange: [YEAR_MIN, YEAR_MAX] }))}
               />
             )}
@@ -1264,7 +1264,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             )}
             {filters.availSources.length > 0 && (
               <FilterChip
-                label="Disponibilité"
+                label="Availability"
                 onRemove={() => setScopedFilters(f => ({ ...f, availSources: [] }))}
               />
             )}
@@ -1273,7 +1273,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
               onClick={() => setScopedFilters(buildDefaultFilters(mode))}
               className="text-xs text-red-400/60 hover:text-red-400 ml-2 transition-colors font-medium"
             >
-              Tout effacer
+              Clear all
             </button>
           </div>
         )}
@@ -1305,12 +1305,12 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
         ) : filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-white/30">
             <SearchX size={46} className="mb-4 text-white/25" />
-            <p className="text-base font-medium">Aucun résultat pour ces filtres</p>
+            <p className="text-base font-medium">No results for these filters</p>
             <button
               onClick={() => setScopedFilters(buildDefaultFilters(mode))}
               className="mt-4 text-sm text-white/50 hover:text-white/80 underline underline-offset-2 transition-colors"
             >
-              Réinitialiser les filtres
+              Reset filters
             </button>
           </div>
         ) : isSearching ? (
@@ -1344,20 +1344,20 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
                   disabled={isLoading}
                   className="px-8 py-3 rounded-full border border-white/20 text-sm text-white/70 hover:border-white/50 hover:text-white transition-all disabled:opacity-40"
                 >
-                  {isLoading ? 'Chargement…' : 'Charger plus'}
+                  {isLoading ? 'Loading…' : 'Load more'}
                 </button>
               </div>
             )}
           </>
         ) : (
-          /* Bouton charger plus hors recherche */
+          /* Load more button outside search */
           canLoadMore && !isLoading ? (
             <div className="mt-4 flex justify-center">
               <button
                 onClick={() => setLoadedPages((p) => p + MORE_PAGES)}
                 className="px-8 py-3 rounded-full border border-white/10 text-sm text-white/40 hover:border-white/30 hover:text-white/70 transition-all"
               >
-                Charger plus de titres
+                Load more titles
               </button>
             </div>
           ) : null
@@ -1367,7 +1367,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
       {drawerOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/60  z-[100]"
             onClick={() => setDrawerOpen(false)}
           />
           <div className="fixed right-0 top-0 h-full w-[380px] z-[101]
@@ -1375,7 +1375,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
                           flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <h2 className="text-base font-bold text-white uppercase tracking-wider">Filtres</h2>
+                <h2 className="text-base font-bold text-white uppercase tracking-wider">Filters</h2>
                 {activeFiltersCount > 0 && (
                   <span className="px-2 py-0.5 rounded-md bg-blue-500 text-[10px] font-bold text-white">
                     {activeFiltersCount}
@@ -1407,13 +1407,13 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
                 onClick={() => setScopedFilters(buildDefaultFilters(mode))}
                 className="text-sm font-medium text-white/40 hover:text-white transition-colors"
               >
-                Réinitialiser
+                Reset
               </button>
               <button
                 onClick={() => setDrawerOpen(false)}
                 className="px-6 py-2.5 bg-white text-black rounded-xl text-sm font-bold hover:bg-white/90 transition-all shadow-lg active:scale-95"
               >
-                Voir {filteredItems.length} résultats
+                View {filteredItems.length} results
               </button>
             </div>
           </div>

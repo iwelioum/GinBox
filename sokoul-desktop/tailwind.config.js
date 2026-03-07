@@ -6,109 +6,52 @@ export default {
   ],
   theme: {
     extend: {
+      // ── Disney+ colour tokens ──────────────────────────────────────────────
+      // Ex : bg-dp-bg · text-dp-text · border-dp-text/10 · border-dp-text/80
       colors: {
-        bg: {
-          primary: 'var(--color-bg-primary)',
-          secondary: 'var(--color-bg-secondary)',
-          card: 'var(--color-bg-card)',
-          glass: 'var(--color-bg-glass)',
-          overlay: 'var(--color-bg-overlay)',
+        dp: {
+          bg:   '#040714',
+          nav:  '#090b13',
+          text: '#f9f9f9',
         },
-        accent: {
-          DEFAULT: 'var(--color-accent)',
-          hover: 'var(--color-accent-hover)',
-          glow: 'var(--color-accent-glow)',
-        },
-        brand: {
-          disney: 'var(--color-brand-disney)',
-          pixar: 'var(--color-brand-pixar)',
-          marvel: 'var(--color-brand-marvel)',
-          starwars: 'var(--color-brand-starwars)',
-          natgeo: 'var(--color-brand-natgeo)',
-        },
-        text: {
-          primary: 'var(--color-text-primary)',
-          secondary: 'var(--color-text-secondary)',
-          muted: 'var(--color-text-muted)',
-        }
       },
-      boxShadow: {
-        'card':       '0 10px 14px 3px #0000005c',  /* html.md exact */
-        'card-hover': 'var(--shadow-card-hover)',
-        'button':     'var(--shadow-button)',
-      },
-      letterSpacing: {
-        'nav': '1.42px',   /* .nav-link html.md */
-      },
-      transitionDuration: {
-        card: '300ms',
-      },
-      width: {
-        'card-landscape': 'var(--card-landscape-w)',
-        'card-poster': 'var(--card-poster-w)',
-      },
-      height: {
-        'card-landscape': 'var(--card-landscape-h)',
-        'card-poster': 'var(--card-poster-h)',
-        'navbar': 'var(--navbar-height)',
-        'hero': 'var(--hero-height)',
-      },
-      padding: {
-        'section': 'var(--section-px)',
-      },
-      borderRadius: {
-        card: 'var(--radius-card)',
-        modal: 'var(--radius-modal)',
-        button: 'var(--radius-button)',
-        pill: 'var(--radius-pill)',
-      },
+
+      // ── Font Avenir-Roman (Disney+ clone) ─────────────────────────────────
       fontFamily: {
-        sans: 'var(--font-main)',
+        sans: ["'Avenir-Roman'", 'Inter', 'ui-sans-serif', 'sans-serif'],
       },
-      transitionTimingFunction: {
-        'card': 'var(--transition-card)',
+
+      height: {
+        navbar: '70px',
       },
-      transitionDuration: {
-        DEFAULT: '150ms', // from --transition-fast
-        card: 'var(--transition-card)',
-        hero: 'var(--transition-hero)',
+
+      boxShadow: {
+        'card':       '0 26px 30px -10px rgba(0,0,0,0.69), 0 16px 10px -10px rgba(0,0,0,0.73)',
+        'card-hover': '0 40px 58px -16px rgba(0,0,0,0.80), 0 30px 22px -10px rgba(0,0,0,0.72)',
       },
-      backgroundImage: {
-        'gradient-hero': 'var(--gradient-hero)',
-        'gradient-navbar': 'var(--gradient-navbar)',
-        'gradient-card-hover': 'var(--gradient-card-hover)',
+
+      letterSpacing: {
+        nav: '1.42px',
       },
+
       keyframes: {
-        'hovercard-in': {
-          '0%':   { opacity: '0', transform: 'scale(0.94) translateY(6px)' },
-          '100%': { opacity: '1', transform: 'scale(1) translateY(0)'      },
-        },
-        'kenburns': {
-          '0%':   { transform: 'scale(1) translate(0, 0)' },
-          '25%':  { transform: 'scale(1.08) translate(-1%, -1%)' },
-          '50%':  { transform: 'scale(1.08) translate(1%, -1%)' },
-          '75%':  { transform: 'scale(1.05) translate(-0.5%, 0.5%)' },
-          '100%': { transform: 'scale(1) translate(0, 0)' },
-        },
-        'fade-up': {
-          '0%':   { opacity: '0', transform: 'translateY(24px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)'    },
-        },
-        'count-bar': {
-          '0%':   { transform: 'scaleX(0)' },
-          '100%': { transform: 'scaleX(1)' },
-        },
         'hero-progress': {
           '0%':   { width: '0%' },
           '100%': { width: '100%' },
         },
+        'fade-up': {
+          '0%':   { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'hovercard-in': {
+          '0%':   { opacity: '0', transform: 'scale(0.94) translateY(6px)' },
+          '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
       },
       animation: {
-        'hovercard-in': 'hovercard-in 0.18s ease-out forwards',
-        'kenburns':     'kenburns 20s ease-in-out infinite',
-        'fade-up':      'fade-up 0.4s ease-out forwards',
-        'count-bar':    'count-bar 0.8s ease-out forwards',
-        'hero-progress':'hero-progress 8s linear forwards',
+        'hero-progress': 'hero-progress 5s linear forwards',
+        'fade-up':       'fade-up 0.4s ease-out forwards',
+        'hovercard-in':  'hovercard-in 0.18s ease-out forwards',
       },
     },
   },

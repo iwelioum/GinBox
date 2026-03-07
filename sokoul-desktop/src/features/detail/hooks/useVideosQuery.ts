@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { endpoints } from '../../../api/client';
+import { endpoints } from '@/shared/api/client';
 import type { CatalogMeta, ContentType } from '../../../shared/types/index';
 
 /**

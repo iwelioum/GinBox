@@ -1,14 +1,14 @@
 # ============================================================
-# logs.ps1 -- Monitoring temps reel de Sokoul Desktop
+# logs.ps1 -- Real-time monitoring for Sokoul Desktop
 # ============================================================
 param()
 $ErrorActionPreference = "Continue"
 $ProgressPreference    = "SilentlyContinue"
 
 # -- Paths --
-$ROOT      = (Get-Item "$PSScriptRoot\..").FullName
+$ROOT      = (Get-Item "$PSScriptRoot\..\..").FullName
 $DESKTOP   = "$ROOT\sokoul-desktop"
-$LOGS_DIR  = "$PSScriptRoot\logs"
+$LOGS_DIR  = "$PSScriptRoot\..\logs"
 $TIMESTAMP = (Get-Date -Format "yyyyMMdd_HHmmss")
 $LOG_FILE  = "$LOGS_DIR\sokoul_$TIMESTAMP.log"
 
@@ -49,15 +49,15 @@ function ColorLine($line) {
     Write-Host "[$prefix] $line" -ForegroundColor $color
 }
 
-Write-Host "  [...] Demarrage de Sokoul Desktop..." -ForegroundColor DarkGray
+Write-Host "  [...] Starting Sokoul Desktop..." -ForegroundColor DarkGray
 
 if (-not (Test-Path $DESKTOP)) {
-    Write-Host "  [ERR] sokoul-desktop introuvable : $DESKTOP" -ForegroundColor Red
+    Write-Host "  [ERR] sokoul-desktop not found : $DESKTOP" -ForegroundColor Red
     exit 1
 }
 
-# Lancement via Start-Process avec redirection pour eviter les problemes d'events
-# On utilise cmd /c pour lancer npm et on redirige vers un fichier temporaire qu'on lit
+# Launch via Start-Process with redirection to avoid event issues
+# Using cmd /c to run npm and redirect to a temp file that we read
 $tmpOut = [System.IO.Path]::GetTempFileName()
 $tmpErr = [System.IO.Path]::GetTempFileName()
 
@@ -74,7 +74,7 @@ $proc = New-Object System.Diagnostics.Process
 $proc.StartInfo = $psi
 $proc.Start() | Out-Null
 
-# Lecture en continu
+# Continuous reading
 try {
     while (-not $proc.HasExited) {
         if (-not $proc.StandardOutput.EndOfStream) {
@@ -95,5 +95,5 @@ try {
     }
 } finally {
     if (-not $proc.HasExited) { $proc.Kill() }
-    Write-Host "  Log complet : $LOG_FILE"
+    Write-Host "  Full log : $LOG_FILE"
 }

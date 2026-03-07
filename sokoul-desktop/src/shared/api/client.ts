@@ -3,8 +3,8 @@ import type {
   Profile, UserList, ListItem, CatalogMeta, ContentType,
   SourcesResponse, PlaybackEntry, CastMember, UserProgressEntry,
   CollectionItem, CollectionDetail,
-} from '../shared/types';
-import { useLogStore } from '../shared/stores/logStore';
+} from '../types';
+import { useLogStore } from '@/stores/logStore';
 
 /** Singleton Axios instance pointed at the local Rust backend; all API calls must go through this client to ensure consistent logging and error handling. */
 export const client = axios.create({

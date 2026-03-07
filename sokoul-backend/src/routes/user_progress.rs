@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════
-// routes/user_progress.rs — Progression utilisateur par profil
-// GET  /user/progress?profile_id=N  → liste des entrées
-// POST /user/progress               → upsert (créer ou mettre à jour)
+// routes/user_progress.rs — User progress per profile
+// GET  /user/progress?profile_id=N  → list of entries
+// POST /user/progress               → upsert (create or update)
 // ══════════════════════════════════════════════════════════
 
 use axum::{
@@ -21,7 +21,7 @@ use crate::models::{UserProgress, SetProgressRequest};
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
         .route("/", get(get_progress))
-        .route("/", post(set_progress))
+        .route("/", post(post_progress))
 }
 
 #[derive(Deserialize)]
@@ -44,7 +44,7 @@ async fn get_progress(
     Ok(Json(rows))
 }
 
-async fn set_progress(
+async fn post_progress(
     State(state): State<Arc<AppState>>,
     Json(req): Json<SetProgressRequest>,
 ) -> Result<Json<UserProgress>, AppError> {

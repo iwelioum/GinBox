@@ -1,16 +1,18 @@
-// ProfileSelectPage.tsx — Rôle: Sélection ou création de profil
-// RÈGLES : Avec formulaire création
+// ProfileSelectPage.tsx — Role: Profile selection or creation
+// RULES: With creation form
 
 import React, { useState }                   from 'react'
+import { useTranslation }                    from 'react-i18next'
 import { useNavigate }                       from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence }           from 'framer-motion'
-import { endpoints }                         from '../../../api/client'
-import { useProfileStore }                   from '../../../shared/stores/profileStore'
+import { endpoints }                         from '@/shared/api/client'
+import { useProfileStore }                   from '@/stores/profileStore'
 import { TitleBar }                          from '../../../shared/components/layout/TitleBar'
 import type { Profile }                      from '../../../shared/types/index'
 
 export default function ProfileSelectPage() {
+  const { t } = useTranslation()
   const navigate         = useNavigate()
   const qc               = useQueryClient()
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile)
@@ -34,13 +36,13 @@ export default function ProfileSelectPage() {
       setKids(false)
       setFormError(null)
     },
-    onError: () => setFormError('Erreur lors de la création du profil.'),
+    onError: () => setFormError(t('profile.errorCreating')),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) { setFormError('Le nom est obligatoire.'); return }
-    if (name.trim().length > 32) { setFormError('Nom trop long (max 32 caractères).'); return }
+    if (!name.trim()) { setFormError(t('profile.nameRequired')); return }
+    if (name.trim().length > 32) { setFormError(t('profile.nameTooLong')); return }
     createProfile.mutate({ name: name.trim(), is_kids: kids })
   }
 
@@ -51,7 +53,7 @@ export default function ProfileSelectPage() {
 
   return (
     <>
-      {/* Contrôles fenêtre Electron — pas de Navbar sur cette page */}
+      {/* Electron window controls — no Navbar on this page */}
       <TitleBar />
 
       <div style={{
@@ -63,7 +65,7 @@ export default function ProfileSelectPage() {
         justifyContent: 'center',
         fontFamily:     'var(--font-main)',
       }}>
-        {/* Titre */}
+        {/* Title */}
         <h1 style={{
           color:        'var(--color-text-primary)',
           fontSize:     'clamp(1.5rem, 4vw, 2.5rem)',
@@ -71,10 +73,10 @@ export default function ProfileSelectPage() {
           marginBottom: '2.5rem',
           letterSpacing: '-0.02em',
         }}>
-          Qui regarde ?
+          {t('profile.whosWatching')}
         </h1>
 
-        {/* Grille profils + bouton créer */}
+        {/* Profile grid + create button */}
         <div style={{
           display:   'flex',
           flexWrap:  'wrap',
@@ -83,10 +85,10 @@ export default function ProfileSelectPage() {
           maxWidth:  '700px',
         }}>
           {isLoading && (
-            <p style={{ color: 'var(--color-text-secondary)' }}>Chargement...</p>
+            <p style={{ color: 'var(--color-text-secondary)' }}>{t('profile.loading')}</p>
           )}
 
-          {/* Cartes profils existants */}
+          {/* Existing profile cards */}
           {profiles.map((profile) => (
             <motion.button
               key={profile.id}
@@ -108,7 +110,7 @@ export default function ProfileSelectPage() {
                 color:        'var(--color-text-primary)',
               }}
             >
-              {/* Avatar initiale */}
+              {/* Initial avatar */}
               <div style={{
                 width:        64,
                 height:       64,
@@ -133,13 +135,13 @@ export default function ProfileSelectPage() {
                   borderRadius: 'var(--radius-pill)',
                   padding:      '2px 8px',
                 }}>
-                  Enfants
+                  {t('profile.kids')}
                 </span>
               )}
             </motion.button>
           ))}
 
-          {/* Bouton Créer un profil */}
+          {/* Create a profile button */}
           <motion.button
             onClick={() => setShowForm(true)}
             whileHover={{ scale: 1.06, y: -4 }}
@@ -170,11 +172,11 @@ export default function ProfileSelectPage() {
             }}>
               +
             </div>
-            <span style={{ fontSize: '0.95rem' }}>Créer un profil</span>
+            <span style={{ fontSize: '0.95rem' }}>{t('profile.createProfile')}</span>
           </motion.button>
         </div>
 
-        {/* Modal formulaire création */}
+        {/* Creation form modal */}
         <AnimatePresence>
           {showForm && (
             <motion.div
@@ -213,19 +215,19 @@ export default function ProfileSelectPage() {
                 }}
               >
                 <h2 style={{ color: 'var(--color-text-primary)', fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>
-                  Nouveau profil
+                  {t('profile.newProfile')}
                 </h2>
 
-                {/* Champ nom */}
+                {/* Name field */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <label style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
-                    Nom du profil
+                    {t('profile.profileName')}
                   </label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Ex : Iliesse"
+                    placeholder={t('profile.placeholder')}
                     autoFocus
                     maxLength={32}
                     style={{
@@ -240,7 +242,7 @@ export default function ProfileSelectPage() {
                   />
                 </div>
 
-                {/* Toggle mode enfants */}
+                {/* Kids mode toggle */}
                 <label style={{
                   display:     'flex',
                   alignItems:  'center',
@@ -273,17 +275,17 @@ export default function ProfileSelectPage() {
                       transition: 'left 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
                     }} />
                   </div>
-                  Mode enfants
+                  {t('profile.kidsMode')}
                 </label>
 
-                {/* Erreur */}
+                {/* Error */}
                 {formError && (
                   <p style={{ color: '#ff453a', fontSize: '0.85rem', margin: 0 }}>
                     {formError}
                   </p>
                 )}
 
-                {/* Boutons */}
+                {/* Buttons */}
                 <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
                   <button
                     type="button"
@@ -299,7 +301,7 @@ export default function ProfileSelectPage() {
                       fontSize:     '0.95rem',
                     }}
                   >
-                    Annuler
+                    {t('profile.cancel')}
                   </button>
                   <button
                     type="submit"
@@ -316,7 +318,7 @@ export default function ProfileSelectPage() {
                       fontWeight:   600,
                     }}
                   >
-                    {createProfile.isPending ? 'Création...' : 'Créer'}
+                    {createProfile.isPending ? t('profile.creating') : t('profile.create')}
                   </button>
                 </div>
               </motion.form>

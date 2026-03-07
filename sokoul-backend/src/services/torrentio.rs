@@ -28,7 +28,7 @@ pub async fn fetch_torrentio_streams(
         (ContentType::Series, _, _) => format!("stream/series/{}.json", imdb_id),
     };
 
-    // Config Real-Debrid depuis AppState (jamais depuis env directement)
+    // Real-Debrid config from AppState (never from env directly)
     let torrentio_config = if state.realdebrid_token.is_empty() {
         String::new()
     } else {

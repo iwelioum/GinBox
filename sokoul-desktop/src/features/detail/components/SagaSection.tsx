@@ -1,8 +1,9 @@
-// components/detail/SagaSection.tsx — Étape 11
-// Films d'une collection TMDB
-// Film actuel mis en évidence avec ring de couleur
+// components/detail/SagaSection.tsx — Step 11
+// Films from a TMDB collection
+// Current film highlighted with colored ring
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 interface CollectionPart {
@@ -26,6 +27,7 @@ interface SagaSectionProps {
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
 
 export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const col = collection as Collection | null;
 
@@ -34,7 +36,7 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
   return (
     <section className="mb-[40px]">
       <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">
-        La saga · {col.name}
+        {t('detail.sagaPrefix', { name: col.name })}
       </h2>
       <div
         className="flex gap-4 overflow-x-auto pb-4 scroll-smooth"
@@ -76,13 +78,13 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
                   </div>
                 )}
 
-                {/* Badge film actuel */}
+                {/* Current film badge */}
                 {isCurrent && (
                   <div
                     className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white"
                     style={{ background: 'var(--accent, #0072D2)' }}
                   >
-                    ici
+                    {t('detail.here')}
                   </div>
                 )}
               </div>
