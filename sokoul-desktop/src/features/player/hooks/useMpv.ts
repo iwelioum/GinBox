@@ -16,7 +16,11 @@ export function useMpv() {
   const [audioTracks, setAudioTracks] = useState<MpvTrack[]>([]);
   const [subTracks,   setSubTracks]   = useState<MpvTrack[]>([]);
 
-  const tracksLoadedRef = useRef(false);
+  const tracksLoadedRef  = useRef(false);
+  const failCountRef    = useRef(0);
+
+  /** Max consecutive poll failures before we deactivate. */
+  const MAX_POLL_FAILURES = 5;
 
   // main.js sends this event after mpv:launch and mpv:kill
   // → avoids polling when MPV is not started
@@ -38,10 +42,12 @@ export function useMpv() {
   }, []);
 
   // ── Polling position / duration / pause state (only when isActive) ──
-  // 250ms interval → smooth progress bar (4 updates/s)
-  // and isPlaying synced with actual MPV state (prevents desync)
+  // 250ms base interval → smooth progress bar (4 updates/s).
+  // After MAX_POLL_FAILURES consecutive errors the hook deactivates polling.
   useEffect(() => {
     if (!isActive) return;
+
+    failCountRef.current = 0;
 
     const interval = setInterval(async () => {
       try {
@@ -51,11 +57,22 @@ export function useMpv() {
           window.mpv?.command({ command: ['get_property', 'pause']     }) as Promise<{ data?: boolean } | null>,
         ]);
 
-        if (typeof pos?.data    === 'number')  setPosition(pos.data);
-        if (typeof dur?.data    === 'number')  setDuration(dur.data);
+        // Reset failure counter on any successful poll
+        failCountRef.current = 0;
+
+        if (typeof pos?.data === 'number' && Number.isFinite(pos.data) && pos.data >= 0) {
+          setPosition(pos.data);
+        }
+        if (typeof dur?.data === 'number' && Number.isFinite(dur.data) && dur.data > 0) {
+          setDuration(dur.data);
+        }
         if (typeof paused?.data === 'boolean') setIsPlaying(!paused.data);
-      } catch {
-        // Silently ignore — main.js returns null if MPV is not ready
+      } catch (err) {
+        failCountRef.current += 1;
+        if (failCountRef.current === MAX_POLL_FAILURES) {
+          console.warn('[useMpv] MPV unresponsive after', MAX_POLL_FAILURES, 'consecutive poll failures — deactivating.', err);
+          setIsActive(false);
+        }
       }
     }, 250);
 
@@ -71,6 +88,7 @@ export function useMpv() {
 
   async function launch(url: string): Promise<void> {
     tracksLoadedRef.current = false;
+    failCountRef.current = 0;
     setAudioTracks([]);
     setSubTracks([]);
     await window.mpv?.launch(url);
@@ -90,6 +108,7 @@ export function useMpv() {
     setAudioTracks([]);
     setSubTracks([]);
     tracksLoadedRef.current = false;
+    failCountRef.current = 0;
   }
 
   async function play(): Promise<void> {

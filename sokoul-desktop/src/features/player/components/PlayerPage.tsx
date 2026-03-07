@@ -8,12 +8,13 @@
  * are delegated to extracted hooks.
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useCallback } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { useMpv } from '../hooks/useMpv';
 import { usePlayerBroadcast } from '../hooks/usePlayerBroadcast';
 import { useProgressSave } from '../hooks/useProgressSave';
 import { useEpisodeNavigation } from '../hooks/useEpisodeNavigation';
+import { usePlayerLifecycle } from '../hooks/usePlayerLifecycle';
 import { LoadingScreen } from './LoadingScreen';
 import { VideoContainer } from './VideoContainer';
 import {
@@ -40,7 +41,6 @@ interface PlayerNavigationState {
 }
 
 export default function PlayerPage() {
-  const navigate       = useNavigate();
   const location       = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -80,30 +80,10 @@ export default function PlayerPage() {
   const [activeStillPath,    setActiveStillPath]     = useState(
     () => launchEpisodes.find(e => e.season === initialSeason && e.episode === initialEpisode)?.still_path ?? '',
   );
-  const [isLoaded,    setIsLoaded]    = useState(false);
-  const [launchError, setLaunchError] = useState<string | null>(null);
 
   const prefs = usePreferencesStore();
   const { activeProfile } = useProfileStore();
   const { launch, kill, waitUntilReady, play, pause, seekTo, isPlaying, position, duration } = useMpv();
-
-  /**
-   * Refs prevent stale closures in IPC and effect callbacks that
-   * capture values at mount time but need current values at call time.
-   */
-  const navigateRef  = useRef(navigate);
-  const killRef      = useRef(kill);
-  const waitReadyRef = useRef(waitUntilReady);
-  const seekToRef    = useRef(seekTo);
-  const returnToRef  = useRef(returnTo);
-  const killedRef    = useRef(false);
-  const launched     = useRef(false);
-
-  navigateRef.current  = navigate;
-  killRef.current      = kill;
-  waitReadyRef.current = waitUntilReady;
-  seekToRef.current    = seekTo;
-  returnToRef.current  = returnTo;
 
   const { saveProgress } = useProgressSave({
     profileId:    activeProfile?.id ?? null,
@@ -117,7 +97,11 @@ export default function PlayerPage() {
     duration,
   });
 
-  /** Broadcast playback metadata to the overlay window */
+  const { isLoaded, launchError, goBack } = usePlayerLifecycle({
+    url, startAt, returnTo,
+    launch, kill, waitUntilReady, seekTo, play, saveProgress,
+  });
+
   usePlayerBroadcast({
     title,
     year,
@@ -172,74 +156,6 @@ export default function PlayerPage() {
     onEpisodeChanged,
   });
 
-  /** Navigate back: save progress, kill MPV, return to origin */
-  const goBack = useRef(async () => {
-    if (killedRef.current) return;
-    killedRef.current = true;
-    try {
-      await saveProgress();
-      await killRef.current();
-    } finally {
-      const target = returnToRef.current;
-      if (target) navigateRef.current(target, { replace: true });
-      else        navigateRef.current(-1);
-    }
-  });
-
-  /** Launch MPV on mount, kill on unmount */
-  useEffect(() => {
-    if (!url) {
-      if (returnToRef.current) navigateRef.current(returnToRef.current, { replace: true });
-      else                     navigateRef.current(-1);
-      return;
-    }
-    if (launched.current) return;
-    launched.current = true;
-
-    const start = async () => {
-      setLaunchError(null);
-      try {
-        await launch(url);
-        const ready = await waitReadyRef.current(24, 150);
-        if (!ready) throw new Error('MPV pipe unavailable');
-        if (startAt > 0) await seekToRef.current(startAt);
-        await play();
-        setIsLoaded(true);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        setLaunchError(`Unable to start playback (${message}).`);
-        setIsLoaded(false);
-        await killRef.current();
-      }
-    };
-
-    void start();
-
-    return () => {
-      launched.current = false;
-      if (!killedRef.current) {
-        void saveProgress();
-        void killRef.current();
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /** Listen for overlay "back" signal via IPC */
-  useEffect(() => {
-    const unsub = window.mpv?.onBack?.(() => { void goBack.current(); });
-    return () => { unsub?.(); };
-  }, []);
-
-  /** Escape key triggers back navigation */
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { void goBack.current(); }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   const handleTogglePlay = async () => {
     if (launchError) return;
     if (isPlaying) await pause();
@@ -270,7 +186,7 @@ export default function PlayerPage() {
       )}
 
       {switchError && !launchError && <SwitchErrorBanner error={switchError} />}
-      {launchError && <LaunchErrorOverlay error={launchError} onBack={() => { void goBack.current(); }} />}
+      {launchError && <LaunchErrorOverlay error={launchError} onBack={() => { void goBack(); }} />}
     </div>
   );
 }

@@ -38,18 +38,23 @@ export function useProgressSave(options: UseProgressSaveOptions) {
       position, duration,
     } = optsRef.current;
 
-    const normalizedType = contentType === 'tv' ? 'series' : contentType;
+    // Validate contentType BEFORE normalisation — reject unknown values early
+    if (contentType !== 'tv' && contentType !== 'movie' && contentType !== 'series') {
+      console.warn(`[Player] saveProgress skipped: invalid contentType "${contentType}"`);
+      return;
+    }
+
+    const normalizedType: ContentType = contentType === 'tv' ? 'series' : contentType;
     const positionMs = Math.floor(position * 1000);
     const durationMs = Math.floor(duration * 1000);
 
     if (!profileId || !contentId || positionMs <= 0 || durationMs <= 0) return;
-    if (normalizedType !== 'movie' && normalizedType !== 'series') return;
 
     try {
       await endpoints.playback.savePosition({
         profile_id: profileId,
         content_id: contentId,
-        content_type: normalizedType as ContentType,
+        content_type: normalizedType,
         season,
         episode,
         position_ms: positionMs,

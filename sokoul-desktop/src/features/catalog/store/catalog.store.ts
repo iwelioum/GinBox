@@ -25,18 +25,20 @@ interface CatalogStore {
   setFavoritesMap: (map: Map<string, boolean>) => void;
   isInFavorites:   (contentId: string) => boolean;
 
-  sections:  Record<string, CatalogMeta[]>;
-  catalog:   Record<string, CatalogMeta[]> | null;
-  loading:   boolean;
-  error:     string | null;
-  greeting:  string;
-  loadedAt:  number;
+  sections:        Record<string, CatalogMeta[]>;
+  catalog:         Record<string, CatalogMeta[]> | null;
+  failedSections:  string[];
+  loading:         boolean;
+  error:           string | null;
+  greeting:        string;
+  loadedAt:        number;
 
-  setSections: (sections: Record<string, CatalogMeta[]>) => void;
-  setLoading:  (loading: boolean) => void;
-  setError:    (error: string | null) => void;
-  setLoadedAt: (ts: number) => void;
-  isStale:     () => boolean;
+  setSections:       (sections: Record<string, CatalogMeta[]>) => void;
+  setFailedSections: (keys: string[]) => void;
+  setLoading:        (loading: boolean) => void;
+  setError:          (error: string | null) => void;
+  setLoadedAt:       (ts: number) => void;
+  isStale:           () => boolean;
 }
 
 /**
@@ -51,14 +53,16 @@ export const useCatalogStore = create<CatalogStore>((set, get) => ({
 
   sections:  {},
   catalog:   null,
+  failedSections: [],
   loading:   false,
   error:     null,
   greeting:  getGreeting(),
   loadedAt:  0,
 
-  setSections: (sections) => set({ sections, catalog: sections }),
-  setLoading:  (loading) => set({ loading }),
-  setError:    (error) => set({ error }),
-  setLoadedAt: (ts) => set({ loadedAt: ts }),
-  isStale:     () => Date.now() - get().loadedAt >= STALE_MS,
+  setSections:       (sections) => set({ sections, catalog: sections }),
+  setFailedSections: (keys) => set({ failedSections: keys }),
+  setLoading:        (loading) => set({ loading }),
+  setError:          (error) => set({ error }),
+  setLoadedAt:       (ts) => set({ loadedAt: ts }),
+  isStale:           () => Date.now() - get().loadedAt >= STALE_MS,
 }));
