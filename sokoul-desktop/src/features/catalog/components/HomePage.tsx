@@ -1,6 +1,7 @@
 // HomePage.tsx
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCatalogStore }  from '../store/catalog.store';
 import { useCatalogLoader } from '../hooks/useCatalogLoader';
 import { HeroBanner }       from './HeroBanner';
@@ -42,8 +43,8 @@ function getRailDisplay(
 
 interface RailConfig {
   key:         string;
-  title:       string;
-  tagline?:    string;
+  titleKey:    string;
+  taglineKey?: string;
   variant:     'poster' | 'landscape';
   accentColor?: string;
   genreIds?:   number[] | null;
@@ -52,149 +53,151 @@ interface RailConfig {
 const RAILS: RailConfig[] = [
   {
     key: 'trending',      variant: 'landscape', accentColor: '#0063e5', genreIds: null,
-    title:   'Recommended for You',
-    tagline: "The best of what's streaming right now.",
+    titleKey:   'home.recommendedForYou',
+    taglineKey: 'home.recommendedTagline',
   },
   {
     key: 'top10',         variant: 'landscape', accentColor: '#0063e5', genreIds: null,
-    title:   'New on Sokoul',
-    tagline: 'Fresh arrivals, first on Sokoul.',
+    titleKey:   'home.newOnSokoul',
+    taglineKey: 'home.newOnSokoulTagline',
   },
   {
     key: 'action',        variant: 'landscape', accentColor: '#e63946', genreIds: [28],
-    title:   'Action',
-    tagline: 'No brakes. No mercy.',
+    titleKey:   'home.action',
+    taglineKey: 'home.actionTagline',
   },
   {
     key: 'scifi',         variant: 'landscape', accentColor: '#4361ee', genreIds: [878],
-    title:   'Science Fiction',
-    tagline: 'Futures you never could have imagined.',
+    titleKey:   'home.scienceFiction',
+    taglineKey: 'home.scienceFictionTagline',
   },
   {
     key: 'thriller',      variant: 'landscape', accentColor: '#c0392b', genreIds: [53],
-    title:   'Thriller',
-    tagline: "Fear doesn't always come from where you expect.",
+    titleKey:   'home.thriller',
+    taglineKey: 'home.thrillerTagline',
   },
   {
     key: 'horror',        variant: 'landscape', accentColor: '#8b0000', genreIds: [27],
-    title:   'Horror',
-    tagline: "For the nights you don't want to sleep.",
+    titleKey:   'home.horror',
+    taglineKey: 'home.horrorTagline',
   },
   {
     key: 'series',        variant: 'landscape', accentColor: '#0063e5', genreIds: null,
-    title:   'TV Shows',
-    tagline: 'One episode in. You watch ten.',
+    titleKey:   'home.tvShows',
+    taglineKey: 'home.tvShowsTagline',
   },
   {
     key: 'adventure',     variant: 'landscape', accentColor: '#f39c12', genreIds: [12],
-    title:   'Adventure',
-    tagline: 'Every journey begins with the first frame.',
+    titleKey:   'home.adventure',
+    taglineKey: 'home.adventureTagline',
   },
   {
     key: 'comedy',        variant: 'landscape', accentColor: '#f4d03f', genreIds: [35],
-    title:   'Comedy',
-    tagline: 'Because laughing feels good.',
+    titleKey:   'home.comedy',
+    taglineKey: 'home.comedyTagline',
   },
   {
     key: 'drama',         variant: 'landscape', accentColor: '#8e44ad', genreIds: [18],
-    title:   'Drama',
-    tagline: 'Stories that stay with you.',
+    titleKey:   'home.drama',
+    taglineKey: 'home.dramaTagline',
   },
   {
     key: 'kdrama',        variant: 'landscape', accentColor: '#c0392b', genreIds: null,
-    title:   'K-Drama',
-    tagline: 'You will cry. And you will want more.',
+    titleKey:   'home.kDrama',
+    taglineKey: 'home.kDramaTagline',
   },
   {
     key: 'fantasy',       variant: 'landscape', accentColor: '#8e44ad', genreIds: [14],
-    title:   'Fantasy',
-    tagline: 'Worlds where anything is possible.',
+    titleKey:   'home.fantasy',
+    taglineKey: 'home.fantasyTagline',
   },
   {
     key: 'crime',         variant: 'landscape', accentColor: '#2c3e50', genreIds: [80],
-    title:   'Crime',
-    tagline: 'Power. Betrayal. Consequences.',
+    titleKey:   'home.crime',
+    taglineKey: 'home.crimeTagline',
   },
   {
     key: 'anime',         variant: 'landscape', accentColor: '#e74c3c', genreIds: [16],
-    title:   'Anime',
-    tagline: 'Worlds that exist nowhere else.',
+    titleKey:   'home.anime',
+    taglineKey: 'home.animeTagline',
   },
   {
     key: 'series-action', variant: 'landscape', accentColor: '#e63946', genreIds: [10759],
-    title:   'Action & Adventure Series',
-    tagline: 'Suspense episode after episode.',
+    titleKey:   'home.actionAdventureSeries',
+    taglineKey: 'home.actionAdventureSeriesTagline',
   },
   {
     key: 'documentary',   variant: 'landscape', accentColor: '#2ecc71', genreIds: [99],
-    title:   'Documentary',
-    tagline: 'Reality is stranger than fiction.',
+    titleKey:   'home.documentary',
+    taglineKey: 'home.documentaryTagline',
   },
   {
     key: 'romance',       variant: 'landscape', accentColor: '#e91e8c', genreIds: [10749],
-    title:   'Romance',
-    tagline: 'For those who still believe in happy endings.',
+    titleKey:   'home.romance',
+    taglineKey: 'home.romanceTagline',
   },
   {
     key: 'animation',     variant: 'landscape', accentColor: '#ff9f43', genreIds: [16],
-    title:   'Animation',
-    tagline: 'The best stories are not always real.',
+    titleKey:   'home.animation',
+    taglineKey: 'home.animationTagline',
   },
   {
     key: 'mystery',       variant: 'landscape', accentColor: '#6c3483', genreIds: [9648],
-    title:   'Mystery',
-    tagline: 'You thought you figured it out. You were wrong.',
+    titleKey:   'home.mystery',
+    taglineKey: 'home.mysteryTagline',
   },
   {
     key: 'war',           variant: 'landscape', accentColor: '#7f8c8d', genreIds: [10752],
-    title:   'War',
-    tagline: 'Real stories of those who fell.',
+    titleKey:   'home.war',
+    taglineKey: 'home.warTagline',
   },
   {
     key: 'history',       variant: 'landscape', accentColor: '#1a5276', genreIds: [36],
-    title:   'History',
-    tagline: 'What happened deserves to be seen.',
+    titleKey:   'home.history',
+    taglineKey: 'home.historyTagline',
   },
   {
     key: 'international', variant: 'landscape', accentColor: '#27ae60', genreIds: null,
-    title:   'From Around the World',
-    tagline: 'The best cinema has no borders.',
+    titleKey:   'home.fromAroundTheWorld',
+    taglineKey: 'home.fromAroundTheWorldTagline',
   },
   {
     key: 'western',       variant: 'landscape', accentColor: '#a04000', genreIds: [37],
-    title:   'Western',
-    tagline: 'Justice, dust, and a setting sun.',
+    titleKey:   'home.western',
+    taglineKey: 'home.westernTagline',
   },
   {
     key: 'family',        variant: 'landscape', accentColor: '#e84393', genreIds: [10751],
-    title:   'Family',
-    tagline: 'Watch together, everyone included.',
+    titleKey:   'home.family',
+    taglineKey: 'home.familyTagline',
   },
   {
     key: 'music',         variant: 'landscape', accentColor: '#1db954', genreIds: [10402],
-    title:   'Music',
-    tagline: 'When images sing.',
+    titleKey:   'home.music',
+    taglineKey: 'home.musicTagline',
   },
 ];
 
 // ── Loading / Error states ────────────────────────────────────────────────────
 
 function LoadingState(): React.ReactElement {
+  const { t } = useTranslation();
   return (
     <p style={{ color: 'rgba(249,249,249,0.45)', fontSize: 13, padding: '20px 0', letterSpacing: '1px' }}>
-      Loading catalog…
+      {t('home.loadingCatalog')}
     </p>
   );
 }
 
 function ErrorState(): React.ReactElement {
+  const { t } = useTranslation();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, color: 'rgba(249,249,249,0.4)' }}>
       <p style={{ fontSize: 18, fontWeight: 600, color: 'rgba(249,249,249,0.6)' }}>
-        The catalog is not responding.
+        {t('home.catalogNotResponding')}
       </p>
       <p style={{ fontSize: 13, textAlign: 'center', maxWidth: 400, lineHeight: 1.6 }}>
-        Make sure the Rust backend is running and TMDB_API_KEY is configured.
+        {t('home.catalogHelpText')}
       </p>
     </div>
   );
@@ -203,6 +206,7 @@ function ErrorState(): React.ReactElement {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const { catalog, loading, error, sections } = useCatalogStore();
   const { load } = useCatalogLoader();
   const tick = useRailTitleCycle();
@@ -293,7 +297,7 @@ export default function HomePage() {
           return (
             <ContentRail
               key={rail.key}
-              title={getRailDisplay(rail.title, rail.tagline, index, tick)}
+              title={getRailDisplay(t(rail.titleKey), rail.taglineKey ? t(rail.taglineKey) : undefined, index, tick)}
               items={items}
               cardVariant={rail.variant}
               accentColor={rail.accentColor}

@@ -1,5 +1,6 @@
 import { Sparkles, Monitor, Tv, Film, type LucideIcon } from 'lucide-react';
 import { parseTorrentName } from '@/shared/utils/parsing';
+import i18n from '@/shared/i18n';
 
 /* ─── Types ─── */
 
@@ -27,10 +28,10 @@ const STRIP_WS       = /\s+/g;
 
 export function formatCacheAge(cachedAt: number): string {
   const age = Math.floor(Date.now() / 1000) - cachedAt;
-  if (age < 60)     return 'just now';
-  if (age < 3600)   return `${Math.floor(age / 60)} min ago`;
-  if (age < 86_400) return `${Math.floor(age / 3600)}h ago`;
-  return `${Math.floor(age / 86_400)}d ago`;
+  if (age < 60)     return i18n.t('sources.cacheJustNow');
+  if (age < 3600)   return i18n.t('sources.cacheMinAgo', { count: Math.floor(age / 60) });
+  if (age < 86_400) return i18n.t('sources.cacheHoursAgo', { count: Math.floor(age / 3600) });
+  return i18n.t('sources.cacheDaysAgo', { count: Math.floor(age / 86_400) });
 }
 
 export function cleanTitle(raw: string, meta: TorrentMeta): string {
@@ -68,22 +69,22 @@ export function cleanTitle(raw: string, meta: TorrentMeta): string {
 /* ─── Constants ─── */
 
 export const QUALITY_SECTIONS = [
-  { key: '4k',    label: '4K Ultra HD', Icon: Sparkles as LucideIcon, color: '#f59e0b' },
-  { key: '1080p', label: 'Full HD',     Icon: Monitor  as LucideIcon, color: '#3b82f6' },
-  { key: '720p',  label: 'HD',          Icon: Tv       as LucideIcon, color: '#22c55e' },
-  { key: 'sd',    label: 'Standard',    Icon: Film     as LucideIcon, color: '#6b7280' },
+  { key: '4k',    label: 'sources.quality4k',    Icon: Sparkles as LucideIcon, color: '#f59e0b' },
+  { key: '1080p', label: 'sources.quality1080p', Icon: Monitor  as LucideIcon, color: '#3b82f6' },
+  { key: '720p',  label: 'sources.quality720p',  Icon: Tv       as LucideIcon, color: '#22c55e' },
+  { key: 'sd',    label: 'sources.qualitySD',    Icon: Film     as LucideIcon, color: '#6b7280' },
 ] as const;
 
 export const FILTER_GROUPS = [
-  { label: 'Quality', tags: ['4K/2160p', '1080p', '720p', 'SD']       },
-  { label: 'Audio',   tags: ['VF/FR', 'VOSTFR', 'VO', 'Multi']        },
-  { label: 'Codec',   tags: ['HEVC/x265', 'AVC/x264', 'AV1', 'Remux'] },
-  { label: 'Source',  tags: ['BluRay', 'WEB-DL', 'WEBRip', 'HDTV']    },
+  { label: 'sources.filterQuality', tags: ['4K/2160p', '1080p', '720p', 'SD']       },
+  { label: 'sources.filterAudio',   tags: ['VF/FR', 'VOSTFR', 'VO', 'Multi']        },
+  { label: 'sources.filterCodec',   tags: ['HEVC/x265', 'AVC/x264', 'AV1', 'Remux'] },
+  { label: 'sources.filterSource',  tags: ['BluRay', 'WEB-DL', 'WEBRip', 'HDTV']    },
 ] as const;
 
 export const SORT_LABELS: [SortKey, string][] = [
-  ['score', 'Relevance'], ['quality', 'Quality'],
-  ['seeders', 'Seeds'],   ['size', 'Size'],
+  ['score', 'sources.sortRelevance'], ['quality', 'sources.sortQuality'],
+  ['seeders', 'sources.sortSeeds'],   ['size', 'sources.sortSize'],
 ];
 
 export const QUALITY_ORDER: Record<string, number> = {

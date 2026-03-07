@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RefreshCw } from 'lucide-react';
 import { formatCacheAge, FILTER_GROUPS, SORT_LABELS, type SortKey } from './sourceUtils';
 
@@ -17,6 +18,7 @@ export function SourcesSidebar({
   sortBy, setSortBy, activeFilters, setActiveFilters, toggleFilter,
   cachedAt, isStale, onForceRefresh,
 }: SourcesSidebarProps) {
+  const { t } = useTranslation();
   return (
     <aside style={{
       width: 210, flexShrink: 0,
@@ -28,7 +30,7 @@ export function SourcesSidebar({
       {/* Sort by */}
       <div>
         <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.28)', marginBottom: 8, margin: '0 0 8px 2px' }}>
-          Sort by
+          {t('sources.sortBy')}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {SORT_LABELS.map(([key, label]) => (
@@ -48,7 +50,7 @@ export function SourcesSidebar({
                 background: sortBy === key ? '#4361ee' : 'rgba(255,255,255,0.12)',
                 transition: 'background 0.12s',
               }} />
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -63,7 +65,7 @@ export function SourcesSidebar({
           <div key={group.label}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
               <p style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.28)', margin: 0 }}>
-                {group.label}
+                {t(group.label)}
               </p>
               {groupActive && (
                 <button
@@ -109,12 +111,12 @@ export function SourcesSidebar({
             onClick={() => setActiveFilters(new Set())}
             style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.35)', textDecoration: 'underline', textAlign: 'left', padding: 0 }}
           >
-            Clear all filters
+            {t('sources.clearAllFilters')}
           </button>
         )}
         {cachedAt && (
           <p style={{ fontSize: 10, color: isStale ? '#fbbf24' : 'rgba(255,255,255,0.22)', margin: 0, lineHeight: 1.4 }}>
-            {isStale ? 'Outdated results' : `Updated ${formatCacheAge(cachedAt)}`}
+            {isStale ? t('sources.outdatedResults') : t('sources.updatedAt', { time: formatCacheAge(cachedAt) })}
           </p>
         )}
         <button
@@ -128,7 +130,7 @@ export function SourcesSidebar({
             fontSize: 11, fontWeight: 600, cursor: 'pointer', transition: 'all 0.12s ease',
           }}
         >
-          <RefreshCw size={12} /> Refresh
+          <RefreshCw size={12} /> {t('common.refresh')}
         </button>
       </div>
     </aside>

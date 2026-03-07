@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, AlertTriangle, RefreshCw, Bug } from 'lucide-react';
 import { client, endpoints } from '@/shared/api/client';
 import { Spinner } from '@/shared/components/ui/Spinner';
@@ -32,6 +33,7 @@ export default function SourcesPage() {
   const shouldReturn = navState?.fromDetail === true;
   const { addLog } = useLogStore();
   const { activeProfile } = useProfileStore();
+  const { t } = useTranslation();
   const { data: meta } = useQuery<CatalogMeta>({
     queryKey: ['catalogMeta', type, id],
     queryFn: () => endpoints.catalog.getMeta(type!, id!).then(r => r.data),
@@ -43,7 +45,7 @@ export default function SourcesPage() {
     sortBy, setSortBy, bestSource, sortedAndFiltered, groupedSections,
     handleRetry, handleForceRefresh,
   } = useSourceFiltering({ id, normalizedType, selectedSeason, selectedEpisode, meta });
-  const titleText = meta?.title || meta?.name || 'Sources';
+  const titleText = meta?.title || meta?.name || t('common.sources');
   const handleBack = () => { shouldReturn ? navigate(returnPath, { replace: true }) : navigate(-1); };
   const [launching, setLaunching] = useState(false);
   const [launchError, setLaunchError] = useState<string | null>(null);
@@ -102,12 +104,12 @@ export default function SourcesPage() {
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-[14px] px-[28px] py-[20px] border-b border-dp-text/5 shrink-0 bg-dp-nav">
         <div className="flex items-center gap-[14px]">
           <button onClick={handleBack} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-white/15 bg-white/5 text-[#f9f9f9cc] text-[13px] font-[600] cursor-pointer whitespace-nowrap transition-colors hover:bg-white/10 hover:text-white">
-            <ChevronLeft size={16} /> Back
+            <ChevronLeft size={16} /> {t('sources.back')}
           </button>
           <h1 className="flex-1 text-[20px] font-[700] m-0 overflow-hidden text-ellipsis whitespace-nowrap">
-            {initialMode === 'download' ? `Download: ${titleText}` : titleText}
+            {initialMode === 'download' ? t('sources.downloadPrefix', { title: titleText }) : titleText}
           </h1>
-          <button onClick={() => navigate('/debug')} className="p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40 transition-colors" title="Open debug console">
+          <button onClick={() => navigate('/debug')} className="p-2 bg-red-500/20 text-red-400 rounded hover:bg-red-500/40 transition-colors" title={t('sources.openDebugConsole')}>
             <Bug size={18} />
           </button>
         </div>
@@ -115,23 +117,23 @@ export default function SourcesPage() {
       {loading ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px]">
           <Spinner size={48} />
-          <p className="text-white/50 text-[14px]">{isForceRefresh ? 'Searching for new sources...' : 'Searching for the best sources...'}</p>
+          <p className="text-white/50 text-[14px]">{isForceRefresh ? t('sources.searchingNew') : t('sources.searchingBest')}</p>
         </div>
       ) : fetchError ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
           <AlertTriangle size={40} className="text-red-400" />
-          <p className="text-[22px] font-[700] m-0 text-red-400">Loading error</p>
+          <p className="text-[22px] font-[700] m-0 text-red-400">{t('sources.loadingError')}</p>
           <p className="text-[14px] text-white/50 m-0 max-w-[400px] break-words">{fetchError}</p>
           <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-            <RefreshCw size={16} /> Retry
+            <RefreshCw size={16} /> {t('common.retry')}
           </button>
         </div>
       ) : sources.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
-          <p className="text-[22px] font-[700] m-0 text-white/50">No streams found</p>
-          <p className="text-[14px] text-white/30 m-0 max-w-[320px]">This content is not available via Torrentio or Prowlarr.</p>
+          <p className="text-[22px] font-[700] m-0 text-white/50">{t('sources.noStreamsFound')}</p>
+          <p className="text-[14px] text-white/30 m-0 max-w-[320px]">{t('sources.notAvailableVia')}</p>
           <button onClick={handleForceRefresh} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-            <RefreshCw size={16} /> Restart search
+            <RefreshCw size={16} /> {t('sources.restartSearch')}
           </button>
         </div>
       ) : (
@@ -142,17 +144,18 @@ export default function SourcesPage() {
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent" style={{ padding: '20px 28px' }}>
             {sortedAndFiltered.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[50vh] gap-[14px] text-center">
-                <p className="text-[22px] font-[700] m-0 text-white/50">No results for this filter</p>
-                <p className="text-[14px] text-white/30 m-0 max-w-[320px]">Modify the filters on the left.</p>
+                <p className="text-[22px] font-[700] m-0 text-white/50">{t('sources.noFilterResults')}</p>
+                <p className="text-[14px] text-white/30 m-0 max-w-[320px]">{t('sources.modifyFilters')}</p>
                 <button onClick={() => setActiveFilters(new Set())} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-                  View all sources
+                  {t('sources.viewAllSources')}
                 </button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', margin: 0 }}>
-                  {sortedAndFiltered.length} source{sortedAndFiltered.length !== 1 ? 's' : ''}
-                  {activeFilters.size > 0 ? ' filtered' : ' available'}
+                  {activeFilters.size > 0
+                    ? t('sources.sourceCountFiltered', { count: sortedAndFiltered.length })
+                    : t('sources.sourceCountAvailable', { count: sortedAndFiltered.length })}
                 </p>
                 {bestSource && <BestSourceCard source={bestSource} onPlay={() => handlePlay(bestSource)} launching={launching} />}
                 {groupedSections.map(s => (

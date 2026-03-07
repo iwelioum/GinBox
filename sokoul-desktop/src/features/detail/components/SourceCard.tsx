@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Zap, Download } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { parseTorrentName } from '@/shared/utils/parsing';
@@ -14,6 +15,7 @@ export function InlineSourceRow({
   source: Source; onPlay: () => void; onDownload?: () => void; launching: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
+  const { t } = useTranslation();
   const meta  = parseTorrentName(source.title);
   const label = cleanTitle(source.title, meta);
   const ok    = source.playable;
@@ -47,7 +49,7 @@ export function InlineSourceRow({
         {source.size_gb > 0 && (
           <>
             <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(249,249,249,0.55)', whiteSpace: 'nowrap' }}>
-              {source.size_gb.toFixed(1)} Go
+              {t('sources.sizeDisplay', { size: source.size_gb.toFixed(1) })}
             </span>
             <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 10 }}>·</span>
           </>
@@ -58,7 +60,7 @@ export function InlineSourceRow({
         {onDownload && (
           <button
             onClick={e => { e.stopPropagation(); onDownload(); }}
-            title="Download"
+            title={t('common.download')}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               color: 'rgba(255,255,255,0.35)', padding: '2px 4px',
@@ -79,7 +81,8 @@ export function BestSourceCard({
   source, onPlay, launching,
 }: { source: Source; onPlay: () => void; launching: boolean }) {
   const m = parseTorrentName(source.title);
-  const t = cleanTitle(source.title, m);
+  const tLabel = cleanTitle(source.title, m);
+  const { t } = useTranslation();
   return (
     <div style={{
       padding: '14px 16px', borderRadius: 12,
@@ -88,10 +91,10 @@ export function BestSourceCard({
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
         <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(249,249,249,0.3)' }}>
-          Best available source
+          {t('sources.bestAvailableSource')}
         </span>
         <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(249,249,249,0.88)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {t}
+          {tLabel}
         </span>
         <SourceBadges meta={m} source={source} />
       </div>
@@ -105,7 +108,7 @@ export function BestSourceCard({
           opacity: launching ? 0.7 : 1, transition: 'opacity 0.15s',
         }}
       >
-        ▶ Play
+        {t('sources.play')}
       </button>
     </div>
   );
@@ -117,6 +120,7 @@ export function QualitySection({
   label: string; Icon: LucideIcon; color: string; sources: Source[];
   onPlay: (s: Source) => void; onDownload?: (s: Source) => void; launching: boolean;
 }) {
+  const { t } = useTranslation();
   if (sources.length === 0) return null;
   return (
     <div>
@@ -127,7 +131,7 @@ export function QualitySection({
       }}>
         <Icon size={12} style={{ color, flexShrink: 0 }} />
         <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(249,249,249,0.4)' }}>
-          {label}
+          {t(label)}
         </span>
         <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(249,249,249,0.22)' }}>
           ({sources.length})

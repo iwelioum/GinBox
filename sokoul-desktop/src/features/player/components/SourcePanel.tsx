@@ -123,7 +123,7 @@ export function SourcePanel({
                     <Wifi className="w-3 h-3" />
                     {source.seeders}
                   </span>
-                  <span>{source.size_gb.toFixed(1)} Go</span>
+                  <span>{t('sources.sizeDisplay', { size: source.size_gb.toFixed(1) })}</span>
                 </div>
               </button>
             ))}

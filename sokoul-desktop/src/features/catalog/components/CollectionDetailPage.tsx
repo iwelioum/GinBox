@@ -4,6 +4,7 @@
 import * as React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery }               from '@tanstack/react-query';
+import { useTranslation }         from 'react-i18next';
 import { ArrowLeft, Play }        from 'lucide-react';
 import { endpoints }              from '@/shared/api/client';
 import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
@@ -11,6 +12,7 @@ import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
 export default function CollectionDetailPage() {
   const { id }   = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t }    = useTranslation();
 
   const { data, isLoading } = useQuery({
     queryKey: ['collection', id],
@@ -33,13 +35,13 @@ export default function CollectionDetailPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 pt-24"
            style={{ backgroundColor: 'var(--bg-abyss)' }}>
-        <p className="text-2xl font-light text-white/60">Collection introuvable.</p>
+        <p className="text-2xl font-light text-white/60">{t('collectionDetail.notFound')}</p>
         <button
           onClick={() => navigate('/collections')}
           className="flex items-center gap-2 px-5 py-3 rounded-xl font-bold"
           style={{ backgroundColor: 'var(--primary-red)', color: 'var(--bg-abyss)' }}
         >
-          <ArrowLeft size={18} /> Back to collections
+          <ArrowLeft size={18} /> {t('collectionDetail.backToCollections')}
         </button>
       </div>
     );
@@ -71,7 +73,7 @@ export default function CollectionDetailPage() {
                      transition-colors duration-200 z-10"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          {t('common.back')}
         </button>
 
         {/* Title + info */}
@@ -80,7 +82,7 @@ export default function CollectionDetailPage() {
             {data.name}
           </h1>
           <p className="text-white/45 text-sm">
-            {data.parts?.length ?? 0} films dans cette saga
+            {t('collectionDetail.filmsInSaga', { count: data.parts?.length ?? 0 })}
           </p>
         </div>
       </div>

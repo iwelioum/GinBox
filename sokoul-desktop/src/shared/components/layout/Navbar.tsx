@@ -7,23 +7,25 @@
 import * as React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useProfileStore } from '@/stores/profileStore';
 import { useScrollPosition } from '@/shared/hooks/useScrollPosition';
 
 // ── Nav items ─────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { to: '/',            label: 'HOME',        icon: '/images/home-icon.svg'      },
-  { to: '/search',      label: 'SEARCH',      icon: '/images/search-icon.svg'    },
-  { to: '/lists',       label: 'WATCHLIST',   icon: '/images/watchlist-icon.svg' },
-  { to: '/films',       label: 'MOVIES',      icon: '/images/movie-icon.svg'     },
-  { to: '/series',      label: 'SERIES',      icon: '/images/series-icon.svg'    },
-  { to: '/collections', label: 'COLLECTIONS', icon: '/images/original-icon.svg'  },
+  { to: '/',            labelKey: 'navbar.home',        icon: '/images/home-icon.svg'      },
+  { to: '/search',      labelKey: 'navbar.search',      icon: '/images/search-icon.svg'    },
+  { to: '/lists',       labelKey: 'navbar.watchlist',   icon: '/images/watchlist-icon.svg' },
+  { to: '/films',       labelKey: 'navbar.movies',      icon: '/images/movie-icon.svg'     },
+  { to: '/series',      labelKey: 'navbar.series',      icon: '/images/series-icon.svg'    },
+  { to: '/collections', labelKey: 'navbar.collections', icon: '/images/original-icon.svg'  },
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const Navbar: React.FC = () => {
+  const { t }         = useTranslation();
   const navigate      = useNavigate();
   const activeProfile = useProfileStore((s) => s.activeProfile);
 
@@ -70,7 +72,9 @@ const Navbar: React.FC = () => {
         className="flex items-center flex-row flex-nowrap h-full"
         style={{ marginLeft: 25, marginRight: 'auto' }}
       >
-        {NAV_ITEMS.map(({ to, label, icon }) => (
+        {NAV_ITEMS.map(({ to, labelKey, icon }) => {
+          const label = t(labelKey);
+          return (
           <NavLink
             key={to}
             to={to}
@@ -111,7 +115,8 @@ const Navbar: React.FC = () => {
               {label}
             </span>
           </NavLink>
-        ))}
+          );
+        })}
       </div>
 
       {/* ── Avatar + dropdown ── */}
@@ -150,7 +155,7 @@ const Navbar: React.FC = () => {
               className="w-full text-left text-dp-text bg-transparent border-none cursor-pointer"
               style={{ fontSize: 13, letterSpacing: 2, padding: '4px 0' }}
             >
-              Profile
+              {t('navbar.profile')}
             </button>
           </div>
         </div>
