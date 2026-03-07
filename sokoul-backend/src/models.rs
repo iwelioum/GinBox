@@ -29,6 +29,9 @@ pub struct ParsedStreamMeta {
     pub language: String,
     #[serde(default)]
     pub codec: String,
+    /// Raw French variant tag: TRUEFRENCH, VFF, VF, VOSTFR, MULTi, FRENCH
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language_variant: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -55,6 +58,8 @@ pub struct Source {
     pub size_gb: f32,
     pub seeders: u32,
     pub language: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language_variant: Option<String>,
     pub info_hash: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub magnet: Option<String>,
@@ -117,7 +122,7 @@ pub struct CatalogItem {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub poster: Option<String>,
-    // Chemin brut TMDB (ex: /abc123.jpg) — le frontend construit l'URL qualité /original/
+    // Raw TMDB path (e.g. /abc123.jpg) — the frontend builds the quality URL /original/
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "backdrop_path")]
     pub backdrop_path: Option<String>,
@@ -127,7 +132,7 @@ pub struct CatalogItem {
     pub genres: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub imdb_rating: Option<f32>,
-    // ── Champs de filtrage (enrichis depuis TMDB list responses) ──
+    // ── Filtering fields (enriched from TMDB list responses) ──
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "vote_average")]
     pub vote_average: Option<f32>,
@@ -153,18 +158,18 @@ pub struct Catalog {
     pub has_more: Option<bool>,
 }
 
-// ── Images unifiées (endpoint /images) ───────────────────────
+// ── Unified images (endpoint /images) ───────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UnifiedImages {
     pub scenes:  Vec<String>,  // backdrops 16:9
-    pub posters: Vec<String>,  // affiches 2:3
-    pub logos:   Vec<String>,  // logos transparents
-    pub banners: Vec<String>,  // bannières + clearart horizontaux
-    pub seasons: Vec<String>,  // affiches de saisons (TV)
+    pub posters: Vec<String>,  // posters 2:3
+    pub logos:   Vec<String>,  // transparent logos
+    pub banners: Vec<String>,  // banners + horizontal clearart
+    pub seasons: Vec<String>,  // season posters (TV)
 }
 
-// ── Crédits (casting) ────────────────────────────────────────
+// ── Credits (cast) ────────────────────────────────────────
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CastMember {
@@ -172,7 +177,7 @@ pub struct CastMember {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub character: Option<String>,
-    /// URL complète Fanart.tv ou TMDB p/w185
+    /// Full URL Fanart.tv or TMDB p/w185
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile_path: Option<String>,
     pub order: u32,
@@ -194,6 +199,7 @@ impl std::fmt::Display for ContentType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
+#[serde(rename_all = "camelCase")]
 pub struct Profile {
     pub id: i64,
     pub name: String,
@@ -421,6 +427,7 @@ pub struct TraktReviewsResponse {
     pub comments: Vec<TraktComment>,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Deserialize)]
 pub struct InstantAvailability {
     #[serde(flatten)]
