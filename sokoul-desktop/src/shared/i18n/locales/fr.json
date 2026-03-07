@@ -117,6 +117,15 @@
     "hiddenGemsSub": "Des trésors que peu ont découverts",
     "titlesCount": "{{count}} titres"
   },
+  "browse": {
+    "noResults": "Aucun résultat pour ces filtres",
+    "resetFilters": "Réinitialiser les filtres",
+    "clearAll": "Tout effacer",
+    "loadMore": "Charger plus",
+    "loadMoreTitles": "Charger plus de titres",
+    "availability": "Disponibilité",
+    "viewResults": "Voir {{count}} résultats"
+  },
   "home": {
     "loadingCatalog": "Chargement du catalogue…",
     "catalogNotResponding": "Le catalogue ne répond pas.",

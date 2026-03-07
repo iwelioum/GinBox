@@ -117,6 +117,15 @@
     "hiddenGemsSub": "Treasures few have discovered",
     "titlesCount": "{{count}} titles"
   },
+  "browse": {
+    "noResults": "No results for these filters",
+    "resetFilters": "Reset filters",
+    "clearAll": "Clear all",
+    "loadMore": "Load more",
+    "loadMoreTitles": "Load more titles",
+    "availability": "Availability",
+    "viewResults": "View {{count}} results"
+  },
   "home": {
     "loadingCatalog": "Loading catalog…",
     "catalogNotResponding": "The catalog is not responding.",
