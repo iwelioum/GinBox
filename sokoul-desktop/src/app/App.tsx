@@ -1,22 +1,24 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { ErrorBoundary } from '../shared/components/ui/ErrorBoundary';
-import ProfileSelectPage from '../features/catalog/components/ProfileSelectPage';
-import HomePage          from '../features/catalog/components/HomePage';
-import SearchPage        from '../features/search/components/SearchPage';
-import DetailPage        from '../features/detail/components/DetailPage';
-import SourcesPage       from '../features/detail/components/SourcesPage';
-import PlayerPage        from '../features/player/components/PlayerPage';
-import OverlayPage       from '../features/player/components/OverlayPage';
-import MyListsPage       from '../features/catalog/components/MyListsPage';
-import ActorPage         from '../features/catalog/components/ActorPage';
-import CollectionsPage      from '../features/catalog/components/CollectionsPage';
-import CollectionDetailPage from '../features/catalog/components/CollectionDetailPage';
-import BrowsePage        from '../features/catalog/components/BrowsePage';
-import ProfilePage       from '../features/catalog/components/ProfilePage';
-import SettingsPage      from '../features/catalog/components/SettingsPage';
-
-import DebugPage         from '../features/catalog/components/DebugPage';
 import { Layout }        from '../shared/components/layout/Layout';
+import LoadingFallback   from '../shared/components/ui/LoadingFallback';
+
+const ProfileSelectPage    = lazy(() => import('../features/catalog/components/ProfileSelectPage'));
+const HomePage             = lazy(() => import('../features/catalog/components/HomePage'));
+const SearchPage           = lazy(() => import('../features/search/components/SearchPage'));
+const DetailPage           = lazy(() => import('../features/detail/components/DetailPage'));
+const SourcesPage          = lazy(() => import('../features/detail/components/SourcesPage'));
+const PlayerPage           = lazy(() => import('../features/player/components/PlayerPage'));
+const OverlayPage          = lazy(() => import('../features/player/components/OverlayPage'));
+const MyListsPage          = lazy(() => import('../features/catalog/components/MyListsPage'));
+const ActorPage            = lazy(() => import('../features/catalog/components/ActorPage'));
+const CollectionsPage      = lazy(() => import('../features/catalog/components/CollectionsPage'));
+const CollectionDetailPage = lazy(() => import('../features/catalog/components/CollectionDetailPage'));
+const BrowsePage           = lazy(() => import('../features/catalog/components/BrowsePage'));
+const ProfilePage          = lazy(() => import('../features/catalog/components/ProfilePage'));
+const SettingsPage         = lazy(() => import('../features/catalog/components/SettingsPage'));
+const DebugPage            = lazy(() => import('../features/catalog/components/DebugPage'));
 
 /** Forces full remount of PlayerPage when content changes */
 function PlayerWrapper() {
@@ -29,6 +31,7 @@ function PlayerWrapper() {
 
 function App() {
   return (
+    <Suspense fallback={<LoadingFallback />}>
     <Routes>
       {/* Player & overlay have their own error boundaries to avoid cross-feature crashes */}
       <Route path="/profile-select" element={<ErrorBoundary area="profiles"><ProfileSelectPage /></ErrorBoundary>} />
@@ -54,6 +57,7 @@ function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
   );
 }
 
