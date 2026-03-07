@@ -272,7 +272,7 @@ async fn p_omdb(
 ) -> Option<String> {
     let id = imdb_id?;
     if api_key.is_empty() { return None; }
-    let url = format!("http://www.omdbapi.com/?apikey={api_key}&i={id}");
+    let url = format!("https://www.omdbapi.com/?apikey={api_key}&i={id}");
     let Ok(resp) = client.get(&url).send().await else { return None; };
     let Ok(json): Result<Value, _> = resp.json().await else { return None; };
     let poster = json["Poster"].as_str()?;

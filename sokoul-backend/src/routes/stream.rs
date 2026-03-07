@@ -162,7 +162,10 @@ async fn do_fresh_fetch(
                 torrentio::fetch_torrentio_streams(torrentio_id, content_type, season, episode, state),
             )
             .await
-            .unwrap_or_else(|_| Ok(vec![]))
+            .unwrap_or_else(|_| {
+                tracing::warn!("Torrentio request timed out (20s)");
+                Ok(vec![])
+            })
         },
         async {
             if let Some(q) = &prowlarr_query {
@@ -171,7 +174,10 @@ async fn do_fresh_fetch(
                     prowlarr::fetch_prowlarr_streams(q, content_type, season, episode, state),
                 )
                 .await
-                .unwrap_or_else(|_| Ok(vec![]))
+                .unwrap_or_else(|_| {
+                    tracing::warn!("Prowlarr request timed out (12s)");
+                    Ok(vec![])
+                })
             } else {
                 Ok(vec![])
             }
