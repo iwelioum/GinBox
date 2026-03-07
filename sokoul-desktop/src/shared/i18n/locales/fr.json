@@ -536,7 +536,15 @@
     "downloadPrefix": "Télécharger : {{title}}",
     "openDebugConsole": "Ouvrir la console de débogage",
     "back": "Retour",
-    "play": "▶ Lecture"
+    "play": "▶ Lecture",
+    "noFilterResults": "Aucun résultat pour ce filtre",
+    "modifyFilters": "Modifiez les filtres à gauche.",
+    "viewAllSources": "Voir toutes les sources",
+    "sourceCountFiltered_one": "{{count}} source filtrée",
+    "sourceCountFiltered_other": "{{count}} sources filtrées",
+    "sourceCountAvailable_one": "{{count}} source disponible",
+    "sourceCountAvailable_other": "{{count}} sources disponibles",
+    "sizeDisplay": "{{size}} Go"
   },
   "lists": {
     "heading": "Mes listes",
@@ -555,5 +563,13 @@
     "noTitlesFound": "Aucun titre trouvé pour cet acteur.",
     "titleInCatalog_one": "{{count}} titre au catalogue",
     "titleInCatalog_other": "{{count}} titres au catalogue"
+  },
+  "collectionDetail": {
+    "notFound": "Collection introuvable.",
+    "backToCollections": "Retour aux collections",
+    "filmsInSaga_one": "{{count}} film dans cette saga",
+    "filmsInSaga_other": "{{count}} films dans cette saga",
+    "allFilms": "Tous les films",
+    "noMoviesFound": "Aucun film trouvé dans cette collection."
   }
 }

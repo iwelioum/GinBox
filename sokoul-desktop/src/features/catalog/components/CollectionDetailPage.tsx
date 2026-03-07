@@ -100,7 +100,7 @@ export default function CollectionDetailPage() {
       <div className="px-8 pb-20">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em]
                        text-white/35 mb-5">
-          Tous les films
+          {t('collectionDetail.allFilms')}
         </h2>
 
         {data.parts && data.parts.length > 0 ? (
@@ -159,7 +159,7 @@ export default function CollectionDetailPage() {
           </div>
         ) : (
           <p className="text-white/30 text-sm">
-            No movies found in this collection.
+            {t('collectionDetail.noMoviesFound')}
           </p>
         )}
       </div>
