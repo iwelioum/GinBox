@@ -13,6 +13,7 @@ fn normalize_entry(mut entry: PlaybackEntry) -> PlaybackEntry {
     entry
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn save_position(
     profile_id: i64,
     content_id: &str,

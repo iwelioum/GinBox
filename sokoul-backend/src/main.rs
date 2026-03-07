@@ -80,13 +80,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .user_agent("Sokoul/1.0.0")
         .build()?;
 
+    // Validate critical API keys — fail fast if core functionality will break
+    let tmdb_key = env::var("TMDB_API_KEY").unwrap_or_default();
+    let realdebrid_token = env::var("REALDEBRID_API_TOKEN").unwrap_or_default();
+    if tmdb_key.is_empty() {
+        tracing::error!("TMDB_API_KEY is missing — catalog/metadata will not work");
+    }
+    if realdebrid_token.is_empty() {
+        tracing::warn!("REALDEBRID_API_TOKEN is missing — debrid streaming will be unavailable");
+    }
+
+    // Optional keys — log warnings for missing ones
+    let optional_keys = [
+        ("PROWLARR_URL", "Prowlarr search"),
+        ("PROWLARR_API_KEY", "Prowlarr search"),
+        ("FANART_API_KEY", "Fanart artwork"),
+        ("TRAKT_CLIENT_ID", "Trakt sync"),
+    ];
+    for (key, feature) in &optional_keys {
+        if env::var(key).unwrap_or_default().is_empty() {
+            tracing::info!("{key} not set — {feature} disabled");
+        }
+    }
+
     let app_state = Arc::new(AppState {
         db: pool,
         http_client,
-        realdebrid_token: env::var("REALDEBRID_API_TOKEN").unwrap_or_default(),
+        realdebrid_token,
         prowlarr_url: env::var("PROWLARR_URL").unwrap_or_default(),
         prowlarr_key: env::var("PROWLARR_API_KEY").unwrap_or_default(),
-        tmdb_key: env::var("TMDB_API_KEY").unwrap_or_default(),
+        tmdb_key,
         fanart_key: env::var("FANART_API_KEY").unwrap_or_default(),
         tvdb_key: env::var("TVDB_API_KEY").unwrap_or_default(),
         simkl_client_id: env::var("SIMKL_CLIENT_ID").unwrap_or_default(),

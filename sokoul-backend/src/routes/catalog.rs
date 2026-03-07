@@ -154,7 +154,7 @@ pub async fn get_images(
     Path((content_type, id)): Path<(ContentType, String)>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<UnifiedImages>, AppError> {
-    let tmdb_id_str = id.split(':').last().unwrap_or(&id);
+    let tmdb_id_str = id.rsplit(':').next().unwrap_or(&id);
     let tmdb_id: i64 = tmdb_id_str.parse().unwrap_or(0);
     let is_movie = matches!(content_type, ContentType::Movie);
     let images = artwork_providers::fetch_unified_images(tmdb_id, is_movie, &state).await;

@@ -318,19 +318,12 @@ fn normalize_show(show: TmdbShow) -> Meta {
             continue;
         }
 
-        let count = season.episode_count.max(1);
-        for episode_number in 1..=count {
-            videos.push(Video {
-                id: format!("{}:{}:{}", imdb_id, season_number, episode_number),
-                title: None,
-                season: Some(season_number),
-                episode: Some(episode_number),
-                released: None,
-                overview: None,
-                still_path: None,
-                runtime: default_episode_runtime,
-            });
-        }
+        // Season has episode_count but no episode details — skip instead of fabricating
+        // The frontend will fetch season details separately via /catalog/meta/:type/:id
+        tracing::debug!(
+            "Season {} of {} has {} episodes but no details — skipping placeholders",
+            season_number, imdb_id, season.episode_count
+        );
     }
 
     Meta {
@@ -374,6 +367,7 @@ pub async fn fetch_genre_catalog(genre_id: u32, content_type: &ContentType, page
 }
 
 /// Unified TMDB /discover endpoint supporting genre, language, keyword, year filters
+#[allow(clippy::too_many_arguments)]
 pub async fn fetch_discover_catalog(
     content_type: &ContentType,
     page: u32,

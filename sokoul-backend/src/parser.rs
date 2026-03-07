@@ -40,38 +40,11 @@ fn resolution_regex() -> &'static Regex {
 
 /// Quality/source type detection (REMUX, BluRay, WEB-DL, etc.)
 /// Available for future use in enhanced scoring.
-#[allow(dead_code)]
-fn quality_source_regex() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(r"(?i)\b(REMUX|BLU-?RAY|BDREMUX|BD-?RIP|BR-?RIP|WEB-?DL|WEBDL|WEB-?DLRip|WEB-?RIP|WEBRIP|WEBMux|WEB(?=[ .\-])|HDTV(?:Rip)?|HD-?RIP|UHD-?Rip|DVD-?RIP|DVDSCR|DVD|PDTV|SDTV|SAT-?Rip|VHS(?:Rip)?|PPVRIP|PPV|CAM-?RIP|HDCAM|HD-?CAM|CAMHD|HQ[ .]?CAM|S[- ]?Print|TS-?RIP|HD-?TS(?:Rip)?|TELESYNC|TELECINE|HDTC(?:Rip)?|SCR(?:EENER)?|BR-?Screener|PRE-?HDRip|PDVDRip|BRRip)\b")
-            .expect("quality source regex")
-    })
-}
-
 fn codec_regex() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
         Regex::new(r"(?i)\b(x\.?265|[Hh]\.?265|HEVC|x\.?264|[Hh]\.?264|AVC|AV1|MPEG[24]?|XviD|DivX|VP9|VC-?1)\b")
             .expect("codec regex")
-    })
-}
-
-#[allow(dead_code)]
-fn hdr_regex() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(r"(?i)\b(Dolby[ .]?Vision|DV|HDR10\+?|HDR|HLG|SDR)\b")
-            .expect("hdr regex")
-    })
-}
-
-#[allow(dead_code)]
-fn audio_regex() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(r"(?i)\b(DTS-?HD(?:[ .]?MA)?|TrueHD|Atmos|DTS-?X|DTS|DD[P+]?[ .]?[257]\.[01]|EAC3|E-?AC-?3|AC-?3|AAC(?:[.-]?LC)?|FLAC|LPCM|PCM|MP3|OGG|OPUS|DD[P+]?)\b")
-            .expect("audio regex")
     })
 }
 

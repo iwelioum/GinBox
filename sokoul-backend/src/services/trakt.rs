@@ -154,25 +154,23 @@ async fn send_scrobble(
                 episode: None,
                 progress,
             }
-        } else {
-            if content_id.contains(':') {
-                let parts: Vec<&str> = content_id.split(':').collect();
-                if parts.len() == 3 {
-                    let imdb = parts[0].to_string();
-                    let season = parts[1].parse().unwrap_or(1);
-                    let episode = parts[2].parse().unwrap_or(1);
-                    TraktScrobblePayload {
-                        movie: None,
-                        show: Some(TraktShow { ids: TraktIds { trakt: 0, slug: None, imdb: Some(imdb), tmdb: None } }),
-                        episode: Some(TraktEpisode { ids: TraktIds { trakt: 0, slug: None, imdb: None, tmdb: None }, season, number: episode }),
-                        progress,
-                    }
-                } else {
-                    return Ok(());
+        } else if content_id.contains(':') {
+            let parts: Vec<&str> = content_id.split(':').collect();
+            if parts.len() == 3 {
+                let imdb = parts[0].to_string();
+                let season = parts[1].parse().unwrap_or(1);
+                let episode = parts[2].parse().unwrap_or(1);
+                TraktScrobblePayload {
+                    movie: None,
+                    show: Some(TraktShow { ids: TraktIds { trakt: 0, slug: None, imdb: Some(imdb), tmdb: None } }),
+                    episode: Some(TraktEpisode { ids: TraktIds { trakt: 0, slug: None, imdb: None, tmdb: None }, season, number: episode }),
+                    progress,
                 }
             } else {
                 return Ok(());
             }
+        } else {
+            return Ok(());
         }
     } else {
         return Ok(());
@@ -244,7 +242,7 @@ pub async fn get_reviews(
         id.to_string()
     } else {
         // Extract the numeric ID (e.g. "tmdb:12345" → "12345")
-        let numeric = id.split(':').last().unwrap_or(id);
+        let numeric = id.rsplit(':').next().unwrap_or(id);
         // Try to resolve via Trakt API /search/tmdb
         let url = format!(
             "https://api.trakt.tv/search/tmdb/{}?type={}",

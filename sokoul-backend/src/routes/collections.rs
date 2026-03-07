@@ -48,13 +48,22 @@ async fn get_collections(
 
     let page_ids = &all_ids[start..end];
 
-    // Fetch collection summaries sequentially (each is a simple TMDB call)
-    let mut collections = Vec::with_capacity(page_ids.len());
-    for &id in page_ids {
-        if let Ok(summary) = tmdb::fetch_collection_summary(id, &state).await {
-            collections.push(summary);
+    // Fetch collection summaries in parallel using JoinSet
+    let mut set = tokio::task::JoinSet::new();
+    for (idx, &id) in page_ids.iter().enumerate() {
+        let state = Arc::clone(&state);
+        set.spawn(async move {
+            (idx, tmdb::fetch_collection_summary(id, &state).await)
+        });
+    }
+    let mut indexed_results: Vec<(usize, _)> = Vec::with_capacity(page_ids.len());
+    while let Some(Ok((idx, result))) = set.join_next().await {
+        if let Ok(summary) = result {
+            indexed_results.push((idx, summary));
         }
     }
+    indexed_results.sort_by_key(|(idx, _)| *idx);
+    let collections: Vec<_> = indexed_results.into_iter().map(|(_, s)| s).collect();
 
     Ok(Json(json!({
         "collections":   collections,

@@ -44,18 +44,24 @@ pub enum AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        let (status, error_code, error_message) = match self {
-            AppError::NetworkError(msg) => (StatusCode::BAD_GATEWAY, "NETWORK_ERROR", msg),
-            AppError::ParseError(msg) => (StatusCode::UNPROCESSABLE_ENTITY, "PARSE_ERROR", msg),
-            AppError::DatabaseError(err) => (StatusCode::INTERNAL_SERVER_ERROR, "DATABASE_ERROR", err.to_string()),
-            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "NOT_FOUND", msg),
-            AppError::ExternalApiError(msg) => (StatusCode::BAD_GATEWAY, "EXTERNAL_API_ERROR", msg),
-            AppError::ConfigError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, "CONFIG_ERROR", msg),
-            AppError::Forbidden(msg) => (StatusCode::FORBIDDEN, "FORBIDDEN", msg),
-            AppError::LimitExceeded(msg) => (StatusCode::UNPROCESSABLE_ENTITY, "LIMIT_EXCEEDED", msg),
-            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg),
-            AppError::ApiError(msg) => (StatusCode::BAD_GATEWAY, "API_ERROR", msg),
-            AppError::HttpError(err) => (StatusCode::BAD_GATEWAY, "HTTP_ERROR", err.to_string()),
+        let (status, error_code, error_message) = match &self {
+            AppError::NetworkError(msg) => (StatusCode::BAD_GATEWAY, "NETWORK_ERROR", msg.clone()),
+            AppError::ParseError(msg) => (StatusCode::UNPROCESSABLE_ENTITY, "PARSE_ERROR", msg.clone()),
+            AppError::DatabaseError(err) => {
+                tracing::error!("Database error: {err}");
+                (StatusCode::INTERNAL_SERVER_ERROR, "DATABASE_ERROR", "An internal database error occurred".to_string())
+            },
+            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "NOT_FOUND", msg.clone()),
+            AppError::ExternalApiError(msg) => (StatusCode::BAD_GATEWAY, "EXTERNAL_API_ERROR", msg.clone()),
+            AppError::ConfigError(msg) => (StatusCode::INTERNAL_SERVER_ERROR, "CONFIG_ERROR", msg.clone()),
+            AppError::Forbidden(msg) => (StatusCode::FORBIDDEN, "FORBIDDEN", msg.clone()),
+            AppError::LimitExceeded(msg) => (StatusCode::UNPROCESSABLE_ENTITY, "LIMIT_EXCEEDED", msg.clone()),
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg.clone()),
+            AppError::ApiError(msg) => (StatusCode::BAD_GATEWAY, "API_ERROR", msg.clone()),
+            AppError::HttpError(err) => {
+                tracing::error!("HTTP client error: {err}");
+                (StatusCode::BAD_GATEWAY, "HTTP_ERROR", "An external service request failed".to_string())
+            },
         };
 
         let body = Json(json!({

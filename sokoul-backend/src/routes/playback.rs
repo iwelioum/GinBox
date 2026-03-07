@@ -54,6 +54,17 @@ async fn post_position(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<SavePositionRequest>,
 ) -> Result<(), AppError> {
+    // Input validation
+    if payload.duration_ms <= 0 {
+        return Err(AppError::BadRequest("duration_ms must be positive".into()));
+    }
+    if payload.position_ms < 0 || payload.position_ms > payload.duration_ms {
+        return Err(AppError::BadRequest("position_ms must be between 0 and duration_ms".into()));
+    }
+    if payload.content_id.is_empty() {
+        return Err(AppError::BadRequest("content_id is required".into()));
+    }
+
     playback::save_position(
         payload.profile_id,
         &payload.content_id,
@@ -89,6 +100,7 @@ async fn get_history(
     Query(query): Query<GetHistoryQuery>,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<Vec<PlaybackEntry>>, AppError> {
-    let history = playback::get_history(query.profile_id, query.limit, &state.db).await?;
+    let limit = query.limit.min(200); // Cap at 200 entries
+    let history = playback::get_history(query.profile_id, limit, &state.db).await?;
     Ok(Json(history))
 }

@@ -132,9 +132,16 @@ pub async fn post_unrestrict(
             return Ok(Json(json!({ "stream_url": result.download, "is_cached": true })));
         }
         
-        // Torrentio resolve URL (contains /resolve/realdebrid/) or other direct HTTP link
-        tracing::info!("Direct or already resolved HTTP link detected: {}", magnet_raw);
-        return Ok(Json(json!({ "stream_url": magnet_raw, "is_cached": true })));
+        // Torrentio resolve URL or other known streaming URL
+        if magnet_raw.contains("torrentio.strem.fun") {
+            tracing::info!("Torrentio resolved link detected: {}", magnet_raw);
+            return Ok(Json(json!({ "stream_url": magnet_raw, "is_cached": true })));
+        }
+
+        tracing::warn!("Rejecting unknown HTTP URL: {}", magnet_raw);
+        return Err(AppError::BadRequest(
+            "Unknown HTTP URL — only magnet:, Real-Debrid, Prowlarr, and Torrentio links are accepted".into()
+        ));
     }
 
     tracing::warn!("Unrecognized link format: {}", magnet_raw);

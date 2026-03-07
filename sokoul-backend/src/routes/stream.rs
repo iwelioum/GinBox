@@ -20,7 +20,7 @@ use axum::{
 use regex::Regex;
 use serde_json::json;
 use std::collections::HashSet;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::time::timeout;
 use crate::AppState;
@@ -29,6 +29,8 @@ use crate::models::{ContentType, Source};
 use crate::services::{cache, prowlarr, tmdb, torrentio};
 
 const MAX_RESULTS: usize = 20;
+const MIN_SIZE_GB: f32 = 0.195;  // ~200 MB
+const MAX_SIZE_GB: f32 = 80.0;
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
@@ -57,8 +59,7 @@ pub async fn get_stream(
     let release_year = params.year.map(|y| y as u32);
     let season       = params.season;
     let episode      = params.episode;
-    let bypass_cache_for_episode = matches!(content_type, ContentType::Series) && season.is_some() && episode.is_some();
-    let use_cache = !force && !bypass_cache_for_episode;
+    let use_cache = !force; // cache key already includes season/episode
     let cache_key    = format!(
         "{}:{}:{}_{}",
         content_type,
@@ -103,7 +104,9 @@ pub async fn get_stream(
             let season_bg      = season;
             let episode_bg     = episode;
             tokio::spawn(async move {
-                let _ = do_fresh_fetch(&id_bg, &ct_bg, season_bg, episode_bg, &cache_key_bg, &state_bg).await;
+                if let Err(e) = do_fresh_fetch(&id_bg, &ct_bg, season_bg, episode_bg, &cache_key_bg, &state_bg).await {
+                    tracing::warn!("Background stream refresh failed: {e}");
+                }
             });
 
             return Ok(Json(json!({
@@ -209,10 +212,12 @@ async fn do_fresh_fetch(
     // Filter series packs (keep only targeted episode)
     if matches!(content_type, ContentType::Series) {
         if let (Some(target_season), Some(target_episode)) = (season, episode) {
-            let pack_regex = Regex::new(
-                r"(?i)(S\d{1,2}\s*[-_]\s*S\d{1,2}|S\d{1,2}E\d{1,2}\s*[-_]\s*E\d{1,2}|COMPLETE|PACK|SAISON\s*\d{1,2})"
-            )
-            .expect("valid pack regex");
+            static PACK_REGEX: OnceLock<Regex> = OnceLock::new();
+            let pack_regex = PACK_REGEX.get_or_init(|| {
+                Regex::new(
+                    r"(?i)(S\d{1,2}\s*[-_]\s*S\d{1,2}|S\d{1,2}E\d{1,2}\s*[-_]\s*E\d{1,2}|COMPLETE|PACK|SAISON\s*\d{1,2})"
+                ).expect("valid pack regex")
+            });
             let episode_regex = Regex::new(
                 &format!(r"(?i)S0?{}E0?{}", target_season, target_episode)
             )
@@ -433,11 +438,10 @@ fn deduplicate_sources(sources: &mut Vec<Source>) {
     let mut seen_titles: HashSet<String> = HashSet::new();
 
     sources.retain(|source| {
-        // Phase 1 : dedup par info_hash
-        if !source.info_hash.is_empty() {
-            if !seen_hashes.insert(source.info_hash.clone()) {
-                return false;
-            }
+        if !source.info_hash.is_empty()
+            && !seen_hashes.insert(source.info_hash.clone())
+        {
+            return false;
         }
         // Phase 2: dedup by normalized title
         let title_key = normalize_title_for_dedup(&source.title);
@@ -454,16 +458,13 @@ fn deduplicate_sources(sources: &mut Vec<Source>) {
 
 fn filter_sources(sources: &mut Vec<Source>) {
     sources.retain(|source| {
-        // Exclude seeders==0 unless already cached on RD
         if source.seeders == 0 && !source.cached_rd {
             return false;
         }
-        // Exclude too small (< 200 MB ≈ 0.195 GB)
-        if source.size_gb > 0.0 && source.size_gb < 0.195 {
+        if source.size_gb > 0.0 && source.size_gb < MIN_SIZE_GB {
             return false;
         }
-        // Exclude too large (> 80 GB)
-        if source.size_gb > 80.0 {
+        if source.size_gb > MAX_SIZE_GB {
             return false;
         }
         true
@@ -554,7 +555,7 @@ fn stream_to_source(stream: &crate::models::Stream, source_name: &str) -> Option
 
     // playable = can be launched via RD pipeline (requires info_hash)
     // or directly if URL is already streamable (torrentio/RD resolved)
-    let playable = !info_hash.is_empty() || stream.url.as_deref().map_or(false, |u| {
+    let playable = !info_hash.is_empty() || stream.url.as_deref().is_some_and(|u| {
         u.contains("torrentio.strem.fun") ||
         u.contains("real-debrid.com") ||
         u.contains("rdeb.io")
@@ -569,7 +570,7 @@ fn stream_to_source(stream: &crate::models::Stream, source_name: &str) -> Option
     };
 
     // cached_rd = true ONLY for already resolved Torrentio/RD URLs
-    let cached_rd = stream.url.as_deref().map_or(false, |u| {
+    let cached_rd = stream.url.as_deref().is_some_and(|u| {
         u.contains("torrentio.strem.fun") ||
         u.contains("real-debrid.com") ||
         u.contains("rdeb.io")

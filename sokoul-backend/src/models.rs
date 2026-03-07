@@ -439,7 +439,7 @@ impl InstantAvailability {
         self.hashes.values().any(|val| {
             if let Some(obj) = val.as_object() {
                 if let Some(rd) = obj.get("rd") {
-                    return rd.as_array().map_or(false, |arr| !arr.is_empty());
+                    return rd.as_array().is_some_and(|arr| !arr.is_empty());
                 }
             }
             false
