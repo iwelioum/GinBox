@@ -22,7 +22,7 @@ import { BrowseHero }               from './BrowseHero';
 import { BrowseFiltersBar }         from './BrowseFiltersBar';
 import { ContentSection }           from './ContentSection';
 import { EmptyBrowseState }         from './EmptyBrowseState';
-import { CatalogFilters }           from './CatalogFilters';
+import { FilterDrawer }             from './FilterDrawer';
 
 /* ═══════════════════════════════════════════════════════════
    BrowsePage — main page component (composes sub-components)
@@ -34,6 +34,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
 
   const [filters, setFilters]         = React.useState<FilterState>(() => buildDefaultFilters(mode));
   const [loadedPages, setLoadedPages] = React.useState(INITIAL_PAGES);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = React.useState(false);
   const { itemId, anchorRect, onEnter, onLeave } = useHoverCard(300);
   const scopedKinds       = React.useMemo(() => getKindsForMode(mode), [mode]);
   const resultsSectionRef = React.useRef<HTMLDivElement | null>(null);
@@ -126,44 +127,17 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
 
   /* ─── Render ─── */
   return (
-    <div
-      className="min-h-screen bg-bg-base text-text-primary"
-      style={{ paddingTop: 'var(--navbar-height)' }}
-    >
+    <div className="min-h-screen bg-[--color-bg-base]">
+      {/* Full-width hero (extends behind navbar, no padding-top) */}
       {!isSearching && (
         <BrowseHero items={filteredItems} onPlay={openSources} onInfo={openDetails} />
       )}
 
-      <main className="flex flex-row gap-6" style={{ padding: 'var(--space-lg) var(--section-px)' }}>
-        {/* Filter Sidebar */}
-        <aside className="w-[260px] shrink-0 sticky top-4 h-fit">
-          <div className="bg-bg-elevated border border-[var(--color-border)] rounded-xl p-5">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xs uppercase text-text-muted tracking-widest">
-                {t('filters.heading')}
-              </h2>
-              <button
-                onClick={resetFilters}
-                className="text-xs text-text-muted hover:text-accent transition-colors"
-              >
-                {t('filters.reset')}
-              </button>
-            </div>
-            
-            <CatalogFilters
-              allItems={enrichedItems}
-              genreItems={genreItems}
-              langCountryItems={langCountryItems}
-              availabilityItems={availabilityItems}
-              filters={filters}
-              onChange={setScopedFilters}
-              profileActive={activeProfile !== null}
-            />
-          </div>
-        </aside>
-
-        {/* Content Area */}
-        <div className="flex-1 min-w-0">
+      {/* Content rails section with slight overlap for depth */}
+      <div className="relative z-10 -mt-20">
+        <div className="px-[--section-px] space-y-6">
+          
+          {/* Filter bar at top: tabs + filter button that opens drawer */}
           <BrowseFiltersBar
             mode={mode}
             filters={filters}
@@ -171,12 +145,13 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             activeFiltersCount={activeFiltersCount}
             currentKindTab={currentKindTab}
             onTabClick={handleTabClick}
-            onOpenDrawer={() => {}} // No-op since sidebar is always visible
+            onOpenDrawer={() => setIsFilterDrawerOpen(true)}
             onChangeFilters={setScopedFilters}
           />
 
+          {/* Content sections as rails (same as HomePage) when not searching */}
           {!isLoading && contentSections.length > 0 && !isSearching && (
-            <div className="mb-6">
+            <div className="space-y-6">
               {contentSections.map((section) => (
                 <ContentSection
                   key={section.id}
@@ -193,19 +168,26 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             </div>
           )}
 
-          {isLoading && rawItems.length === 0 ? (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4 transition-all duration-300">
+          {/* Loading state */}
+          {isLoading && rawItems.length === 0 && (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 transition-all duration-300">
               {Array.from({ length: 28 }).map((_, i) => (
-                <div key={i} className="aspect-[2/3] rounded-lg bg-bg-elevated animate-pulse" />
+                <div key={i} className="aspect-[2/3] rounded-lg bg-[--color-bg-elevated] animate-pulse" />
               ))}
             </div>
-          ) : filteredItems.length === 0 ? (
+          )}
+
+          {/* Empty state */}
+          {!isLoading && filteredItems.length === 0 && (
             <EmptyBrowseState mode={mode} onReset={setScopedFilters} />
-          ) : isSearching ? (
+          )}
+
+          {/* Grid of results when searching/filtering */}
+          {isSearching && filteredItems.length > 0 && (
             <>
               <div
                 ref={resultsSectionRef}
-                className="grid scroll-mt-24 grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4 transition-all duration-300"
+                className="grid scroll-mt-24 grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 transition-all duration-300"
               >
                 {filteredItems.map((item) => (
                   <ContentCard
@@ -230,27 +212,45 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
                   <button
                     onClick={() => setLoadedPages((p) => p + MORE_PAGES)}
                     disabled={isLoading}
-                    className="px-8 py-3 rounded-full border border-[var(--color-border)] text-sm text-text-secondary hover:border-accent hover:text-accent transition-all disabled:opacity-40"
+                    className="px-8 py-3 rounded-full border border-[--color-border] text-sm text-[--color-text-secondary] hover:border-[--color-accent] hover:text-[--color-accent] transition-all disabled:opacity-40"
                   >
                     {isLoading ? t('common.loading') : t('browse.loadMore')}
                   </button>
                 </div>
               )}
             </>
-          ) : (
-            canLoadMore && !isLoading ? (
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => setLoadedPages((p) => p + MORE_PAGES)}
-                  className="px-8 py-3 rounded-full border border-[var(--color-border)] text-sm text-text-secondary hover:border-accent hover:text-accent transition-all"
-                >
-                  {t('browse.loadMoreTitles')}
-                </button>
-              </div>
-            ) : null
+          )}
+
+          {/* Load more when browsing (not searching) */}
+          {!isSearching && !isLoading && canLoadMore && contentSections.length > 0 && (
+            <div className="mt-4 flex justify-center">
+              <button
+                onClick={() => setLoadedPages((p) => p + MORE_PAGES)}
+                className="px-8 py-3 rounded-full border border-[--color-border] text-sm text-[--color-text-secondary] hover:border-[--color-accent] hover:text-[--color-accent] transition-all"
+              >
+                {t('browse.loadMoreTitles')}
+              </button>
+            </div>
           )}
         </div>
-      </main>
+      </div>
+
+      {/* Filter Drawer */}
+      {isFilterDrawerOpen && (
+        <FilterDrawer
+          mode={mode}
+          filters={filters}
+          enrichedItems={enrichedItems}
+          genreItems={genreItems}
+          langCountryItems={langCountryItems}
+          availabilityItems={availabilityItems}
+          filteredCount={filteredItems.length}
+          activeFiltersCount={activeFiltersCount}
+          profileActive={activeProfile !== null}
+          onChangeFilters={setScopedFilters}
+          onClose={() => setIsFilterDrawerOpen(false)}
+        />
+      )}
     </div>
   );
 }
