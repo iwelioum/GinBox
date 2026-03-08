@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom';
 import { ErrorBoundary } from '../shared/components/ui/ErrorBoundary';
 import { Layout }        from '../shared/components/layout/Layout';
 import LoadingFallback   from '../shared/components/ui/LoadingFallback';
+import { ToastContainer } from '../shared/components/ui/Toast';
 
 const ProfileSelectPage    = lazy(() => import('../features/catalog/components/ProfileSelectPage'));
 const HomePage             = lazy(() => import('../features/catalog/components/HomePage'));
@@ -32,6 +33,7 @@ function PlayerWrapper() {
 function App() {
   return (
     <Suspense fallback={<LoadingFallback />}>
+    <ToastContainer />
     <Routes>
       {/* Player & overlay have their own error boundaries to avoid cross-feature crashes */}
       <Route path="/profile-select" element={<ErrorBoundary area="profiles"><ProfileSelectPage /></ErrorBoundary>} />

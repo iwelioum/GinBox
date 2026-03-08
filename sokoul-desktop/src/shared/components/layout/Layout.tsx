@@ -2,18 +2,20 @@
 // RULES: Integrates TitleBar and Navbar for content pages.
 
 import * as React from 'react';
-import { Outlet } from 'react-router-dom'; // Import Outlet
 import { TitleBar } from './TitleBar';
 import { Navbar } from './Navbar';
+import { AnimatedOutlet } from '@/app/AnimatedOutlet';
+import { ToastContainer } from '@/shared/components/ui/Toast';
 
-const Layout: React.FC = () => { // LayoutProps no longer needed as children are rendered via Outlet
+const Layout: React.FC = () => {
   return (
     <>
       <TitleBar />
       <Navbar />
       <main>
-        <Outlet />
+        <AnimatedOutlet />
       </main>
+      <ToastContainer />
     </>
   );
 };

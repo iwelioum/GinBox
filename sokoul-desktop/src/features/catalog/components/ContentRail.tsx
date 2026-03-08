@@ -37,36 +37,17 @@ const ContentRail: React.FC<ContentRailProps> = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <section style={{ marginBottom: 36 }} className={className ?? ''}>
+    <section className={`mb-9 ${className ?? ''}`}>
       {/* Title with left accent border — exact CategoryRow.js style */}
       <h3
-        style={{
-          color: '#f9f9f9',
-          fontSize: 17,
-          fontWeight: 700,
-          letterSpacing: '0.4px',
-          marginBottom: 14,
-          paddingLeft: 10,
-          borderLeft: `3px solid ${accentColor}`,
-          lineHeight: 1.3,
-        }}
+        className="text-dp-text text-[17px] font-bold tracking-[0.4px] mb-3.5 pl-2.5 leading-[1.3]"
+        style={{ borderLeft: `3px solid ${accentColor}` }}
       >
         {title}
       </h3>
 
       {/* Horizontal scroll track — exact CategoryRow.js ScrollTrack */}
-      <div
-        style={{
-          display: 'flex',
-          gap: 12,
-          overflowX: 'auto',
-          paddingBottom: 6,
-          scrollBehavior: 'smooth',
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
+      <div className="flex gap-3 overflow-x-auto pb-1.5 scroll-smooth">
         {items.map((item) => (
           <ContentCard
             key={item.id}

@@ -25,3 +25,6 @@ export type { TabsProps } from './Tabs';
 
 export { Toggle } from './Toggle';
 export type { ToggleProps } from './Toggle';
+
+export { ToastContainer } from './Toast';
+export type { ToastData } from './Toast';

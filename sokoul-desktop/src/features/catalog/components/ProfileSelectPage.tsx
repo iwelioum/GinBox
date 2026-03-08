@@ -9,6 +9,7 @@ import { motion, AnimatePresence }           from 'framer-motion'
 import { endpoints }                         from '@/shared/api/client'
 import { useProfileStore }                   from '@/stores/profileStore'
 import { TitleBar }                          from '../../../shared/components/layout/TitleBar'
+import { Skeleton }                          from '@/shared/components/ui'
 import type { Profile }                      from '../../../shared/types/index'
 
 export default function ProfileSelectPage() {
@@ -56,36 +57,20 @@ export default function ProfileSelectPage() {
       {/* Electron window controls — no Navbar on this page */}
       <TitleBar />
 
-      <div style={{
-        minHeight:      '100vh',
-        background:     'var(--color-bg-primary)',
-        display:        'flex',
-        flexDirection:  'column',
-        alignItems:     'center',
-        justifyContent: 'center',
-        fontFamily:     'var(--font-main)',
-      }}>
+      <div className="min-h-screen bg-[var(--color-bg-primary)] flex flex-col items-center justify-center font-sans">
         {/* Title */}
-        <h1 style={{
-          color:        'var(--color-text-primary)',
-          fontSize:     'clamp(1.5rem, 4vw, 2.5rem)',
-          fontWeight:   700,
-          marginBottom: '2.5rem',
-          letterSpacing: '-0.02em',
-        }}>
+        <h1 className="text-dp-text text-[clamp(1.5rem,4vw,2.5rem)] font-bold mb-10 tracking-tight">
           {t('profile.whosWatching')}
         </h1>
 
         {/* Profile grid + create button */}
-        <div style={{
-          display:   'flex',
-          flexWrap:  'wrap',
-          gap:       '1.5rem',
-          justifyContent: 'center',
-          maxWidth:  '700px',
-        }}>
+        <div className="flex flex-wrap gap-6 justify-center max-w-[700px]">
           {isLoading && (
-            <p style={{ color: 'var(--color-text-secondary)' }}>{t('profile.loading')}</p>
+            <div className="flex gap-6 justify-center">
+              <Skeleton variant="circle" />
+              <Skeleton variant="circle" />
+              <Skeleton variant="circle" />
+            </div>
           )}
 
           {/* Existing profile cards */}
@@ -95,46 +80,17 @@ export default function ProfileSelectPage() {
               onClick={() => handleSelectProfile(profile)}
               whileHover={{ scale: 1.06, y: -4 }}
               whileTap={{ scale: 0.97 }}
-              style={{
-                background:   'var(--color-bg-glass)',
-                border:       '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 'var(--radius-card)',
-                padding:      '1.5rem 2rem',
-                cursor:       'pointer',
-                display:      'flex',
-                flexDirection:'column',
-                alignItems:   'center',
-                gap:          '0.75rem',
-                minWidth:     '130px',
-                backdropFilter: 'blur(20px)',
-                color:        'var(--color-text-primary)',
-              }}
+              className="bg-[var(--color-bg-glass)] border border-white/[0.08] rounded-[var(--radius-card)] px-8 py-6 cursor-pointer flex flex-col items-center gap-3 min-w-[130px] backdrop-blur-[20px] text-dp-text"
             >
               {/* Initial avatar */}
-              <div style={{
-                width:        64,
-                height:       64,
-                borderRadius: '50%',
-                background:   'var(--color-accent)',
-                display:      'flex',
-                alignItems:   'center',
-                justifyContent: 'center',
-                fontSize:     '1.75rem',
-                fontWeight:   700,
-              }}>
+              <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] flex items-center justify-center text-[1.75rem] font-bold">
                 {profile.name.charAt(0).toUpperCase()}
               </div>
-              <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>
+              <span className="text-[0.95rem] font-medium">
                 {profile.name}
               </span>
               {profile.isKids && (
-                <span style={{
-                  fontSize:     '0.7rem',
-                  background:   'rgba(10,132,255,0.2)',
-                  color:        'var(--color-accent)',
-                  borderRadius: 'var(--radius-pill)',
-                  padding:      '2px 8px',
-                }}>
+                <span className="text-[0.7rem] bg-[rgba(10,132,255,0.2)] text-[var(--color-accent)] rounded-full px-2 py-0.5">
                   {t('profile.kids')}
                 </span>
               )}
@@ -146,33 +102,12 @@ export default function ProfileSelectPage() {
             onClick={() => setShowForm(true)}
             whileHover={{ scale: 1.06, y: -4 }}
             whileTap={{ scale: 0.97 }}
-            style={{
-              background:   'rgba(28,28,30,0.4)',
-              border:       '2px dashed rgba(255,255,255,0.2)',
-              borderRadius: 'var(--radius-card)',
-              padding:      '1.5rem 2rem',
-              cursor:       'pointer',
-              display:      'flex',
-              flexDirection:'column',
-              alignItems:   'center',
-              gap:          '0.75rem',
-              minWidth:     '130px',
-              color:        'var(--color-text-muted)',
-            }}
+            className="bg-[rgba(28,28,30,0.4)] border-2 border-dashed border-white/20 rounded-[var(--radius-card)] px-8 py-6 cursor-pointer flex flex-col items-center gap-3 min-w-[130px] text-[var(--color-text-muted)]"
           >
-            <div style={{
-              width:        64,
-              height:       64,
-              borderRadius: '50%',
-              border:       '2px dashed rgba(255,255,255,0.2)',
-              display:      'flex',
-              alignItems:   'center',
-              justifyContent: 'center',
-              fontSize:     '2rem',
-            }}>
+            <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center text-[2rem]">
               +
             </div>
-            <span style={{ fontSize: '0.95rem' }}>{t('profile.createProfile')}</span>
+            <span className="text-[0.95rem]">{t('profile.createProfile')}</span>
           </motion.button>
         </div>
 
@@ -184,16 +119,7 @@ export default function ProfileSelectPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowForm(false)}
-              style={{
-                position:        'fixed',
-                inset:           0,
-                background:      'var(--color-bg-overlay)',
-                backdropFilter:  'blur(8px)',
-                display:         'flex',
-                alignItems:      'center',
-                justifyContent:  'center',
-                zIndex:          200,
-              }}
+              className="fixed inset-0 bg-[var(--color-bg-overlay)] backdrop-blur-[8px] flex items-center justify-center z-[200]"
             >
               <motion.form
                 initial={{ scale: 0.92, opacity: 0 }}
@@ -202,25 +128,15 @@ export default function ProfileSelectPage() {
                 transition={{ type: 'spring', damping: 22, stiffness: 300 }}
                 onClick={(e) => e.stopPropagation()}
                 onSubmit={handleSubmit}
-                style={{
-                  background:    'var(--color-bg-glass)',
-                  border:        '1px solid rgba(255,255,255,0.1)',
-                  borderRadius:  'var(--radius-modal)',
-                  padding:       '2.5rem',
-                  width:         '100%',
-                  maxWidth:      '400px',
-                  display:       'flex',
-                  flexDirection: 'column',
-                  gap:           '1.25rem',
-                }}
+                className="bg-[var(--color-bg-glass)] border border-white/10 rounded-[var(--radius-modal)] p-10 w-full max-w-[400px] flex flex-col gap-5"
               >
-                <h2 style={{ color: 'var(--color-text-primary)', fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>
+                <h2 className="text-dp-text text-[1.3rem] font-bold m-0">
                   {t('profile.newProfile')}
                 </h2>
 
                 {/* Name field */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <label style={{ color: 'var(--color-text-secondary)', fontSize: '0.85rem' }}>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[var(--color-text-secondary)] text-[0.85rem]">
                     {t('profile.profileName')}
                   </label>
                   <input
@@ -230,92 +146,56 @@ export default function ProfileSelectPage() {
                     placeholder={t('profile.placeholder')}
                     autoFocus
                     maxLength={32}
-                    style={{
-                      background:   'var(--color-bg-card)',
-                      border:       '1px solid rgba(255,255,255,0.12)',
-                      borderRadius: 'var(--radius-button)',
-                      padding:      '0.75rem 1rem',
-                      color:        'var(--color-text-primary)',
-                      fontSize:     '1rem',
-                      outline:      'none',
-                    }}
+                    className="bg-[var(--color-bg-card)] border border-white/[0.12] rounded-[var(--radius-button)] py-3 px-4 text-dp-text text-base outline-none"
                   />
                 </div>
 
                 {/* Kids mode toggle */}
-                <label style={{
-                  display:     'flex',
-                  alignItems:  'center',
-                  gap:         '0.75rem',
-                  cursor:      'pointer',
-                  color:       'var(--color-text-secondary)',
-                  fontSize:    '0.9rem',
-                }}>
+                <label className="flex items-center gap-3 cursor-pointer text-[var(--color-text-secondary)] text-[0.9rem]">
                   <div
                     onClick={() => setKids(!kids)}
+                    className="relative shrink-0 cursor-pointer transition-colors duration-200"
                     style={{
                       width:        '44px',
                       height:       '26px',
                       borderRadius: 'var(--radius-pill)',
                       background:   kids ? 'var(--color-accent)' : 'rgba(255,255,255,0.15)',
-                      position:     'relative',
-                      transition:   'background 200ms',
-                      flexShrink:   0,
-                      cursor:       'pointer',
                     }}
                   >
-                    <div style={{
-                      position:   'absolute',
-                      top:        '3px',
-                      left:       kids ? '21px' : '3px',
-                      width:      '20px',
-                      height:     '20px',
-                      borderRadius: '50%',
-                      background: 'var(--color-text-primary)',
-                      transition: 'left 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    }} />
+                    <div
+                      className="absolute top-[3px] w-5 h-5 rounded-full bg-dp-text"
+                      style={{
+                        left:       kids ? '21px' : '3px',
+                        transition: 'left 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      }}
+                    />
                   </div>
                   {t('profile.kidsMode')}
                 </label>
 
                 {/* Error */}
                 {formError && (
-                  <p style={{ color: '#ff453a', fontSize: '0.85rem', margin: 0 }}>
+                  <p className="text-[#ff453a] text-[0.85rem] m-0">
                     {formError}
                   </p>
                 )}
 
                 {/* Buttons */}
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <div className="flex gap-3 mt-2">
                   <button
                     type="button"
                     onClick={() => { setShowForm(false); setFormError(null) }}
-                    style={{
-                      flex:         1,
-                      padding:      '0.75rem',
-                      borderRadius: 'var(--radius-pill)',
-                      background:   'rgba(255,255,255,0.08)',
-                      border:       'none',
-                      color:        'var(--color-text-primary)',
-                      cursor:       'pointer',
-                      fontSize:     '0.95rem',
-                    }}
+                    className="flex-1 py-3 rounded-full bg-white/[0.08] border-none text-dp-text cursor-pointer text-[0.95rem]"
                   >
                     {t('profile.cancel')}
                   </button>
                   <button
                     type="submit"
                     disabled={createProfile.isPending}
+                    className="flex-1 py-3 rounded-full border-none text-dp-text text-[0.95rem] font-semibold"
                     style={{
-                      flex:         1,
-                      padding:      '0.75rem',
-                      borderRadius: 'var(--radius-pill)',
-                      background:   createProfile.isPending ? 'rgba(10,132,255,0.4)' : 'var(--color-accent)',
-                      border:       'none',
-                      color:        'var(--color-text-primary)',
-                      cursor:       createProfile.isPending ? 'not-allowed' : 'pointer',
-                      fontSize:     '0.95rem',
-                      fontWeight:   600,
+                      background: createProfile.isPending ? 'rgba(10,132,255,0.4)' : 'var(--color-accent)',
+                      cursor:     createProfile.isPending ? 'not-allowed' : 'pointer',
                     }}
                   >
                     {createProfile.isPending ? t('profile.creating') : t('profile.create')}

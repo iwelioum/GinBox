@@ -7,6 +7,7 @@ import { useCatalogLoader } from '../hooks/useCatalogLoader';
 import { HeroBanner }       from './HeroBanner';
 import { BrandRow }         from './BrandRow';
 import { ContentRail }      from './ContentRail';
+import { Skeleton }         from '@/shared/components/ui';
 import type { CatalogMeta } from '@/shared/types';
 
 // ── Title cycling ─────────────────────────────────────────────────────────────
@@ -181,11 +182,10 @@ const RAILS: RailConfig[] = [
 // ── Loading / Error states ────────────────────────────────────────────────────
 
 function LoadingState(): React.ReactElement {
-  const { t } = useTranslation();
   return (
-    <p style={{ color: 'rgba(249,249,249,0.45)', fontSize: 13, padding: '20px 0', letterSpacing: '1px' }}>
-      {t('home.loadingCatalog')}
-    </p>
+    <div className="flex gap-4 overflow-hidden py-5">
+      <Skeleton variant="rail" count={5} />
+    </div>
   );
 }
 

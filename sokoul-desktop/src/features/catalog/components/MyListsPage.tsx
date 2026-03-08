@@ -6,6 +6,7 @@ import { useTranslation }                from 'react-i18next'
 import { motion }                        from 'framer-motion'
 import { useLists, useListItems }        from '../../../shared/hooks/useLists'
 import { ContentCard }                   from './ContentCard'
+import { Skeleton }                          from '@/shared/components/ui'
 import type { UserList, ListItem, CatalogMeta } from '../../../shared/types/index'
 
 export default function MyListsPage() {
@@ -26,47 +27,28 @@ export default function MyListsPage() {
   const { data: items = [], isLoading: itemsLoading } = useListItems(selectedListId)
 
   return (
-    <div style={{
-      minHeight:  '100vh',
-      background: 'var(--color-bg-primary)',
-      padding:    'calc(var(--titlebar-height) + var(--navbar-height) + 2rem) var(--section-px) 2rem',
-      fontFamily: 'var(--font-main)',
-      color: 'var(--color-text-primary)'
-    }}>
+    <div
+      className="min-h-screen bg-[var(--color-bg-primary)] font-sans text-dp-text"
+      style={{ padding: 'calc(var(--titlebar-height) + var(--navbar-height) + 2rem) var(--section-px) 2rem' }}
+    >
 
       {/* Page title */}
-      <h1 style={{
-        fontSize:      'clamp(1.5rem, 3vw, 2rem)',
-        fontWeight:    700,
-        marginBottom:  '1.5rem',
-        letterSpacing: '-0.02em',
-      }}>
+      <h1 className="text-[clamp(1.5rem,3vw,2rem)] font-bold mb-6 tracking-tight">
         {t('lists.heading')}
       </h1>
 
       {/* List selector — pill tabs */}
-      <div style={{
-        display:      'flex',
-        gap:          '0.5rem',
-        flexWrap:     'wrap',
-        marginBottom: '2rem',
-      }}>
+      <div className="flex gap-2 flex-wrap mb-8">
         {lists.map((list: UserList) => (
           <button
             key={list.id}
             onClick={() => setSelectedListId(list.id)}
+            className="px-5 py-1.5 rounded-full border-none text-dp-text cursor-pointer text-[0.9rem] transition-colors duration-150"
             style={{
-              padding:       '0.4rem 1.25rem',
-              borderRadius:  'var(--radius-pill)',
-              border:        'none',
-              background:    list.id === selectedListId
+              background: list.id === selectedListId
                 ? 'var(--color-accent)'
                 : 'var(--color-bg-card)',
-              color:         'var(--color-text-primary)',
-              cursor:        'pointer',
-              fontSize:      '0.9rem',
-              fontWeight:    list.id === selectedListId ? 600 : 400,
-              transition:    'background 150ms',
+              fontWeight: list.id === selectedListId ? 600 : 400,
             }}
           >
             {list.name}
@@ -76,28 +58,27 @@ export default function MyListsPage() {
 
       {/* Selected list content */}
       {itemsLoading ? (
-        <p style={{ color: 'var(--color-text-secondary)' }}>{t('lists.loading')}</p>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(185px,1fr))] gap-5">
+          <Skeleton variant="card" />
+          <Skeleton variant="card" />
+          <Skeleton variant="card" />
+          <Skeleton variant="card" />
+          <Skeleton variant="card" />
+          <Skeleton variant="card" />
+        </div>
       ) : items.length === 0 ? (
-        <div style={{
-          padding:   '4rem',
-          textAlign: 'center',
-          color:     'var(--color-text-muted)',
-        }}>
-          <p style={{ fontSize: '1.1rem' }}>
+        <div className="p-16 text-center text-[var(--color-text-muted)]">
+          <p className="text-[1.1rem]">
             {activeList ? t('lists.listEmpty', { name: activeList.name }) : t('lists.noLists')}
           </p>
-          <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
+          <p className="text-[0.85rem] mt-2">
             {t('lists.addFromDetail')}
           </p>
         </div>
       ) : (
         <motion.div
           layout
-          style={{
-            display:             'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))',
-            gap:                 '1.25rem',
-          }}
+          className="grid grid-cols-[repeat(auto-fill,minmax(185px,1fr))] gap-5"
         >
           {items.map((item: ListItem) => {
             const meta: CatalogMeta = {
