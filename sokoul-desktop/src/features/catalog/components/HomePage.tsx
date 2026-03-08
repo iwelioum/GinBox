@@ -1,4 +1,4 @@
-// HomePage.tsx — Premium Netflix 2025 × Infuse × Apple TV dark aesthetic redesign
+// HomePage.tsx
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { ContentRail }      from './ContentRail';
 import { Skeleton }         from '@/shared/components/ui';
 import type { CatalogMeta } from '@/shared/types';
 
-// ── Title cycling ─────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Title cycling ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 //
 // Each rail alternates between a short label ("Action") and a contextual tagline
 // ("No brakes. No mercy."). The cycle is 25 seconds per rail: 15s showing the
@@ -40,7 +40,7 @@ function getRailDisplay(
   return ((tick + railIndex) % CYCLE) < LABEL_TICKS ? title : tagline;
 }
 
-// ── Rail configuration (25 distinct sections) ─────────────────────────────────
+// ÔöÇÔöÇ Rail configuration (25 distinct sections) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 interface RailConfig {
   key:         string;
@@ -179,7 +179,7 @@ const RAILS: RailConfig[] = [
   },
 ];
 
-// ── Loading / Error states ────────────────────────────────────────────────────
+// ÔöÇÔöÇ Loading / Error states ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 function LoadingState(): React.ReactElement {
   return (
@@ -192,18 +192,18 @@ function LoadingState(): React.ReactElement {
 function ErrorState(): React.ReactElement {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-[--color-text-secondary]">
-      <p className="text-lg font-semibold text-[--color-text-primary]">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, color: 'rgba(249,249,249,0.4)' }}>
+      <p style={{ fontSize: 18, fontWeight: 600, color: 'rgba(249,249,249,0.6)' }}>
         {t('home.catalogNotResponding')}
       </p>
-      <p className="text-sm text-center max-w-md leading-relaxed">
+      <p style={{ fontSize: 13, textAlign: 'center', maxWidth: 400, lineHeight: 1.6 }}>
         {t('home.catalogHelpText')}
       </p>
     </div>
   );
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Main page ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -247,12 +247,12 @@ export default function HomePage() {
   const getItems = (key: string): CatalogMeta[] => railItems[key] ?? [];
 
   if (loading && !catalog) return (
-    <div className="relative min-h-[calc(100vh-250px)] top-0 px-[--section-px]">
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 calc(3.5vw + 5px)' }}>
       <LoadingState />
     </div>
   );
   if (error && !catalog) return (
-    <div className="relative min-h-[calc(100vh-250px)] top-0 px-[--section-px]">
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 calc(3.5vw + 5px)' }}>
       <ErrorState />
     </div>
   );
@@ -265,33 +265,48 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Full-width hero (extends behind navbar, no padding-top) */}
-      {heroItems.length > 0 && <HeroBanner items={heroItems.slice(0, 5)} />}
+      <main
+        style={{
+          position: 'relative',
+          minHeight: 'calc(100vh - 250px)',
+          overflowX: 'hidden',
+          display: 'block',
+          top: 0,
+          padding: '0 calc(3.5vw + 5px)',
+        }}
+      >
+        <div
+          style={{
+            background: 'url("/images/home-background.png") center center / cover no-repeat fixed',
+            position: 'absolute',
+            inset: 0,
+            opacity: 1,
+            zIndex: -1,
+          }}
+        />
 
-      {/* Content rails section with slight overlap for depth */}
-      <div className="relative z-10 -mt-20 bg-[--color-bg-base]">
-        <div className="px-[--section-px] space-y-8">
-          <BrandRow />
+        {heroItems.length > 0 && <HeroBanner items={heroItems.slice(0, 5)} />}
 
-          {loading && <LoadingState />}
+        <BrandRow />
 
-          {RAILS.map((rail, index) => {
-            const items = getItems(rail.key);
-            if (!items || items.length === 0) return null;
-            return (
-              <ContentRail
-                key={rail.key}
-                title={getRailDisplay(t(rail.titleKey), rail.taglineKey ? t(rail.taglineKey) : undefined, index, tick)}
-                items={items}
-                cardVariant={rail.variant}
-                accentColor={rail.accentColor}
-              />
-            );
-          })}
+        {loading && <LoadingState />}
 
-          {Object.values(sections).every(arr => arr.length === 0) && !loading && <ErrorState />}
-        </div>
-      </div>
+        {RAILS.map((rail, index) => {
+          const items = getItems(rail.key);
+          if (!items || items.length === 0) return null;
+          return (
+            <ContentRail
+              key={rail.key}
+              title={getRailDisplay(t(rail.titleKey), rail.taglineKey ? t(rail.taglineKey) : undefined, index, tick)}
+              items={items}
+              cardVariant={rail.variant}
+              accentColor={rail.accentColor}
+            />
+          );
+        })}
+
+        {Object.values(sections).every(arr => arr.length === 0) && !loading && <ErrorState />}
+      </main>
     </>
   );
 }

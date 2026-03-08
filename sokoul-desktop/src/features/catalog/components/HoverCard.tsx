@@ -47,17 +47,14 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   return ReactDOM.createPortal(
     <div
       className="fixed z-[1000] w-[320px] rounded-xl overflow-hidden
-                 bg-[var(--color-bg-overlay)] border border-[var(--color-border)]
-                 backdrop-blur-xl
+                 bg-[#141827] border border-white/10
+                 shadow-2xl shadow-black/80
                  animate-hovercard-in"
-      style={{ 
-        top, left, transformOrigin,
-        boxShadow: 'var(--shadow-overlay)'
-      }}
+      style={{ top, left, transformOrigin }}
       onMouseLeave={onLeave}
     >
-      {/* Backdrop image section */}
-      <div className="relative w-full aspect-video overflow-hidden rounded-t-xl">
+      {/* Image backdrop 16:9 */}
+      <div className="relative w-full aspect-video bg-white/5 overflow-hidden">
         {backdropUrl ? (
           <img
             src={backdropUrl}
@@ -67,92 +64,88 @@ export const HoverCard: React.FC<HoverCardProps> = ({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center
-                          bg-[var(--color-bg-elevated)] text-[var(--color-text-muted)] text-4xl">
-            🎬
+                          text-white/10 text-4xl">
+            Movie
           </div>
         )}
 
         {/* Bottom gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t
-                        from-[var(--color-bg-overlay)] to-transparent" />
+                        from-[#141827] via-transparent to-transparent" />
 
-        {/* Action buttons on backdrop */}
+        {/* Floating action buttons */}
         <div className="absolute bottom-3 left-3 right-3
                         flex items-center justify-between">
           <div className="flex gap-2">
             {/* Play button */}
             <button className="flex items-center gap-1.5 px-4 py-2
-                               bg-[var(--color-accent)] text-white rounded-full
-                               text-xs font-bold hover:bg-[var(--color-accent-hover)]
-                               transition-[var(--transition-fast)]">
-              ▶ Lire
+                               bg-white text-black rounded-full
+                               text-xs font-bold hover:bg-white/90
+                               transition-colors">
+              ÔûÂ {t('common.play')}
             </button>
-            {/* Watchlist button */}
+            {/* + List button */}
             <button className="w-8 h-8 rounded-full bg-white/20
                                border border-white/30 text-white
                                flex items-center justify-center
-                               hover:bg-white/30 transition-[var(--transition-fast)]
+                               hover:bg-white/30 transition-colors
                                text-sm font-bold"
-              title={t('detail.addToMyList')}>
+              title={t('detail.addToMyList')}
+            >
               +
             </button>
           </div>
           {/* Type badge */}
           {item._kind && (
-            <span className="text-[10px] text-[var(--color-text-muted)] bg-black/40
-                             px-2 py-0.5 rounded-full">
+            <span className="text-[10px] text-white/50 bg-black/40
+                             px-2 py-0.5 rounded-full ">
               {KIND_LABELS[item._kind] ?? item._kind}
             </span>
           )}
         </div>
       </div>
 
-      {/* Content section */}
-      <div className="p-4">
+      {/* Infos */}
+      <div className="px-4 py-3 space-y-2">
+
         {/* Title */}
-        <h3 className="text-[1rem] font-semibold text-[var(--color-text-primary)]
-                       line-clamp-1 mb-2">
+        <h3 className="text-sm font-semibold text-white leading-snug
+                       line-clamp-1">
           {title}
         </h3>
 
-        {/* Metadata row */}
-        <div className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)] mb-3">
+        {/* Inline metadata */}
+        <div className="flex items-center gap-2 text-[11px] text-white/50 flex-wrap">
           {rating && (
-            <>
-              <span className="text-amber-400 font-semibold">★ {rating}</span>
-              <span>·</span>
-            </>
+            <span className="text-yellow-400 font-semibold">Ôÿà {rating}</span>
           )}
-          {year && (
-            <>
-              <span>{year}</span>
-              {runtime && <span>·</span>}
-            </>
-          )}
+          {year && <span>{year}</span>}
           {runtime && <span>{runtime}</span>}
+          {item._status === 'returning' && (
+            <span className="text-green-400 font-medium">ÔùÅ {t('common.ongoing')}</span>
+          )}
         </div>
 
-        {/* Genre pills */}
+        {/* Genres (3 max) */}
         {item._genres.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
+          <div className="flex flex-wrap gap-1">
             {item._genres.slice(0, 3).map(g => (
               <span key={g}
                 className="text-[10px] px-2 py-0.5 rounded-full
-                           bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)]
-                           border border-[var(--color-border)]">
+                           bg-white/8 text-white/50 border border-white/10">
                 {g}
               </span>
             ))}
           </div>
         )}
 
-        {/* Synopsis */}
+        {/* Synopsis (2 lines max) */}
         {item.overview && (
-          <p className="text-[0.875rem] text-[var(--color-text-secondary)]
-                        line-clamp-3 leading-relaxed">
+          <p className="text-[11px] text-white/40 leading-relaxed line-clamp-2">
             {item.overview}
           </p>
         )}
+
       </div>
     </div>,
     document.body

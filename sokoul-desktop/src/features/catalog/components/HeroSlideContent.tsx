@@ -1,8 +1,8 @@
-// HeroSlideContent.tsx — Premium title, metadata, synopsis, and action buttons
+// HeroSlideContent.tsx ÔÇö Badge, logo / title, metadata, synopsis, and
+// action buttons rendered inside the hero content overlay.
 
 import * as React        from 'react';
 import { useNavigate }   from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { motion }        from 'framer-motion';
 import { Play, Info }    from 'lucide-react';
 import type { CatalogMeta } from '@/shared/types';
@@ -17,7 +17,6 @@ export interface HeroSlideContentProps {
 
 export const HeroSlideContent: React.FC<HeroSlideContentProps> = ({ item, heroLogo }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const { ripples, addRipple } = useRipple();
 
   const title     = item.title ?? item.name ?? '';
@@ -31,103 +30,125 @@ export const HeroSlideContent: React.FC<HeroSlideContentProps> = ({ item, heroLo
 
   return (
     <>
-      {/* ── Premium badge indicator ──────────────────────────────────── */}
       {badge && (
         <motion.div
-          animate={{ opacity: [0.7, 1, 0.7] }}
+          animate={{ opacity: [0.72, 1, 0.72] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-          className="mb-3"
+          style={{ marginBottom: 12 }}
         >
-          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white border ${
-            badge === 'new' 
-              ? 'bg-[--color-accent]/80 border-[--color-accent]/35' 
-              : 'bg-red-600/80 border-red-400/35'
-          }`}>
-            {badge === 'new' ? '✦ Nouveau' : '▲ Tendance'}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '3px 10px', borderRadius: 20, fontSize: 10,
+            fontWeight: 800, letterSpacing: '0.07em', textTransform: 'uppercase' as const,
+            background: badge === 'new' ? 'rgba(0,99,229,0.82)' : 'rgba(220,80,0,0.82)',
+            color: '#fff',
+            border: `1px solid ${badge === 'new' ? 'rgba(100,160,255,0.35)' : 'rgba(255,130,50,0.35)'}`,
+          }}>
+            {badge === 'new' ? 'Ô£ª New' : 'Ôû▓ Trending'}
           </span>
         </motion.div>
       )}
 
-      {/* ── Title or logo ─────────────────────────────────────────── */}
       {heroLogo ? (
         <img
-          src={heroLogo} 
-          alt={title} 
-          loading="lazy"
-          className="max-h-24 max-w-lg object-contain mb-4 drop-shadow-2xl"
+          src={heroLogo} alt={title} loading="lazy"
+          style={{
+            maxHeight: 96, maxWidth: 420, objectFit: 'contain',
+            marginBottom: 18, filter: 'drop-shadow(0 4px 28px rgba(0,0,0,0.95))', display: 'block',
+          }}
         />
       ) : (
-        <h1 className="text-[--text-hero] font-black tracking-[-0.035em] leading-tight mb-4 text-[--color-text-primary] drop-shadow-2xl">
+        <h1 style={{
+          fontSize: 'clamp(1.9rem, 3.8vw, 3.4rem)', fontWeight: 900,
+          letterSpacing: '-0.035em', lineHeight: 1.06, marginBottom: 16,
+          color: '#f9f9f9', textShadow: '0 2px 24px rgba(0,0,0,0.95)',
+        }}>
           {title}
         </h1>
       )}
 
-      {/* ── Metadata row ──────────────────────────────────────────── */}
-      <div className="flex items-center gap-2 mb-3 flex-wrap text-sm text-[--color-text-secondary]">
-        {year && <span className="font-medium">{year}</span>}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+        {year && (
+          <span style={{ fontSize: 12.5, color: 'rgba(249,249,249,0.55)', fontWeight: 500 }}>{year}</span>
+        )}
         {rating != null && rating > 0 && (
           <>
-            <span className="text-white/20">·</span>
-            <div className="flex items-center gap-1">
-              <span className="text-yellow-400">⭐</span>
-              <span className="text-green-400 font-bold">{Math.round(rating * 10)}%</span>
-            </div>
+            <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 11 }}>┬À</span>
+            <span style={{ fontSize: 12.5, color: '#4ade80', fontWeight: 700 }}>{Math.round(rating * 10)}%</span>
           </>
         )}
         {duration && (
           <>
-            <span className="text-white/20">·</span>
-            <span className="font-medium">{duration}</span>
+            <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 11 }}>┬À</span>
+            <span style={{ fontSize: 12.5, color: 'rgba(249,249,249,0.55)', fontWeight: 500 }}>{duration}</span>
           </>
         )}
-        {genres.slice(0, 2).map(g => (
-          <span key={g} className="px-2 py-1 rounded border border-white/15 bg-black/40 text-xs font-medium">
+        {genres.slice(0, 3).map(g => (
+          <span key={g} style={{
+            fontSize: 10.5, padding: '2px 8px', borderRadius: 5,
+            border: '1px solid rgba(255,255,255,0.13)', background: 'rgba(0,0,0,0.38)',
+            color: 'rgba(249,249,249,0.62)', fontWeight: 500,
+          }}>
             {g}
           </span>
         ))}
       </div>
 
-      {/* ── Synopsis with line clamping ──────────────────────────── */}
       {synopsis && (
-        <p className="text-base text-[--color-text-primary] leading-relaxed mb-6 max-w-xl line-clamp-2">
+        <p style={{
+          fontSize: 14, color: 'rgba(249,249,249,0.80)', lineHeight: 1.65,
+          marginBottom: 24, maxWidth: 500, display: '-webkit-box',
+          WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+        } as React.CSSProperties}>
           {synopsis}
         </p>
       )}
 
-      {/* ── Action buttons row ───────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        {/* Primary watch button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <motion.button
           onClick={(e) => { addRipple(e); navigate(`/detail/${mediaType}/${item.id}`); }}
-          whileHover={{ scale: 1.025, boxShadow: '0 0 28px rgba(108, 99, 255, 0.3)' }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="relative overflow-hidden flex items-center gap-2 px-6 py-3 rounded-lg bg-[--color-accent] text-white font-bold text-sm tracking-[-0.01em] border-none cursor-pointer select-none hover:bg-[--color-accent-hover] transition-colors"
+          whileHover={{ boxShadow: '0 0 28px rgba(255,255,255,0.26)', scale: 1.025 }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+          style={{
+            position: 'relative', overflow: 'hidden', display: 'flex',
+            alignItems: 'center', gap: 8, padding: '11px 26px', borderRadius: 8,
+            background: '#f9f9f9', color: '#040714', fontSize: 14, fontWeight: 700,
+            border: 'none', cursor: 'pointer', letterSpacing: '-0.01em', userSelect: 'none',
+          }}
         >
           {ripples.map(r => (
             <motion.span
               key={r.id}
-              initial={{ scale: 0, opacity: 0.4 }}
+              initial={{ scale: 0, opacity: 0.40 }}
               animate={{ scale: 5, opacity: 0 }}
               transition={{ duration: 0.65, ease: 'easeOut' }}
-              className="absolute rounded-full w-16 h-16 bg-white/20 pointer-events-none"
-              style={{ left: r.x - 32, top: r.y - 32 }}
+              style={{
+                position: 'absolute', borderRadius: '50%', width: 64, height: 64,
+                background: 'rgba(4,7,20,0.18)', left: r.x - 32, top: r.y - 32,
+                pointerEvents: 'none',
+              }}
             />
           ))}
-          <Play size={16} fill="white" strokeWidth={0} />
-          {t('hero.play', 'Lire')}
+          <Play size={15} fill="#040714" strokeWidth={0} />
+          Watch
         </motion.button>
 
-        {/* Secondary info button */}
         <motion.button
           onClick={() => navigate(`/detail/${mediaType}/${item.id}`)}
-          whileHover={{ scale: 1.025, backgroundColor: 'rgba(255,255,255,0.15)' }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg bg-black/40 text-[--color-text-primary] font-semibold text-sm tracking-[-0.01em] border border-white/25 cursor-pointer select-none backdrop-blur-sm hover:border-white/40 transition-all"
+          whileHover={{ scale: 1.025, background: 'rgba(255,255,255,0.10)' }}
+          whileTap={{ scale: 0.96 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 22 }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8, padding: '11px 22px',
+            borderRadius: 8, background: 'rgba(0,0,0,0.38)', color: '#f9f9f9',
+            fontSize: 14, fontWeight: 600, border: '1px solid rgba(255,255,255,0.25)',
+            cursor: 'pointer', letterSpacing: '-0.01em', backdropFilter: 'blur(8px)',
+            userSelect: 'none',
+          }}
         >
-          <Info size={16} />
-          {t('hero.moreInfo', 'Détails')}
+          <Info size={15} />
+          More info
         </motion.button>
       </div>
     </>

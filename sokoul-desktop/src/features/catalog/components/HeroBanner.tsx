@@ -1,4 +1,4 @@
-// HeroBanner.tsx — Premium Netflix 2025 × Infuse × Apple TV dark aesthetic redesign
+// HeroBanner.tsx ÔÇö Cinematic hero v3 (composer)
 //
 // Sub-components: HeroSlide, HeroIndicators
 // Hooks:          useHeroRotation, useDominantColor
@@ -15,13 +15,13 @@ import { useDominantColor } from './useDominantColor';
 import { HeroSlide }        from './HeroSlide';
 import { HeroIndicators }   from './HeroIndicators';
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Types ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 interface HeroBannerProps {
   items: CatalogMeta[];
 }
 
-// ── HeroBanner ────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ HeroBanner ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
   const slides = items.slice(0, MAX_SLIDES);
@@ -58,8 +58,16 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
   };
 
   return (
-    <section
-      className="relative w-full h-[70vh] min-h-[500px] overflow-hidden"
+    <div
+      style={{
+        position:    'relative',
+        marginLeft:  'calc(-3.5vw - 5px)',
+        marginRight: 'calc(-3.5vw - 5px)',
+        marginTop:   0,
+        height:      '65vh',
+        minHeight:    520,
+        overflow:    'hidden',
+      }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -80,7 +88,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
           onSelect={handleDotSelect}
         />
       )}
-    </section>
+    </div>
   );
 };
 

@@ -1,7 +1,8 @@
-// ContentCard.tsx — Premium Netflix 2025 × Infuse × Apple TV redesign
+// ContentCard.tsx ÔÇö Exact replica of CategoryCard.js from Disney+ clone
 //
-// Aspect-driven responsive design · Clean poster default · Rich hover reveals
-// Poster: aspect-[2/3] · Landscape: aspect-video · Tailwind + CSS variables only
+// Fixed 280├ù157px ┬À border-radius 8px ┬À border 2px rgba(249,249,249,0.08)
+// Hover: scale(1.05), border-color rgba(249,249,249,0.5), box-shadow
+// Backdrop image + overlay gradient + fanart logo bottom center
 
 import * as React from 'react';
 import { Link }        from 'react-router-dom';
@@ -18,7 +19,7 @@ function imgUrl(path: string | undefined | null, size = 'w780'): string | null {
   return `${TMDB_IMAGE_BASE}${size}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Types ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 interface ContentCardProps {
   item:       CatalogMeta;
@@ -28,17 +29,19 @@ interface ContentCardProps {
   onHoverLeave?: () => void;
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// ÔöÇÔöÇ Component ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
 
 const ContentCard: React.FC<ContentCardProps> = ({
   item, variant, className, onHoverEnter, onHoverLeave,
 }) => {
+  const [hovered, setHovered] = React.useState(false);
+
   const mediaType  = item.media_type ?? item.type ?? 'movie';
   const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
   // 'tv' and 'series' both map to the TV fanart endpoint
   const fanartType = (mediaType === 'series' || mediaType === 'tv') ? 'tv' : 'movie' as 'movie' | 'tv';
 
-  // Fanart logo — load immediately; errors silently return null (no logo shown)
+  // Fanart logo ÔÇö load immediately; errors silently return null (no logo shown)
   const { data: fanartData } = useQuery<FanartResponse | null>({
     queryKey:  ['fanart-card', fanartType, tmdbId],
     queryFn:   async () => {
@@ -63,70 +66,105 @@ const ContentCard: React.FC<ContentCardProps> = ({
   const src      = isPoster ? (topPoster ?? poster ?? backdrop) : (backdrop ?? topPoster);
   if (!src) return null;
 
-  // Format rating for display
-  const rating = item.vote_average;
-  const formattedRating = rating && rating > 0 ? rating.toFixed(1) : null;
-
   return (
     <div
-      className={`group relative overflow-hidden rounded-card cursor-pointer transition-all duration-200 
-        hover:scale-[1.04] hover:shadow-card-hover ${variant === 'poster' ? 'aspect-[2/3]' : 'aspect-video'} 
-        ${className ?? ''}`}
+      className={className ?? ''}
+      style={{
+        flex: isPoster ? '0 0 200px' : '0 0 280px',
+        height: isPoster ? 300 : 157,
+        borderRadius: 8,
+        overflow: 'hidden',
+        position: 'relative',
+        cursor: 'pointer',
+        border: '2px solid rgba(249,249,249,0.08)',
+        transition: 'all 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+        ...(hovered ? {
+          transform: 'scale(1.05)',
+          borderColor: 'rgba(249,249,249,0.5)',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.7)',
+          zIndex: 2,
+        } : {}),
+      }}
       onMouseEnter={(e) => {
+        setHovered(true);
         onHoverEnter?.(item.id, e.currentTarget.getBoundingClientRect());
       }}
-      onMouseLeave={() => { onHoverLeave?.(); }}
+      onMouseLeave={() => { setHovered(false); onHoverLeave?.(); }}
     >
-      <Link to={detailPath} className="block w-full h-full relative">
-        {/* Main poster image */}
+      <Link
+        to={detailPath}
+        style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}
+      >
+        {/* Backdrop */}
         <img
           src={src}
           alt={title}
-          className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            position: 'absolute',
+            inset: 0,
+          }}
           loading="lazy"
           draggable={false}
         />
-        
-        {/* Hover overlay gradient - only visible on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent 
-          opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-        
-        {/* Rating badge - top-right, revealed on hover */}
-        {formattedRating && (
-          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200
-            bg-amber-500/20 text-amber-300 text-[10px] px-1.5 py-0.5 rounded-full font-medium backdrop-blur-sm">
-            ⭐ {formattedRating}
-          </div>
-        )}
-        
-        {/* Heart icon - top-right below rating, revealed on hover */}
-        <div className="absolute top-2 right-2 mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-          <div className="w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-            <svg className="w-3.5 h-3.5 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-        </div>
-        
-        {/* Title - bottom, revealed on hover when no fanart logo */}
-        {!logoUrl && (
-          <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 
-            transition-opacity duration-200">
-            <h3 className="text-sm font-semibold text-white line-clamp-1 drop-shadow-lg">
-              {title}
-            </h3>
-          </div>
-        )}
-        
-        {/* Logo (fanart) - always visible when available, centered bottom */}
-        {logoUrl && (
+        {/* Overlay gradient */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(to top, rgba(4,7,20,0.55) 0%, rgba(4,7,20,0.1) 40%, transparent 100%)',
+          }}
+        />
+        {/* Logo (fanart) ÔÇö mandatory identifier; title text only when no logo */}
+        {logoUrl !== null ? (
           <img
             src={logoUrl}
             alt={title}
-            className="absolute bottom-3 left-1/2 transform -translate-x-1/2 max-w-[62%] max-h-12 object-contain
-              filter drop-shadow-lg z-10"
+            style={{
+              position: 'absolute',
+              bottom: 14,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              maxWidth: '62%',
+              maxHeight: 52,
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.95))',
+              zIndex: 2,
+            }}
             loading="lazy"
           />
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 14,
+              left: 0,
+              right: 0,
+              textAlign: 'center',
+              padding: '0 12px',
+              zIndex: 2,
+            }}
+          >
+            <span
+              style={{
+                color: '#fff',
+                fontSize: isPoster ? 13 : 12,
+                fontWeight: 700,
+                textShadow: '0 2px 10px rgba(0,0,0,0.95)',
+                letterSpacing: '0.03em',
+                lineHeight: 1.3,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {title}
+            </span>
+          </div>
         )}
       </Link>
     </div>
