@@ -1,4 +1,4 @@
-// ContentRail.tsx ÔÇö Exact replica of CategoryRow.js from Disney+ clone
+// ContentRail.tsx -- Exact replica of CategoryRow.js from Disney+ clone
 //
 // Horizontal scroll (flex, gap 12px, overflow-x auto, hidden scrollbar)
 // Title with border-left 3px solid accent
@@ -9,7 +9,7 @@ import type { LucideIcon } from 'lucide-react';
 import type { CatalogMeta } from '@/shared/types';
 import { ContentCard }      from './ContentCard';
 
-// ÔöÇÔöÇ Types ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Types -------------------------------------------------------------------
 
 interface ContentRailProps {
   title:        string;
@@ -25,7 +25,7 @@ interface ContentRailProps {
   className?:   string;
 }
 
-// ÔöÇÔöÇ Component ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Component ----------------------------------------------------------------
 
 const ContentRail: React.FC<ContentRailProps> = ({
   title,
@@ -38,7 +38,7 @@ const ContentRail: React.FC<ContentRailProps> = ({
 
   return (
     <section className={`mb-9 ${className ?? ''}`}>
-      {/* Title with left accent border ÔÇö exact CategoryRow.js style */}
+      {/* Title with left accent border -- exact CategoryRow.js style */}
       <h3
         className="text-dp-text text-[17px] font-bold tracking-[0.4px] mb-3.5 pl-2.5 leading-[1.3]"
         style={{ borderLeft: `3px solid ${accentColor}` }}
@@ -46,7 +46,7 @@ const ContentRail: React.FC<ContentRailProps> = ({
         {title}
       </h3>
 
-      {/* Horizontal scroll track ÔÇö exact CategoryRow.js ScrollTrack */}
+      {/* Horizontal scroll track -- exact CategoryRow.js ScrollTrack */}
       <div className="flex gap-3 overflow-x-auto pb-1.5 scroll-smooth">
         {items.map((item) => (
           <ContentCard

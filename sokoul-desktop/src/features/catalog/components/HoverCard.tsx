@@ -82,7 +82,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
                                bg-white text-black rounded-full
                                text-xs font-bold hover:bg-white/90
                                transition-colors">
-              ÔûÂ {t('common.play')}
+              ▶ {t('common.play')}
             </button>
             {/* + List button */}
             <button className="w-8 h-8 rounded-full bg-white/20
@@ -117,12 +117,12 @@ export const HoverCard: React.FC<HoverCardProps> = ({
         {/* Inline metadata */}
         <div className="flex items-center gap-2 text-[11px] text-white/50 flex-wrap">
           {rating && (
-            <span className="text-yellow-400 font-semibold">Ôÿà {rating}</span>
+            <span className="text-yellow-400 font-semibold">⭐ {rating}</span>
           )}
           {year && <span>{year}</span>}
           {runtime && <span>{runtime}</span>}
           {item._status === 'returning' && (
-            <span className="text-green-400 font-medium">ÔùÅ {t('common.ongoing')}</span>
+            <span className="text-green-400 font-medium">🔄 {t('common.ongoing')}</span>
           )}
         </div>
 

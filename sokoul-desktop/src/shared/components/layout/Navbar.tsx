@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useProfileStore } from '@/stores/profileStore';
 import { useScrollPosition } from '@/shared/hooks/useScrollPosition';
 
-// ── Nav items ─────────────────────────────────────────────────────────────────
+// -- Nav items ----------------------------------------------------------------
 
 const NAV_ITEMS = [
   { to: '/',            labelKey: 'navbar.home',        icon: '/images/home-icon.svg'      },
@@ -22,7 +22,7 @@ const NAV_ITEMS = [
   { to: '/collections', labelKey: 'navbar.collections', icon: '/images/original-icon.svg'  },
 ] as const;
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// -- Component ----------------------------------------------------------------
 
 const Navbar: React.FC = () => {
   const { t }         = useTranslation();
@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
         className="flex items-center justify-between"
         style={{ height: 'var(--navbar-height)', padding: '0 36px' }}
       >
-      {/* ── Logo ── */}
+        {/* -- Logo -- */}
       <NavLink
         to="/"
         className="flex-shrink-0"
@@ -67,7 +67,7 @@ const Navbar: React.FC = () => {
         />
       </NavLink>
 
-      {/* ── NavMenu ── */}
+        {/* -- NavMenu -- */}
       <div
         className="flex items-center flex-row flex-nowrap h-full"
         style={{ marginLeft: 25, marginRight: 'auto' }}
@@ -119,7 +119,7 @@ const Navbar: React.FC = () => {
         })}
       </div>
 
-      {/* ── Avatar + dropdown ── */}
+        {/* -- Avatar + dropdown -- */}
       {activeProfile !== null && activeProfile !== undefined && (
         <div className="relative flex items-center justify-center cursor-pointer group/avatar"
           style={{ height: 48, width: 48 }}

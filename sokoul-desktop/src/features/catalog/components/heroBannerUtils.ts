@@ -1,17 +1,17 @@
-// heroBannerUtils.ts ÔÇö Shared constants, helpers, and Framer Motion variants
+// heroBannerUtils.ts -- Shared constants, helpers, and Framer Motion variants
 // used across HeroBanner sub-components.
 
 import * as React            from 'react';
 import type { CatalogMeta } from '@/shared/types';
 import { TMDB_IMAGE_BASE }  from '@/shared/constants/tmdb';
 
-// ÔöÇÔöÇ Constants ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Constants ----------------------------------------------------------------
 
 export const AUTOPLAY_MS  = 7_000;
 export const MAX_SLIDES   = 8;
 export const DEFAULT_TINT = 'rgba(4,7,20,0.97)';
 
-// ÔöÇÔöÇ Image helper ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Image helper -------------------------------------------------------------
 
 export function imgUrl(
   path: string | undefined | null,
@@ -24,7 +24,7 @@ export function imgUrl(
   return `${TMDB_IMAGE_BASE}${size}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
-// ÔöÇÔöÇ Metadata helpers ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Metadata helpers ---------------------------------------------------------
 
 export function getYear(item: CatalogMeta): string {
   const raw = item.release_date ?? item.first_air_date ?? String(item.year ?? '');
@@ -58,7 +58,7 @@ export function computeBadge(item: CatalogMeta): 'new' | 'trending' | null {
   return null;
 }
 
-// ÔöÇÔöÇ Framer Motion variants ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Framer Motion variants ---------------------------------------------------
 
 // Background: direction-aware on the x-axis
 export const bgVariants = {
@@ -78,7 +78,7 @@ export const contentVariants = {
   exit:   { opacity: 0, y: -5 },
 };
 
-// ÔöÇÔöÇ Ripple hook (Watch button effect) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Ripple hook (Watch button effect) ---------------------------------------
 
 export interface RippleItem { id: number; x: number; y: number }
 

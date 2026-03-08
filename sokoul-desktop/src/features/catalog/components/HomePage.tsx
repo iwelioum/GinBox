@@ -10,12 +10,22 @@ import { ContentRail }      from './ContentRail';
 import { Skeleton }         from '@/shared/components/ui';
 import type { CatalogMeta } from '@/shared/types';
 
-// ÔöÇÔöÇ Title cycling ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Title cycling -----------------------------------------------------------
 //
 // Each rail alternates between a short label ("Action") and a contextual tagline
 // ("No brakes. No mercy."). The cycle is 25 seconds per rail: 15s showing the
 // label, 10s showing the tagline. Rails are staggered by one tick each (5s apart)
 // so the switch rolls across the page rather than all flipping simultaneously.
+
+// Fisher-Yates shuffle function for randomizing items
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 const TICK_MS     = 5_000; // one tick = 5 seconds
 const LABEL_TICKS = 3;     // show label for 3 ticks  (15s)
@@ -40,7 +50,7 @@ function getRailDisplay(
   return ((tick + railIndex) % CYCLE) < LABEL_TICKS ? title : tagline;
 }
 
-// ÔöÇÔöÇ Rail configuration (25 distinct sections) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Rail configuration (25 distinct sections) ----------------------------------
 
 interface RailConfig {
   key:         string;
@@ -179,7 +189,7 @@ const RAILS: RailConfig[] = [
   },
 ];
 
-// ÔöÇÔöÇ Loading / Error states ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Loading / Error states --------------------------------------------------
 
 function LoadingState(): React.ReactElement {
   return (
@@ -203,7 +213,7 @@ function ErrorState(): React.ReactElement {
   );
 }
 
-// ÔöÇÔöÇ Main page ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Main page ----------------------------------------------------------------
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -238,7 +248,7 @@ export default function HomePage() {
 
       const deduplicated = filtered.filter(item => !seen.has(item.id));
       deduplicated.forEach(item => seen.add(item.id));
-      result[rail.key] = deduplicated;
+      result[rail.key] = shuffle(deduplicated);
     }
 
     return result;
@@ -257,11 +267,15 @@ export default function HomePage() {
     </div>
   );
 
-  const heroItems = getItems('trending').length > 0
-    ? getItems('trending')
-    : getItems('top10').length > 0
-      ? getItems('top10')
-      : Object.values(sections).flat().slice(0, 8);
+  const heroItems = React.useMemo(() => {
+    const trending = getItems('trending');
+    if (trending.length > 0) return shuffle(trending);
+    
+    const top10 = getItems('top10');
+    if (top10.length > 0) return shuffle(top10);
+    
+    return shuffle(Object.values(sections).flat()).slice(0, 8);
+  }, [getItems, sections]);
 
   return (
     <>

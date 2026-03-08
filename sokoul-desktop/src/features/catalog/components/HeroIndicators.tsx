@@ -1,4 +1,4 @@
-// HeroIndicators.tsx ÔÇö Dot navigation with thumbnail previews and slide counter.
+// HeroIndicators.tsx -- Dot navigation with thumbnail previews and slide counter.
 
 import * as React            from 'react';
 import { useState }          from 'react';

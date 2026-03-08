@@ -1,4 +1,4 @@
-// HeroSlide.tsx ÔÇö Background (Ken Burns + gradients), progress bar,
+// HeroSlide.tsx -- Background (Ken Burns + gradients), progress bar,
 // and animated content overlay for one hero slide.
 
 import * as React from 'react';
@@ -9,7 +9,7 @@ import {
 } from './heroBannerUtils';
 import { HeroSlideContent } from './HeroSlideContent';
 
-// ÔöÇÔöÇ Types ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Types -------------------------------------------------------------------
 
 export interface HeroSlideProps {
   item:         CatalogMeta;
@@ -21,7 +21,7 @@ export interface HeroSlideProps {
   slideCount:   number;
 }
 
-// ÔöÇÔöÇ Component ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Component ----------------------------------------------------------------
 
 export const HeroSlide: React.FC<HeroSlideProps> = ({
   item, safeIdx, direction, paused, dominantTint, heroLogo, slideCount,
@@ -31,7 +31,7 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
 
   return (
     <>
-      {/* ÔöÇÔöÇ Background crossfade + Ken Burns ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */}
+      {/* -- Background crossfade + Ken Burns ------------------------------- */}
       <AnimatePresence mode="sync" custom={direction}>
         <motion.div
           key={`bg-${safeIdx}`}
@@ -82,7 +82,7 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
         </motion.div>
       </AnimatePresence>
 
-      {/* ÔöÇÔöÇ Progress bar ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */}
+      {/* -- Progress bar ----------------------------------------------------- */}
       {!paused && slideCount > 1 && (
         <motion.div
           key={`progress-${safeIdx}`}
@@ -96,7 +96,7 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
         />
       )}
 
-      {/* ÔöÇÔöÇ Content panel ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */}
+      {/* -- Content panel ---------------------------------------------------- */}
       <div style={{
         position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end',
         paddingBottom: 60, paddingLeft: 'calc(3.5vw + 5px)', paddingRight: 'calc(3.5vw + 5px)',

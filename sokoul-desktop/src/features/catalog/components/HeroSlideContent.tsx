@@ -1,4 +1,4 @@
-// HeroSlideContent.tsx ÔÇö Badge, logo / title, metadata, synopsis, and
+// HeroSlideContent.tsx -- Badge, logo / title, metadata, synopsis, and
 // action buttons rendered inside the hero content overlay.
 
 import * as React        from 'react';
@@ -44,7 +44,7 @@ export const HeroSlideContent: React.FC<HeroSlideContentProps> = ({ item, heroLo
             color: '#fff',
             border: `1px solid ${badge === 'new' ? 'rgba(100,160,255,0.35)' : 'rgba(255,130,50,0.35)'}`,
           }}>
-            {badge === 'new' ? 'Ô£ª New' : 'Ôû▓ Trending'}
+            {badge === 'new' ? '★ New' : '🔥 Trending'}
           </span>
         </motion.div>
       )}
@@ -73,13 +73,13 @@ export const HeroSlideContent: React.FC<HeroSlideContentProps> = ({ item, heroLo
         )}
         {rating != null && rating > 0 && (
           <>
-            <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 11 }}>┬À</span>
+            <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 11 }}>•</span>
             <span style={{ fontSize: 12.5, color: '#4ade80', fontWeight: 700 }}>{Math.round(rating * 10)}%</span>
           </>
         )}
         {duration && (
           <>
-            <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 11 }}>┬À</span>
+            <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 11 }}>•</span>
             <span style={{ fontSize: 12.5, color: 'rgba(249,249,249,0.55)', fontWeight: 500 }}>{duration}</span>
           </>
         )}

@@ -7,6 +7,21 @@
 export function extractLogo(data: unknown): string | null {
   if (!data) return null;
   const d = data as Record<string, Array<{ url: string; lang?: string }>>;
-  const logos = d.hdmovielogo ?? d.hdtvlogo ?? d.movielogo ?? d.tvlogo ?? [];
-  return (logos.find(l => l.lang === 'fr') ?? logos.find(l => l.lang === 'en') ?? logos[0])?.url ?? null;
+
+  // Exhaustive priority: HD logos > standard logos > clear logos/art
+  const keys = [
+    'hdmovielogo', 'hdtvlogo',
+    'movielogo', 'tvlogo',
+    'clearlogo',
+    'hdclearart', 'clearart',
+  ];
+
+  for (const key of keys) {
+    const arr = d[key];
+    if (!Array.isArray(arr) || arr.length === 0) continue;
+    const match = arr.find(l => l.lang === 'fr') ?? arr.find(l => l.lang === 'en') ?? arr[0];
+    if (match?.url) return match.url;
+  }
+
+  return null;
 }

@@ -1,4 +1,4 @@
-// HeroBanner.tsx ÔÇö Cinematic hero v3 (composer)
+// HeroBanner.tsx -- Cinematic hero v3 (composer)
 //
 // Sub-components: HeroSlide, HeroIndicators
 // Hooks:          useHeroRotation, useDominantColor
@@ -15,13 +15,13 @@ import { useDominantColor } from './useDominantColor';
 import { HeroSlide }        from './HeroSlide';
 import { HeroIndicators }   from './HeroIndicators';
 
-// ÔöÇÔöÇ Types ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- Types -------------------------------------------------------------------
 
 interface HeroBannerProps {
   items: CatalogMeta[];
 }
 
-// ÔöÇÔöÇ HeroBanner ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+// -- HeroBanner ---------------------------------------------------------------
 
 const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
   const slides = items.slice(0, MAX_SLIDES);
