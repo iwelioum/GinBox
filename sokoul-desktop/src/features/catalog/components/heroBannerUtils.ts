@@ -7,7 +7,7 @@ import { TMDB_IMAGE_BASE }  from '@/shared/constants/tmdb';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-export const AUTOPLAY_MS  = 7_000;
+export const AUTOPLAY_MS  = 8_000;
 export const MAX_SLIDES   = 8;
 export const DEFAULT_TINT = 'rgba(4,7,20,0.97)';
 

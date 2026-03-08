@@ -43,13 +43,13 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.statusProgress')}
       </h3>
 
       {showSeriesStatus && (
-        <div className="mb-5">
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
             {t('filters.seriesStatus')}
           </p>
           <div className="flex flex-wrap gap-2">
@@ -60,8 +60,10 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
               if (count === 0) return null;
               return (
                 <button key={value} onClick={() => toggleStatus(value)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-xl text-sm font-medium transition-all min-w-[110px] border ${
-                    active ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/90'
+                  className={`flex flex-col items-start px-3 py-2 rounded-full text-sm font-medium transition-all min-w-[110px] border ${
+                    active 
+                      ? 'bg-accent text-white border-accent' 
+                      : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="inline-flex items-center gap-1.5">
@@ -80,7 +82,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
 
       {profileActive ? (
         <div>
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
             {t('filters.myProgress')}
           </p>
           <div className="flex flex-wrap gap-2 mb-4">
@@ -90,15 +92,17 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
               const ProgressIcon = USER_STATUS_ICONS[value];
               return (
                 <button key={value} onClick={() => toggleUserStatus(value)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-xl text-sm font-medium transition-all min-w-[130px] border ${
-                    active ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/90'
+                  className={`flex flex-col items-start px-3 py-2 rounded-full text-sm font-medium transition-all min-w-[130px] border ${
+                    active 
+                      ? 'bg-accent text-white border-accent' 
+                      : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="inline-flex items-center gap-1.5">
                     <ProgressIcon size={13} />
                     {t(labelKey)}
                   </span>
-                  <span className={`text-[10px] mt-0.5 ${active ? 'text-black/50' : 'text-white/30'}`}>
+                  <span className={`text-xs mt-0.5 ${active ? 'text-white/70' : 'text-text-muted'}`}>
                     {t(sublabelKey)} · {count}
                   </span>
                 </button>

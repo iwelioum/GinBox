@@ -22,73 +22,38 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
   };
 
   return (
-    <div style={{ width: '100%' }}>
+    <div className="w-full">
       {/* Clickable bar */}
       <div
         data-testid="progress-bar"
         onClick={handleClick}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        style={{
-          width:        '100%',
-          height:       hovered ? 'var(--player-bar-h-hover, 5px)' : 'var(--player-bar-h, 3px)',
-          background:   'var(--player-progress-bg, rgba(255,255,255,0.15))',
-          borderRadius: 4,
-          cursor:       'pointer',
-          position:     'relative',
-          transition:   'height var(--player-timing, 0.2s) var(--player-ease, ease)',
-        }}
+        className={`
+          group/progress w-full cursor-pointer relative rounded-full transition-all duration-150
+          ${hovered ? 'h-[5px]' : 'h-[3px]'}
+          bg-white/15
+        `}
+        style={{ pointerEvents: 'auto' }}
       >
         {/* Fill */}
         <div
-          style={{
-            width:        `${progress}%`,
-            height:       '100%',
-            background:   'var(--player-progress-fill, #F5F5F5)',
-            borderRadius: 4,
-            transition:   'width 0.3s linear',
-            position:     'relative',
-          }}
+          className="h-full bg-accent rounded-full relative transition-all duration-300 ease-linear"
+          style={{ width: `${progress}%` }}
         >
           {/* Scrubber — visible only on hover */}
           {hovered && (
             <div
-              style={{
-                position:      'absolute',
-                right:         -6,
-                top:           '50%',
-                transform:     'translateY(-50%)',
-                width:         'var(--player-scrubber-sz, 12px)',
-                height:        'var(--player-scrubber-sz, 12px)',
-                background:    '#fff',
-                borderRadius:  '50%',
-                pointerEvents: 'none',
-                boxShadow:     '0 0 4px rgba(0,0,0,0.4)',
-              }}
+              className="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg pointer-events-none"
             />
           )}
         </div>
       </div>
 
-      {/* Current time / duration */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 5 }}>
-        <span
-          style={{
-            color:              'var(--player-text-muted, rgba(245,245,245,0.6))',
-            fontSize:           12,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {formatTime(position)}
-        </span>
-        <span
-          style={{
-            color:              'var(--player-text-muted, rgba(245,245,245,0.6))',
-            fontSize:           12,
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {formatTime(duration)}
+      {/* Time Display */}
+      <div className="flex justify-center mt-2">
+        <span className="text-text-secondary text-sm font-mono">
+          {formatTime(position)} / {formatTime(duration)}
         </span>
       </div>
     </div>

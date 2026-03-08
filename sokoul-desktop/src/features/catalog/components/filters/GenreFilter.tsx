@@ -47,27 +47,29 @@ export const GenreFilter: React.FC<GenreFilterProps> = ({
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.genres')}
       </h3>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {displayedGenres.map(({ name, count }) => {
           const active = filters.genres.includes(name);
           return (
             <button key={name} onClick={() => toggleGenre(name)}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 whitespace-nowrap flex items-center gap-1 ${
-                active ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 ${
+                active 
+                  ? 'bg-accent text-white font-medium' 
+                  : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
               }`}
             >
               {name}
-              <span className={`font-mono text-[10px] ${active ? 'text-black/50' : 'text-white/30'}`}>{count}</span>
+              <span className={`text-xs font-mono ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
             </button>
           );
         })}
       </div>
       {hasMore && (
         <button onClick={() => setShowAll((v) => !v)}
-          className="mt-2 text-[11px] text-white/35 hover:text-white/70 transition-colors"
+          className="mt-3 text-xs text-text-muted hover:text-accent transition-colors"
         >
           {showAll
             ? t('common.showLess')

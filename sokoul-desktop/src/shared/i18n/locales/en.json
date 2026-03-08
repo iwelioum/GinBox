@@ -214,7 +214,11 @@
     "creating": "Creating...",
     "errorCreating": "Error creating profile.",
     "nameRequired": "Name is required.",
-    "nameTooLong": "Name too long (max 32 characters)."
+    "nameTooLong": "Name too long (max 32 characters).",
+    "manageProfiles": "Manage Profiles",
+    "done": "Done",
+    "editProfile": "Edit Profile",
+    "save": "Save"
   },
   "detail": {
     "seasonEpisode": "Season & episode",

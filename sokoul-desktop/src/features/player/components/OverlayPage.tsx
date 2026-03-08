@@ -157,14 +157,12 @@ export default function OverlayPage() {
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        className="relative flex flex-col gap-4 px-6 pb-6"
         style={{
-          position: 'relative',
           /* CSS custom properties from player.tokens.css drive overlay gradient */
           background: 'var(--player-overlay-bot, linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%))',
-          padding: '0 var(--player-pad-h, 16px) var(--player-pad-v, 12px)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 4,
+          minHeight: 'var(--player-overlay-h, 120px)',
+          justifyContent: 'flex-end',
           boxSizing: 'border-box',
           ...uiVisible,
         }}

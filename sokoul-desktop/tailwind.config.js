@@ -6,28 +6,55 @@ export default {
   ],
   theme: {
     extend: {
-      // ── Disney+ colour tokens ──────────────────────────────────────────────
-      // Ex : bg-dp-bg · text-dp-text · border-dp-text/10 · border-dp-text/80
+      // ── Premium Netflix 2025 × Infuse × Apple TV Design Tokens ──
       colors: {
-        dp: {
-          bg:   '#040714',
-          nav:  '#090b13',
-          text: '#f9f9f9',
+        'bg-base':     'var(--color-bg-base)',
+        'bg-elevated': 'var(--color-bg-elevated)',
+        'bg-overlay':  'var(--color-bg-overlay)',
+        'border':      'var(--color-border)',
+        'text-primary':'var(--color-text-primary)',
+        'text-secondary':'var(--color-text-secondary)',
+        'text-muted':  'var(--color-text-muted)',
+        'accent':      'var(--color-accent)',
+        'accent-hover':'var(--color-accent-hover)',
+        'danger':      'var(--color-danger)',
+        'success':     'var(--color-success)',
+        // Keep dp aliases for backwards compat
+        dp: { 
+          bg: 'var(--color-bg-base)', 
+          nav: 'var(--color-bg-elevated)', 
+          text: 'var(--color-text-primary)' 
         },
       },
 
-      // ── Font Avenir-Roman (Disney+ clone) ─────────────────────────────────
       fontFamily: {
-        sans: ["'Avenir-Roman'", 'Inter', 'ui-sans-serif', 'sans-serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
 
       height: {
-        navbar: '70px',
+        navbar: '64px',
+      },
+
+      spacing: {
+        'xs': '4px', 
+        'sm': '8px', 
+        'md': '16px', 
+        'lg': '24px', 
+        'xl': '40px', 
+        '2xl': '64px',
+      },
+
+      borderRadius: {
+        'card': '8px', 
+        'pill': '9999px', 
+        'modal': '16px', 
+        'button': '8px',
       },
 
       boxShadow: {
-        'card':       '0 26px 30px -10px rgba(0,0,0,0.69), 0 16px 10px -10px rgba(0,0,0,0.73)',
-        'card-hover': '0 40px 58px -16px rgba(0,0,0,0.80), 0 30px 22px -10px rgba(0,0,0,0.72)',
+        'card': '0 8px 24px rgba(0,0,0,0.4)',
+        'card-hover': '0 24px 60px rgba(0,0,0,0.6)',
+        'overlay': '0 24px 60px rgba(0,0,0,0.6)',
       },
 
       letterSpacing: {
@@ -47,11 +74,16 @@ export default {
           '0%':   { opacity: '0', transform: 'scale(0.94) translateY(6px)' },
           '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
         },
+        'page-enter': {
+          '0%': { opacity: '0', transform: 'translateY(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'hero-progress': 'hero-progress 5s linear forwards',
         'fade-up':       'fade-up 0.4s ease-out forwards',
         'hovercard-in':  'hovercard-in 0.18s ease-out forwards',
+        'page-enter':    'page-enter 200ms ease-out forwards',
       },
     },
   },

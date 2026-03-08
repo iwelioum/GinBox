@@ -18,26 +18,30 @@ export const YearRangeFilter: React.FC<FilterSectionProps> = ({ filters, onChang
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.releasePeriod')}
       </h3>
       <DualRangeSlider value={filters.yearRange} onChange={(r) => onChange({ ...filters, yearRange: r })} />
-      <div className="flex justify-between text-[11px] text-white/40 mt-2 mb-3 font-mono">
+      <div className="flex justify-between text-xs text-text-muted mt-2 mb-3 font-mono">
         <span>{filters.yearRange[0]}</span>
         <span>{filters.yearRange[1] === YEAR_MAX ? t('common.today') : filters.yearRange[1]}</span>
       </div>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         <button onClick={() => onChange({ ...filters, yearRange: [YEAR_MIN, YEAR_MAX] })}
-          className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-            isDefaultYear ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+          className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+            isDefaultYear 
+              ? 'bg-accent text-white font-medium' 
+              : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
           }`}
         >{t('common.all')}</button>
         {DECADE_PRESETS.map(({ labelKey, range }) => {
           const active = filters.yearRange[0] === range[0] && filters.yearRange[1] === range[1];
           return (
             <button key={labelKey} onClick={() => applyPreset(range)}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                active ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                active 
+                  ? 'bg-accent text-white font-medium' 
+                  : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
               }`}
             >{t(labelKey)}</button>
           );

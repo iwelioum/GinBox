@@ -1,8 +1,4 @@
-// ContentRail.tsx — Exact replica of CategoryRow.js from Disney+ clone
-//
-// Horizontal scroll (flex, gap 12px, overflow-x auto, hidden scrollbar)
-// Title with border-left 3px solid accent
-// Interface preserved for compatibility with ActorPage, BrowsePage, etc.
+// ContentRail.tsx — Premium horizontal content rail with Netflix 2025 aesthetic
 
 import * as React from 'react';
 import type { LucideIcon } from 'lucide-react';
@@ -37,17 +33,19 @@ const ContentRail: React.FC<ContentRailProps> = ({
   if (!items || items.length === 0) return null;
 
   return (
-    <section className={`mb-9 ${className ?? ''}`}>
-      {/* Title with left accent border — exact CategoryRow.js style */}
-      <h3
-        className="text-dp-text text-[17px] font-bold tracking-[0.4px] mb-3.5 pl-2.5 leading-[1.3]"
-        style={{ borderLeft: `3px solid ${accentColor}` }}
-      >
-        {title}
-      </h3>
+    <section className={`mb-10 ${className ?? ''}`}>
+      {/* Premium section header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-[--color-text-primary] tracking-[-0.01em]">
+          {title}
+        </h2>
+        <button className="text-sm text-[--color-text-secondary] hover:text-[--color-accent] transition-colors duration-200 font-medium">
+          Voir tout →
+        </button>
+      </div>
 
-      {/* Horizontal scroll track — exact CategoryRow.js ScrollTrack */}
-      <div className="flex gap-3 overflow-x-auto pb-1.5 scroll-smooth">
+      {/* Horizontal scroll rail with snap behavior */}
+      <div className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-2">
         {items.map((item) => (
           <ContentCard
             key={item.id}

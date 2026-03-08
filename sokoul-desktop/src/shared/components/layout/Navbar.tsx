@@ -1,25 +1,23 @@
-// Navbar.tsx — Disney+ Header style
-// Fixed top-0 · covers TitleBar (32px) + NavBar (70px) · z-40
-// Transparent over the hero, glassmorphism (blur 20px) after scroll
-// Nav links: underline scaleX(0→1) via before: pseudo, cubic-bezier Disney+
-// Right-side avatar with Profile dropdown on hover
+// Navbar.tsx — Netflix 2025 × Infuse × Apple TV Premium Dark Aesthetic
+// Fixed top-0, gradient background, premium glass effect on scroll
+// Nav links: center-aligned, accent underline for active state
+// Search expands inline, profile avatar with hover ring
 
 import * as React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { Search } from 'lucide-react';
 import { useProfileStore } from '@/stores/profileStore';
 import { useScrollPosition } from '@/shared/hooks/useScrollPosition';
 
-// ── Nav items ─────────────────────────────────────────────────────────────────
+// ── Main nav items (center section) ──────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { to: '/',            labelKey: 'navbar.home',        icon: '/images/home-icon.svg'      },
-  { to: '/search',      labelKey: 'navbar.search',      icon: '/images/search-icon.svg'    },
-  { to: '/lists',       labelKey: 'navbar.watchlist',   icon: '/images/watchlist-icon.svg' },
-  { to: '/films',       labelKey: 'navbar.movies',      icon: '/images/movie-icon.svg'     },
-  { to: '/series',      labelKey: 'navbar.series',      icon: '/images/series-icon.svg'    },
-  { to: '/collections', labelKey: 'navbar.collections', icon: '/images/original-icon.svg'  },
+  { to: '/',        labelKey: 'navbar.home' },
+  { to: '/films',   labelKey: 'navbar.movies' },
+  { to: '/series',  labelKey: 'navbar.series' },
+  { to: '/lists',   labelKey: 'navbar.watchlist' },
 ] as const;
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -29,137 +27,114 @@ const Navbar: React.FC = () => {
   const navigate      = useNavigate();
   const activeProfile = useProfileStore((s) => s.activeProfile);
 
+  const [searchExpanded, setSearchExpanded] = React.useState(false);
   const scrollY       = useScrollPosition();
   // Transparent while on the hero (65vh), opaque afterwards
-  const isTransparent = scrollY < window.innerHeight * 0.65;
+  const isScrolled = scrollY > window.innerHeight * 0.65;
 
   return (
-    // fixed top-0: covers the TitleBar (32px) for zero visible gap
-    // paddingTop pushes nav content away from the Electron drag area
-    // glassmorphism: rgba(9,11,19,0.85) + blur(20px) after the hero
+    // Fixed navbar with gradient background and glass effect on scroll
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-40"
-      style={{
-        paddingTop:    'var(--titlebar-height)',
-        letterSpacing: '16px',
-      }}
+      className="fixed top-0 left-0 right-0 z-50 h-[var(--navbar-height)]"
+      style={{ paddingTop: 'var(--titlebar-height)' }}
       animate={{
-        backgroundColor: isTransparent ? 'rgba(0,0,0,0)' : 'rgba(9,11,19,0.85)',
-        backdropFilter:  isTransparent ? 'blur(0px)'      : 'blur(20px)',
+        backgroundColor: isScrolled 
+          ? 'rgba(10,10,15,0.95)' 
+          : 'transparent',
+        backdropFilter: isScrolled ? 'blur(16px)' : 'blur(0px)',
       }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
-      {/* Content bar — navbar height, horizontal padding */}
-      <div
-        className="flex items-center justify-between"
-        style={{ height: 'var(--navbar-height)', padding: '0 36px' }}
-      >
-      {/* ── Logo ── */}
-      <NavLink
-        to="/"
-        className="flex-shrink-0"
-        style={{ letterSpacing: 0 }}
-      >
-        <img
-          src="/Sokoul_Logo.svg"
-          alt="Sokoul"
-          style={{ width: 80, height: 'auto', display: 'block' }}
-        />
-      </NavLink>
-
-      {/* ── NavMenu ── */}
-      <div
-        className="flex items-center flex-row flex-nowrap h-full"
-        style={{ marginLeft: 25, marginRight: 'auto' }}
-      >
-        {NAV_ITEMS.map(({ to, labelKey, icon }) => {
-          const label = t(labelKey);
-          return (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className="group/link flex items-center"
-            style={{ padding: '0 12px', textDecoration: 'none' }}
-          >
-            {/* SVG Icon */}
-            <img
-              src={icon}
-              alt={label}
-              style={{ height: 20, minWidth: 20, width: 20 }}
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-            />
-
-            {/* Label + underline animation (Disney+ ::before scaleX trick) */}
-            <span
-              className={[
-                'relative ml-1.5',
-                // Pseudo-element underline: scaleX(0) → scaleX(1) on hover
-                'before:content-[""]',
-                'before:absolute before:bottom-[-6px] before:left-0 before:right-0',
-                'before:h-[2px] before:rounded-b-[4px] before:bg-dp-text',
-                'before:scale-x-0 before:origin-left before:opacity-0',
-                'before:transition-all before:duration-[250ms]',
-                'before:[transition-timing-function:cubic-bezier(0.25,0.46,0.45,0.94)]',
-                'group-hover/link:before:scale-x-100 group-hover/link:before:opacity-100',
-              ].join(' ')}
-              style={{
-                color:         '#f9f9f9',
-                fontSize:      13,
-                letterSpacing: '1.42px',
-                lineHeight:    1.08,
-                padding:       '2px 0',
-                whiteSpace:    'nowrap',
-              }}
-            >
-              {label}
-            </span>
-          </NavLink>
-          );
-        })}
-      </div>
-
-      {/* ── Avatar + dropdown ── */}
-      {activeProfile !== null && activeProfile !== undefined && (
-        <div className="relative flex items-center justify-center cursor-pointer group/avatar"
-          style={{ height: 48, width: 48 }}
-        >
+      {/* Main content container */}
+      <div className="flex items-center justify-between h-[var(--navbar-height)] px-8">
+        
+        {/* ── Logo ── */}
+        <NavLink to="/" className="flex-shrink-0">
           <img
-            src={
-              activeProfile.avatarUrl ??
-              `https://api.dicebear.com/8.x/pixel-art/svg?seed=${activeProfile.name}`
-            }
-            alt={activeProfile.name}
-            className="w-full h-full object-cover rounded-full"
-            style={{ border: '2px solid rgba(249,249,249,0.3)' }}
+            src="/Sokoul_Logo.svg"
+            alt="Sokoul"
+            className="h-8 w-auto block"
           />
+        </NavLink>
 
-          {/* Dropdown "Sign out" — visible on hover */}
-          <div
-            className="absolute right-0 top-12 opacity-0 group-hover/avatar:opacity-100"
-            style={{
-              background:   'rgb(19,19,19)',
-              border:       '1px solid rgba(151,151,151,0.34)',
-              borderRadius: 4,
-              boxShadow:    'rgba(0,0,0,0.5) 0 0 18px 0',
-              padding:      10,
-              fontSize:     14,
-              letterSpacing: 3,
-              width:        100,
-              transition:   'opacity 1s ease',
-              whiteSpace:   'nowrap',
-            }}
-          >
-            <button
-              onClick={() => navigate('/profile')}
-              className="w-full text-left text-dp-text bg-transparent border-none cursor-pointer"
-              style={{ fontSize: 13, letterSpacing: 2, padding: '4px 0' }}
-            >
-              {t('navbar.profile')}
-            </button>
-          </div>
+        {/* ── Center nav links ── */}
+        <div className="flex items-center gap-8">
+          {NAV_ITEMS.map(({ to, labelKey }) => {
+            const label = t(labelKey);
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === '/'}
+                className={({ isActive }) =>
+                  `text-sm font-medium tracking-wide transition-colors duration-200 ${
+                    isActive
+                      ? 'text-[var(--color-text-primary)] border-b-2 border-[var(--color-accent)] pb-1'
+                      : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            );
+          })}
         </div>
-      )}
+
+        {/* ── Right section: Search + Profile ── */}
+        <div className="flex items-center gap-4">
+          
+          {/* Expandable search */}
+          <div className="flex items-center">
+            <button
+              onClick={() => setSearchExpanded(!searchExpanded)}
+              className="p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors duration-200"
+            >
+              <Search size={20} />
+            </button>
+            <motion.div
+              className="overflow-hidden"
+              initial={false}
+              animate={{ width: searchExpanded ? 240 : 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <input
+                type="text"
+                placeholder={t('navbar.search')}
+                className="w-60 ml-2 bg-transparent border-b border-white/20 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:border-[var(--color-accent)] focus:outline-none py-1 transition-colors duration-200"
+                autoFocus={searchExpanded}
+              />
+            </motion.div>
+          </div>
+
+          {/* Profile avatar */}
+          {activeProfile && (
+            <div className="relative group">
+              <button
+                onClick={() => navigate('/profile')}
+                className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-[var(--color-accent)] transition-all duration-200"
+              >
+                <img
+                  src={
+                    activeProfile.avatarUrl ??
+                    `https://api.dicebear.com/8.x/pixel-art/svg?seed=${activeProfile.name}`
+                  }
+                  alt={activeProfile.name}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+
+              {/* Profile dropdown */}
+              <div className="absolute right-0 top-full mt-2 bg-[var(--color-bg-elevated)] border border-[var(--color-border)] rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 min-w-[120px] py-2">
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="w-full px-4 py-2 text-left text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-bg-base)] transition-colors duration-150"
+                >
+                  {t('navbar.profile')}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </motion.nav>
   );

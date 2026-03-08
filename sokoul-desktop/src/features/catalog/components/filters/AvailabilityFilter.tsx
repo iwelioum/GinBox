@@ -78,41 +78,43 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.availability')}
       </h3>
 
       <button
         onClick={() => onChange({ ...filters, watchableNow: !filters.watchableNow })}
-        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all text-sm mb-5 ${
+        className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all text-sm mb-4 ${
           filters.watchableNow
-            ? 'bg-green-600/20 border-green-500 text-green-400 font-medium'
-            : 'bg-white/5 border-white/10 text-white/50 hover:border-white/30 hover:text-white/80'
+            ? 'bg-accent text-white border-accent font-medium'
+            : 'bg-transparent border-[var(--color-border)] text-text-secondary hover:bg-white/5 hover:text-text-primary'
         }`}
       >
         <span className="flex items-center gap-2">
           <Play size={14} />
           <span>{t('filters.watchableNow')}</span>
         </span>
-        <span className="text-[10px] opacity-60">{t('filters.watchableNowSub')}</span>
+        <span className="text-xs opacity-60">{t('filters.watchableNowSub')}</span>
       </button>
 
       <div className="mb-4">
-        <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+        <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
           {t('filters.sourceLabel')}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {sources.map(({ value, labelKey, icon: SourceIcon, count }) => {
             const active = filters.availSources.includes(value);
             return (
               <button key={value} onClick={() => toggleAvailSource(value)}
-                className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border transition-all duration-150 ${
-                  active ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                  active 
+                    ? 'bg-accent text-white font-medium' 
+                    : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
                 }`}
               >
                 <SourceIcon size={12} />
                 <span>{t(labelKey)}</span>
-                <span className={`font-mono text-[10px] ${active ? 'text-black/50' : 'text-white/30'}`}>{count}</span>
+                <span className={`font-mono text-xs ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
               </button>
             );
           })}
@@ -121,14 +123,16 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
 
       {(filters.availSources.includes('streaming') || filters.availSources.length === 0) && (
         <div className="mb-4">
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
             {t('filters.accessType')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {accessTypes.map(({ value, labelKey, icon: AccessIcon }) => (
               <button key={value} onClick={() => onChange({ ...filters, streamingType: value })}
-                className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                  filters.streamingType === value ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+                className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                  filters.streamingType === value 
+                    ? 'bg-accent text-white font-medium' 
+                    : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
                 }`}
               >
                 {AccessIcon ? <AccessIcon size={12} /> : null}
@@ -141,22 +145,24 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
 
       {availableProviders.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
             {t('filters.platform')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {availableProviders.map(({ id, nameKey, flag, color, count }) => {
               const active = filters.selectedProviders.includes(id);
               return (
                 <button key={id} onClick={() => toggleProvider(id)}
-                  className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full border transition-all duration-150 ${
-                    active ? 'text-white border-transparent' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/15 hover:border-white/25'
+                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition-all duration-200 ${
+                    active 
+                      ? 'text-white border-transparent' 
+                      : 'bg-transparent border-[var(--color-border)] text-text-secondary hover:bg-white/5'
                   }`}
                   style={active ? { backgroundColor: color + '33', borderColor: color } : {}}
                 >
                   <span>{flag}</span>
                   <span>{t(nameKey)}</span>
-                  <span className={`font-mono text-[10px] ${active ? 'text-white/50' : 'text-white/30'}`}>{count}</span>
+                  <span className={`font-mono text-xs ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
                 </button>
               );
             })}

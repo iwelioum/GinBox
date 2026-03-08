@@ -55,48 +55,8 @@ const CatalogFilters: React.FC<CatalogFiltersProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const hasAnyFilter = React.useMemo(() =>
-    filters.kinds.length > 0 ||
-    filters.genres.length > 0 ||
-    filters.ratingMin > 0 ||
-    filters.votesMin > 0 ||
-    filters.popularityTopN !== null ||
-    filters.yearRange[0] !== YEAR_MIN || filters.yearRange[1] !== YEAR_MAX ||
-    filters.seriesStatuses.length > 0 ||
-    filters.originalLanguages.length > 0 ||
-    filters.countries.length > 0 ||
-    filters.movieRuntimeRange !== null ||
-    filters.seasonsRange !== null ||
-    filters.episodeRtRange !== null ||
-    filters.watchableNow ||
-    filters.availSources.length > 0 ||
-    filters.selectedProviders.length > 0 ||
-    filters.streamingType !== 'all' ||
-    filters.userStatuses.length > 0 ||
-    filters.selectedRatings.length > 0,
-  [filters]);
-
-  const handleReset = React.useCallback(() => {
-    onChange(DEFAULT_FILTERS);
-  }, [onChange]);
-
   return (
-    <div className="space-y-7 text-sm">
-      {/* Header + Reset */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-base font-bold text-white/90 tracking-wide uppercase">
-          {t('filters.heading')}
-        </h2>
-        {hasAnyFilter && (
-          <button
-            onClick={handleReset}
-            className="text-xs text-white/40 hover:text-white/80 transition-colors"
-          >
-            {t('filters.reset')}
-          </button>
-        )}
-      </div>
-
+    <div className="space-y-6 text-sm">
       <ContentTypeFilter        allItems={allItems} filters={filters} onChange={onChange} />
       <GenreFilter              genreItems={genreItems} filters={filters} onChange={onChange} />
       <YearRangeFilter          filters={filters} onChange={onChange} />

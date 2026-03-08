@@ -43,19 +43,21 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.durationStructure')}
       </h3>
 
       {showMovieDuration && (
-        <div className="mb-5">
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
             {t('filters.movieDuration')}
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onChange({ ...filters, movieRuntimeRange: null })}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                filters.movieRuntimeRange === null ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                filters.movieRuntimeRange === null 
+                  ? 'bg-accent text-white font-medium' 
+                  : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
               }`}
             >{t('common.all')}</button>
             {MOVIE_RUNTIME_PRESETS.map(({ labelKey, sublabelKey, range }) => {
@@ -63,15 +65,17 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
               const count  = allItems.filter((i) => i._movieRuntime !== null && i._movieRuntime >= range[0] && i._movieRuntime <= range[1]).length;
               return (
                 <button key={labelKey} onClick={() => toggleRange('movieRuntimeRange', range)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-xl transition-all min-w-[86px] border ${
-                    active ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/90'
+                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-all min-w-[86px] border ${
+                    active 
+                      ? 'bg-accent text-white border-accent' 
+                      : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="text-xs font-medium inline-flex items-center gap-1.5">
                     <Clock3 size={12} />
                     {t(labelKey)}
                   </span>
-                  <span className={`text-[10px] mt-0.5 ${active ? 'text-black/50' : 'text-white/30'}`}>
+                  <span className={`text-xs mt-0.5 ${active ? 'text-white/70' : 'text-text-muted'}`}>
                     {t(sublabelKey)} · {count}
                   </span>
                 </button>
@@ -82,14 +86,16 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
       )}
 
       {showSeriesDuration && (
-        <div className="mb-5">
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
             {t('filters.numberOfSeasons')}
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onChange({ ...filters, seasonsRange: null })}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                filters.seasonsRange === null ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                filters.seasonsRange === null 
+                  ? 'bg-accent text-white font-medium' 
+                  : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
               }`}
             >{t('common.all')}</button>
             {SEASONS_PRESETS.map(({ labelKey, sublabelKey, range }) => {
@@ -97,15 +103,17 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
               const count  = allItems.filter((i) => i._seasonCount !== null && i._seasonCount >= range[0] && i._seasonCount <= range[1]).length;
               return (
                 <button key={labelKey} onClick={() => toggleRange('seasonsRange', range)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-xl transition-all min-w-[86px] border ${
-                    active ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/90'
+                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-all min-w-[86px] border ${
+                    active 
+                      ? 'bg-accent text-white border-accent' 
+                      : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="text-xs font-medium inline-flex items-center gap-1.5">
                     <Tv size={12} />
                     {t(labelKey)}
                   </span>
-                  <span className={`text-[10px] mt-0.5 ${active ? 'text-black/50' : 'text-white/30'}`}>
+                  <span className={`text-xs mt-0.5 ${active ? 'text-white/70' : 'text-text-muted'}`}>
                     {t(sublabelKey)} · {count}
                   </span>
                 </button>
@@ -117,13 +125,15 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
 
       {showSeriesDuration && (
         <div>
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
             {t('filters.episodeDuration')}
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onChange({ ...filters, episodeRtRange: null })}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                filters.episodeRtRange === null ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                filters.episodeRtRange === null 
+                  ? 'bg-accent text-white font-medium' 
+                  : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
               }`}
             >{t('common.all')}</button>
             {EPISODE_RUNTIME_PRESETS.map(({ labelKey, sublabelKey, range }) => {
@@ -131,15 +141,17 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
               const count  = allItems.filter((i) => i._episodeRuntime !== null && i._episodeRuntime >= range[0] && i._episodeRuntime <= range[1]).length;
               return (
                 <button key={labelKey} onClick={() => toggleRange('episodeRtRange', range)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-xl transition-all min-w-[86px] border ${
-                    active ? 'bg-white text-black border-white' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/90'
+                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-all min-w-[86px] border ${
+                    active 
+                      ? 'bg-accent text-white border-accent' 
+                      : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="text-xs font-medium inline-flex items-center gap-1.5">
                     <Clapperboard size={12} />
                     {t(labelKey)}
                   </span>
-                  <span className={`text-[10px] mt-0.5 ${active ? 'text-black/50' : 'text-white/30'}`}>
+                  <span className={`text-xs mt-0.5 ${active ? 'text-white/70' : 'text-text-muted'}`}>
                     {t(sublabelKey)} · {count}
                   </span>
                 </button>

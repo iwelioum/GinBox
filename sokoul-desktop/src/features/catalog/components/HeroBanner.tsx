@@ -1,4 +1,4 @@
-// HeroBanner.tsx — Cinematic hero v3 (composer)
+// HeroBanner.tsx — Premium Netflix 2025 × Infuse × Apple TV dark aesthetic redesign
 //
 // Sub-components: HeroSlide, HeroIndicators
 // Hooks:          useHeroRotation, useDominantColor
@@ -58,16 +58,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
   };
 
   return (
-    <div
-      style={{
-        position:    'relative',
-        marginLeft:  'calc(-3.5vw - 5px)',
-        marginRight: 'calc(-3.5vw - 5px)',
-        marginTop:   0,
-        height:      '65vh',
-        minHeight:    520,
-        overflow:    'hidden',
-      }}
+    <section
+      className="relative w-full h-[70vh] min-h-[500px] overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -88,7 +80,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
           onSelect={handleDotSelect}
         />
       )}
-    </div>
+    </section>
   );
 };
 

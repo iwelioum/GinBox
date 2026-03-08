@@ -30,7 +30,7 @@ export const ContentTypeFilter: React.FC<ContentTypeFilterProps> = ({
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.contentType')}
       </h3>
       <div className="grid grid-cols-3 gap-2">
@@ -41,13 +41,15 @@ export const ContentTypeFilter: React.FC<ContentTypeFilterProps> = ({
           if (count === 0) return null;
           return (
             <button key={kind} onClick={() => toggleKind(kind)}
-              className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-lg text-center transition-all duration-150 border ${
-                active ? 'bg-white text-black border-white font-semibold' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white/90'
+              className={`flex flex-col items-center gap-2 py-3 px-2 rounded-lg text-center transition-all duration-200 border ${
+                active 
+                  ? 'bg-accent text-white border-accent font-semibold' 
+                  : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5 hover:text-text-primary'
               }`}
             >
               <KindIcon size={16} strokeWidth={2.2} />
-              <span className="text-[10px] leading-tight">{label}</span>
-              <span className={`text-[9px] font-mono ${active ? 'text-black/50' : 'text-white/25'}`}>{count}</span>
+              <span className="text-xs leading-tight font-medium">{label}</span>
+              <span className={`text-xs font-mono ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
             </button>
           );
         })}

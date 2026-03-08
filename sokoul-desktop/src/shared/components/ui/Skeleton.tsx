@@ -4,7 +4,7 @@ import * as React from 'react';
 const cn = (...classes: (string | undefined | false | null)[]) => classes.filter(Boolean).join(' ');
 
 export interface SkeletonProps {
-  variant?: 'text' | 'card' | 'circle' | 'rail';
+  variant?: 'text' | 'card' | 'circle' | 'rail' | 'poster';
   width?: string | number;
   height?: string | number;
   count?: number;
@@ -13,9 +13,10 @@ export interface SkeletonProps {
 
 const variantClasses: Record<NonNullable<SkeletonProps['variant']>, string> = {
   text: 'h-4 w-full rounded',
-  card: 'h-40 w-full rounded-[var(--radius-card)]',
+  card: 'w-full aspect-[2/3] rounded-[var(--radius-card)]',
   circle: 'h-12 w-12 rounded-full',
-  rail: 'h-36 w-56 flex-shrink-0 rounded-[var(--radius-card)]',
+  rail: 'w-56 aspect-[2/3] flex-shrink-0 rounded-[var(--radius-card)]',
+  poster: 'w-40 h-60 aspect-[2/3] flex-shrink-0 rounded-[var(--radius-card)]',
 };
 
 export function Skeleton({
@@ -33,7 +34,7 @@ export function Skeleton({
   const items = Array.from({ length: count }, (_, i) => (
     <div
       key={i}
-      className={cn('skeleton-shimmer bg-white/5', variantClasses[variant], className)}
+      className={cn('skeleton-shimmer bg-[var(--color-bg-elevated)]', variantClasses[variant], className)}
       style={style}
     />
   ));

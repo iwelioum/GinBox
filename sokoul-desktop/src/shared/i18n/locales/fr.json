@@ -214,7 +214,11 @@
     "creating": "Création...",
     "errorCreating": "Erreur lors de la création du profil.",
     "nameRequired": "Le nom est requis.",
-    "nameTooLong": "Nom trop long (32 caractères max)."
+    "nameTooLong": "Nom trop long (32 caractères max).",
+    "manageProfiles": "Gérer les profils",
+    "done": "Terminé",
+    "editProfile": "Modifier le profil",
+    "save": "Enregistrer"
   },
   "detail": {
     "seasonEpisode": "Saison et épisode",

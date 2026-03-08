@@ -1,5 +1,4 @@
-// HeroSlide.tsx — Background (Ken Burns + gradients), progress bar,
-// and animated content overlay for one hero slide.
+// HeroSlide.tsx — Premium background with gradient overlay and animated content
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -31,7 +30,7 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
 
   return (
     <>
-      {/* ── Background crossfade + Ken Burns ─────────────────────────────── */}
+      {/* ── Full-width backdrop with premium gradient overlay ───────────── */}
       <AnimatePresence mode="sync" custom={direction}>
         <motion.div
           key={`bg-${safeIdx}`}
@@ -40,11 +39,11 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
           animate="center"
           exit="exit"
           transition={{
-            opacity: { duration: 0.4, ease: 'easeInOut' },
-            x:       { duration: 0.4, ease: 'easeOut' },
-            scale:   { duration: 0.4, ease: 'easeOut' },
+            opacity: { duration: 0.6, ease: 'easeInOut' },
+            x:       { duration: 0.6, ease: 'easeOut' },
+            scale:   { duration: 0.6, ease: 'easeOut' },
           }}
-          style={{ position: 'absolute', inset: 0 }}
+          className="absolute inset-0"
         >
           {bgImg ? (
             <motion.img
@@ -54,60 +53,40 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
               initial={{ scale: 1.0 }}
               animate={{ scale: 1.05 }}
               transition={{ duration: AUTOPLAY_MS / 1000, ease: 'linear' }}
-              style={{
-                width: '100%', height: '100%',
-                objectFit: 'cover', objectPosition: 'center 20%', display: 'block',
-              }}
+              className="w-full h-full object-cover object-[center_20%] block"
               draggable={false}
             />
           ) : (
-            <div style={{
-              width: '100%', height: '100%',
-              background: 'linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%)',
-            }} />
+            <div className="w-full h-full bg-gradient-to-br from-[--color-bg-base] to-[--color-bg-elevated]" />
           )}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: `linear-gradient(to right, ${dominantTint} 16%, rgba(4,7,20,0.68) 50%, rgba(4,7,20,0.14) 78%, transparent 100%)`,
-            transition: 'background 1.5s ease',
-          }} />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to top, rgba(4,7,20,1) 0%, rgba(4,7,20,0.60) 20%, rgba(4,7,20,0.10) 48%, transparent 65%)',
-          }} />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(4,7,20,0.38) 0%, transparent 18%)',
-          }} />
+          
+          {/* Netflix 2025 style gradient overlay: bottom to top fade */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[--color-bg-base] via-transparent to-transparent transition-all duration-[--transition-slow]" />
         </motion.div>
       </AnimatePresence>
 
-      {/* ── Progress bar ──────────────────────────────────────────────────── */}
+      {/* ── Auto-slide progress bar ──────────────────────────────────── */}
       {!paused && slideCount > 1 && (
         <motion.div
           key={`progress-${safeIdx}`}
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: AUTOPLAY_MS / 1000, ease: 'linear' }}
-          style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
-            background: 'rgba(255,255,255,0.52)', transformOrigin: 'left', zIndex: 20,
-          }}
+          className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/50 origin-left z-20"
         />
       )}
 
-      {/* ── Content panel ─────────────────────────────────────────────────── */}
-      <div style={{
-        position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end',
-        paddingBottom: 60, paddingLeft: 'calc(3.5vw + 5px)', paddingRight: 'calc(3.5vw + 5px)',
-      }}>
+      {/* ── Content overlay with responsive positioning ─────────────── */}
+      <div className="absolute inset-0 flex items-end pb-16 px-[--section-px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={`content-${safeIdx}`}
             variants={contentVariants}
-            initial="enter" animate="center" exit="exit"
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-            style={{ maxWidth: 580 }}
+            initial="enter" 
+            animate="center" 
+            exit="exit"
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="max-w-2xl"
           >
             <HeroSlideContent item={item} heroLogo={heroLogo} />
           </motion.div>

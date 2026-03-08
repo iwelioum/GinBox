@@ -1,4 +1,4 @@
-// HomePage.tsx
+// HomePage.tsx — Premium Netflix 2025 × Infuse × Apple TV dark aesthetic redesign
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -192,11 +192,11 @@ function LoadingState(): React.ReactElement {
 function ErrorState(): React.ReactElement {
   const { t } = useTranslation();
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, color: 'rgba(249,249,249,0.4)' }}>
-      <p style={{ fontSize: 18, fontWeight: 600, color: 'rgba(249,249,249,0.6)' }}>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-[--color-text-secondary]">
+      <p className="text-lg font-semibold text-[--color-text-primary]">
         {t('home.catalogNotResponding')}
       </p>
-      <p style={{ fontSize: 13, textAlign: 'center', maxWidth: 400, lineHeight: 1.6 }}>
+      <p className="text-sm text-center max-w-md leading-relaxed">
         {t('home.catalogHelpText')}
       </p>
     </div>
@@ -247,12 +247,12 @@ export default function HomePage() {
   const getItems = (key: string): CatalogMeta[] => railItems[key] ?? [];
 
   if (loading && !catalog) return (
-    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 calc(3.5vw + 5px)' }}>
+    <div className="relative min-h-[calc(100vh-250px)] top-0 px-[--section-px]">
       <LoadingState />
     </div>
   );
   if (error && !catalog) return (
-    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 calc(3.5vw + 5px)' }}>
+    <div className="relative min-h-[calc(100vh-250px)] top-0 px-[--section-px]">
       <ErrorState />
     </div>
   );
@@ -265,48 +265,33 @@ export default function HomePage() {
 
   return (
     <>
-      <main
-        style={{
-          position: 'relative',
-          minHeight: 'calc(100vh - 250px)',
-          overflowX: 'hidden',
-          display: 'block',
-          top: 0,
-          padding: '0 calc(3.5vw + 5px)',
-        }}
-      >
-        <div
-          style={{
-            background: 'url("/images/home-background.png") center center / cover no-repeat fixed',
-            position: 'absolute',
-            inset: 0,
-            opacity: 1,
-            zIndex: -1,
-          }}
-        />
+      {/* Full-width hero (extends behind navbar, no padding-top) */}
+      {heroItems.length > 0 && <HeroBanner items={heroItems.slice(0, 5)} />}
 
-        {heroItems.length > 0 && <HeroBanner items={heroItems.slice(0, 5)} />}
+      {/* Content rails section with slight overlap for depth */}
+      <div className="relative z-10 -mt-20 bg-[--color-bg-base]">
+        <div className="px-[--section-px] space-y-8">
+          <BrandRow />
 
-        <BrandRow />
+          {loading && <LoadingState />}
 
-        {loading && <LoadingState />}
+          {RAILS.map((rail, index) => {
+            const items = getItems(rail.key);
+            if (!items || items.length === 0) return null;
+            return (
+              <ContentRail
+                key={rail.key}
+                title={getRailDisplay(t(rail.titleKey), rail.taglineKey ? t(rail.taglineKey) : undefined, index, tick)}
+                items={items}
+                cardVariant={rail.variant}
+                accentColor={rail.accentColor}
+              />
+            );
+          })}
 
-        {RAILS.map((rail, index) => {
-          const items = getItems(rail.key);
-          if (!items || items.length === 0) return null;
-          return (
-            <ContentRail
-              key={rail.key}
-              title={getRailDisplay(t(rail.titleKey), rail.taglineKey ? t(rail.taglineKey) : undefined, index, tick)}
-              items={items}
-              cardVariant={rail.variant}
-              accentColor={rail.accentColor}
-            />
-          );
-        })}
-
-        {Object.values(sections).every(arr => arr.length === 0) && !loading && <ErrorState />}
-      </main>
+          {Object.values(sections).every(arr => arr.length === 0) && !loading && <ErrorState />}
+        </div>
+      </div>
     </>
   );
 }

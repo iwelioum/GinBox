@@ -4,14 +4,14 @@
 :root {
   /* Couleurs */
   --player-bg:             #000000;
-  --player-text:           #F5F5F5;
-  --player-text-muted:     rgba(245, 245, 245, 0.6);
+  --player-text:           var(--color-text-primary, #f0f0f5);
+  --player-text-muted:     var(--color-text-secondary, #9898b0);
   --player-border:         rgba(202, 202, 202, 0.26);
   --player-progress-bg:    rgba(255, 255, 255, 0.15);
   --player-progress-buf:   rgba(255, 255, 255, 0.3);
-  --player-progress-fill:  #F5F5F5;
+  --player-progress-fill:  var(--color-accent, #6c63ff);
   --player-overlay-top:    linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
-  --player-overlay-bot:    linear-gradient(to top,   rgba(0,0,0,0.85), transparent);
+  --player-overlay-bot:    linear-gradient(to top, rgba(0,0,0,0.85), transparent);
 
   /* Espacements */
   --player-pad-h:   16px;
@@ -33,6 +33,6 @@
   --player-scrubber-sz:  12px;
 
   /* Overlay */
-  --player-overlay-h:  100px;
+  --player-overlay-h:  120px;
   --player-header-h:    60px;
 }

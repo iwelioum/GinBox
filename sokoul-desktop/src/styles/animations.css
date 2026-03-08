@@ -1,4 +1,4 @@
-   animations.css — Sokoul v3 "CINÉMA VIVANT"
+/* ── animations.css — Sokoul v4 "PREMIUM EXPERIENCE" ── */
 
 @keyframes shimmer {
   0%   { background-position: -200% center; }
@@ -8,12 +8,12 @@
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.04) 25%,
-    rgba(255,255,255,0.10) 50%,
-    rgba(255,255,255,0.04) 75%
+    var(--color-bg-elevated) 25%,
+    rgba(255,255,255,0.04) 50%,
+    var(--color-bg-elevated) 75%
   );
-  background-size: 200% 100%;
-  animation: shimmer 1.8s ease-in-out infinite;
+  background-size: 400% 100%;
+  animation: shimmer 1.5s infinite;
 }
 
 @keyframes glow-pulse {
@@ -52,10 +52,28 @@
   animation: dot-expand 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+@keyframes page-enter {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: page-enter 200ms ease-out forwards;
+}
+
 .rail-scroll::-webkit-scrollbar { display: none; }
 .rail-scroll {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@keyframes hovercard-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-hovercard-in {
+  animation: hovercard-in 150ms ease-out forwards;
 }
 
 @media (max-width: 768px) {

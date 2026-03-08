@@ -70,29 +70,31 @@ export const LanguageCountryFilter: React.FC<LanguageCountryFilterProps> = ({
 
   return (
     <section>
-      <h3 className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4">
+      <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-3">
         {t('filters.languageCountry')}
       </h3>
 
       {availableLangs.length > 1 && (
         <div className="mb-4">
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
             {t('filters.originalLanguage')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {availableLangs.map(({ code, labelKey, count }) => {
               const active = filters.originalLanguages.includes(code);
               return (
                 <button key={code} onClick={() => toggleLang(code)}
-                  className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                    active ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                    active 
+                      ? 'bg-accent text-white font-medium' 
+                      : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/10">
                     <Tv size={10} />
                   </span>
                   <span>{t(labelKey)}</span>
-                  <span className={`font-mono text-[10px] ${active ? 'text-black/50' : 'text-white/30'}`}>{count}</span>
+                  <span className={`font-mono text-xs ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
                 </button>
               );
             })}
@@ -102,30 +104,32 @@ export const LanguageCountryFilter: React.FC<LanguageCountryFilterProps> = ({
 
       {availableCountries.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-2">
+          <p className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-2">
             {t('filters.productionCountry')}
           </p>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {displayedCountries.map(({ code, labelKey, count }) => {
               const active = filters.countries.includes(code);
               return (
                 <button key={code} onClick={() => toggleCountry(code)}
-                  className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border transition-all duration-150 ${
-                    active ? 'bg-white text-black border-white font-semibold' : 'bg-transparent text-white/55 border-white/20 hover:border-white/50 hover:text-white/80'
+                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                    active 
+                      ? 'bg-accent text-white font-medium' 
+                      : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
                   }`}
                 >
                   <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/10">
                     <UserRound size={10} />
                   </span>
                   <span>{t(labelKey)}</span>
-                  <span className={`font-mono text-[10px] ${active ? 'text-black/50' : 'text-white/30'}`}>{count}</span>
+                  <span className={`font-mono text-xs ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
                 </button>
               );
             })}
           </div>
           {hasMoreCountries && (
             <button onClick={() => setShowAllCountries((v) => !v)}
-              className="mt-2 text-[11px] text-white/35 hover:text-white/70 transition-colors"
+              className="mt-3 text-xs text-text-muted hover:text-accent transition-colors"
             >
               {showAllCountries
                 ? t('common.showLess')
