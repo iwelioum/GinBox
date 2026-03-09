@@ -25,49 +25,44 @@ export function InlineSourceRow({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={ok && !launching ? onPlay : undefined}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
-        borderLeft:  hovered && ok ? '2px solid rgba(255,255,255,0.28)' : '2px solid transparent',
-        background:  hovered && ok ? 'rgba(255,255,255,0.04)' : 'transparent',
-        cursor:      !ok ? 'not-allowed' : launching ? 'wait' : 'pointer',
-        opacity:     ok ? 1 : 0.45,
-        transition:  'background 0.15s ease, border-color 0.15s ease',
-        userSelect:  'none',
-      }}
+      className={[
+        'flex items-center gap-2.5 px-3 py-2.5 select-none',
+        'transition-[background,border-color] duration-[var(--transition-fast)]',
+        !ok ? 'cursor-not-allowed opacity-45' : launching ? 'cursor-wait' : 'cursor-pointer',
+        hovered && ok
+          ? 'border-l-2 border-l-white/[0.28] bg-[var(--color-white-4)]'
+          : 'border-l-2 border-l-transparent bg-transparent',
+      ].join(' ')}
     >
-      <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-        <span style={{
-          fontSize: 13, fontWeight: hovered && ok ? 600 : 500, color: 'rgba(249,249,249,0.92)',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', transition: 'font-weight 0.1s',
-        }}>
+      <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
+        <span className={[
+          'text-[13px] text-white/[0.92] truncate transition-[font-weight] duration-100',
+          hovered && ok ? 'font-semibold' : 'font-medium',
+        ].join(' ')}>
           {label}
         </span>
         <SourceBadges meta={meta} source={source} />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+      <div className="flex items-center gap-1.5 shrink-0">
         {source.size_gb > 0 && (
           <>
-            <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(249,249,249,0.55)', whiteSpace: 'nowrap' }}>
+            <span className="text-xs font-semibold text-white/[0.55] whitespace-nowrap">
               {t('sources.sizeDisplay', { size: source.size_gb.toFixed(1) })}
             </span>
-            <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 10 }}>·</span>
+            <span className="text-[var(--color-white-20)] text-[10px]">·</span>
           </>
         )}
-        <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, fontWeight: 600, color: 'rgba(249,249,249,0.45)', whiteSpace: 'nowrap' }}>
+        <span className="flex items-center gap-[3px] text-xs font-semibold text-white/45 whitespace-nowrap">
           <Zap size={10} /> {source.seeders}
         </span>
         {onDownload && (
           <button
             onClick={e => { e.stopPropagation(); onDownload(); }}
             title={t('common.download')}
-            style={{
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(255,255,255,0.35)', padding: '2px 4px',
-              display: 'flex', alignItems: 'center', transition: 'color 0.12s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.35)')}
+            className="bg-transparent border-none cursor-pointer text-white/[0.35] px-1 py-0.5
+                       flex items-center transition-colors duration-[120ms]
+                       hover:text-white/70"
           >
             <Download size={13} />
           </button>
@@ -84,29 +79,24 @@ export function BestSourceCard({
   const tLabel = cleanTitle(source.title, m);
   const { t } = useTranslation();
   return (
-    <div style={{
-      padding: '14px 16px', borderRadius: 12,
-      border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.05)',
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-    }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 }}>
-        <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: 'rgba(249,249,249,0.3)' }}>
+    <div className="p-3.5 px-4 rounded-[var(--radius-lg)] border border-[var(--color-white-12)]
+                    bg-white/5 flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-1.5 min-w-0">
+        <span className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-white/30">
           {t('sources.bestAvailableSource')}
         </span>
-        <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(249,249,249,0.88)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span className="text-[13px] font-medium text-white/[0.88] truncate">
           {tLabel}
         </span>
         <SourceBadges meta={m} source={source} />
       </div>
       <button
         onClick={onPlay} disabled={launching}
-        style={{
-          flexShrink: 0, padding: '9px 20px', borderRadius: 8,
-          background: '#fff', color: '#000', border: 'none',
-          fontSize: 13, fontWeight: 700,
-          cursor: launching ? 'wait' : 'pointer',
-          opacity: launching ? 0.7 : 1, transition: 'opacity 0.15s',
-        }}
+        className={[
+          'shrink-0 px-5 py-[9px] rounded-[var(--radius-card)] bg-white text-black',
+          'border-none text-[13px] font-bold transition-opacity duration-[var(--transition-fast)]',
+          launching ? 'cursor-wait opacity-70' : 'cursor-pointer opacity-100',
+        ].join(' ')}
       >
         {t('sources.play')}
       </button>
@@ -124,16 +114,12 @@ export function QualitySection({
   if (sources.length === 0) return null;
   return (
     <div>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8,
-        paddingBottom: 8, marginBottom: 4,
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-      }}>
-        <Icon size={12} style={{ color, flexShrink: 0 }} />
-        <span style={{ fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(249,249,249,0.4)' }}>
+      <div className="flex items-center gap-2 pb-2 mb-1 border-b border-[var(--color-border)]">
+        <Icon size={12} style={{ color }} className="shrink-0" />
+        <span className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-white/40">
           {t(label)}
         </span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(249,249,249,0.22)' }}>
+        <span className="text-[10px] font-bold text-white/[0.22]">
           ({sources.length})
         </span>
       </div>

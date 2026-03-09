@@ -30,136 +30,121 @@ const Navbar: React.FC = () => {
   const activeProfile = useProfileStore((s) => s.activeProfile);
 
   const scrollY       = useScrollPosition();
-  // Transparent while on the hero (65vh), opaque afterwards
   const isTransparent = scrollY < window.innerHeight * 0.65;
 
   return (
-    // fixed top-0: covers the TitleBar (32px) for zero visible gap
-    // paddingTop pushes nav content away from the Electron drag area
-    // glassmorphism: rgba(9,11,19,0.85) + blur(20px) after the hero
     <motion.nav
-      className="fixed top-0 left-0 right-0 z-40"
-      style={{
-        paddingTop:    'var(--titlebar-height)',
-        letterSpacing: '16px',
-      }}
+      className="fixed top-0 left-0 right-0 z-40 pt-[var(--titlebar-height)] tracking-[16px]"
       animate={{
         backgroundColor: isTransparent ? 'rgba(0,0,0,0)' : 'rgba(9,11,19,0.85)',
         backdropFilter:  isTransparent ? 'blur(0px)'      : 'blur(20px)',
       }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
     >
-      {/* Content bar — navbar height, horizontal padding */}
-      <div
-        className="flex items-center justify-between"
-        style={{ height: 'var(--navbar-height)', padding: '0 36px' }}
-      >
+      <div className="flex items-center justify-between h-[var(--navbar-height)] px-9">
         {/* -- Logo -- */}
-      <NavLink
-        to="/"
-        className="flex-shrink-0"
-        style={{ letterSpacing: 0 }}
-      >
-        <img
-          src="/Sokoul_Logo.svg"
-          alt="Sokoul"
-          style={{ width: 80, height: 'auto', display: 'block' }}
-        />
-      </NavLink>
+        <NavLink to="/" className="flex-shrink-0 tracking-normal">
+          <img
+            src="/Sokoul_Logo.svg"
+            alt="Sokoul"
+            className="w-20 h-auto block"
+          />
+        </NavLink>
 
         {/* -- NavMenu -- */}
-      <div
-        className="flex items-center flex-row flex-nowrap h-full"
-        style={{ marginLeft: 25, marginRight: 'auto' }}
-      >
-        {NAV_ITEMS.map(({ to, labelKey, icon }) => {
-          const label = t(labelKey);
-          return (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className="group/link flex items-center"
-            style={{ padding: '0 12px', textDecoration: 'none' }}
-          >
-            {/* SVG Icon */}
-            <img
-              src={icon}
-              alt={label}
-              style={{ height: 20, minWidth: 20, width: 20 }}
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-            />
+        <div className="flex items-center flex-row flex-nowrap h-full ml-[25px] mr-auto">
+          {NAV_ITEMS.map(({ to, labelKey, icon }) => {
+            const label = t(labelKey);
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === '/'}
+                className="group/link flex items-center px-3 no-underline"
+              >
+                <img
+                  src={icon}
+                  alt={label}
+                  className="h-5 w-5 min-w-[20px]"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                />
 
-            {/* Label + underline animation (Disney+ ::before scaleX trick) */}
-            <span
-              className={[
-                'relative ml-1.5',
-                // Pseudo-element underline: scaleX(0) → scaleX(1) on hover
-                'before:content-[""]',
-                'before:absolute before:bottom-[-6px] before:left-0 before:right-0',
-                'before:h-[2px] before:rounded-b-[4px] before:bg-dp-text',
-                'before:scale-x-0 before:origin-left before:opacity-0',
-                'before:transition-all before:duration-[250ms]',
-                'before:[transition-timing-function:cubic-bezier(0.25,0.46,0.45,0.94)]',
-                'group-hover/link:before:scale-x-100 group-hover/link:before:opacity-100',
-              ].join(' ')}
-              style={{
-                color:         '#f9f9f9',
-                fontSize:      13,
-                letterSpacing: '1.42px',
-                lineHeight:    1.08,
-                padding:       '2px 0',
-                whiteSpace:    'nowrap',
-              }}
-            >
-              {label}
-            </span>
-          </NavLink>
-          );
-        })}
-      </div>
+                <span
+                  className={[
+                    'relative ml-1.5',
+                    'before:content-[""]',
+                    'before:absolute before:bottom-[-6px] before:left-0 before:right-0',
+                    'before:h-[2px] before:rounded-b-[4px] before:bg-dp-text',
+                    'before:scale-x-0 before:origin-left before:opacity-0',
+                    'before:transition-all before:duration-[250ms]',
+                    'before:[transition-timing-function:cubic-bezier(0.25,0.46,0.45,0.94)]',
+                    'group-hover/link:before:scale-x-100 group-hover/link:before:opacity-100',
+                    'text-[var(--color-text-primary)] text-[13px] tracking-[1.42px]',
+                    'leading-[1.08] py-0.5 whitespace-nowrap',
+                  ].join(' ')}
+                >
+                  {label}
+                </span>
+              </NavLink>
+            );
+          })}
+        </div>
 
         {/* -- Avatar + dropdown -- */}
-      {activeProfile !== null && activeProfile !== undefined && (
-        <div className="relative flex items-center justify-center cursor-pointer group/avatar"
-          style={{ height: 48, width: 48 }}
-        >
-          <img
-            src={
-              activeProfile.avatarUrl ??
-              `https://api.dicebear.com/8.x/pixel-art/svg?seed=${activeProfile.name}`
-            }
-            alt={activeProfile.name}
-            className="w-full h-full object-cover rounded-full"
-            style={{ border: '2px solid rgba(249,249,249,0.3)' }}
-          />
+        {activeProfile !== null && activeProfile !== undefined && (
+          <div className="relative flex items-center justify-center cursor-pointer group/avatar
+                          h-12 w-12">
+            <img
+              src={
+                activeProfile.avatarUrl ??
+                `https://api.dicebear.com/8.x/pixel-art/svg?seed=${activeProfile.name}`
+              }
+              alt={activeProfile.name}
+              className="w-full h-full object-cover rounded-full border-2 border-white/30"
+            />
 
-          {/* Dropdown "Sign out" — visible on hover */}
-          <div
-            className="absolute right-0 top-12 opacity-0 group-hover/avatar:opacity-100"
-            style={{
-              background:   'rgb(19,19,19)',
-              border:       '1px solid rgba(151,151,151,0.34)',
-              borderRadius: 4,
-              boxShadow:    'rgba(0,0,0,0.5) 0 0 18px 0',
-              padding:      10,
-              fontSize:     14,
-              letterSpacing: 3,
-              width:        100,
-              transition:   'opacity 1s ease',
-              whiteSpace:   'nowrap',
-            }}
-          >
-            <button
-              onClick={() => navigate('/profile')}
-              className="w-full text-left text-dp-text bg-transparent border-none cursor-pointer"
-              style={{ fontSize: 13, letterSpacing: 2, padding: '4px 0' }}
+            {/* Dropdown — visible on hover */}
+            <div
+              className="absolute right-0 top-12 opacity-0 group-hover/avatar:opacity-100
+                         pointer-events-none group-hover/avatar:pointer-events-auto
+                         bg-[rgb(19,19,19)] border border-[rgba(151,151,151,0.34)]
+                         rounded-[var(--radius-card)] shadow-[0_8px_32px_rgba(0,0,0,0.6)]
+                         py-1.5 text-sm tracking-normal min-w-[160px]
+                         transition-opacity duration-[var(--transition-base)] whitespace-nowrap"
             >
-              {t('navbar.profile')}
-            </button>
+              <button
+                onClick={() => navigate('/profile')}
+                className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
+                           hover:bg-white/10 text-[13px] tracking-[0.5px] px-4 py-2 block
+                           transition-colors duration-[var(--transition-fast)]"
+              >
+                {t('navbar.profile')}
+              </button>
+
+              <div className="h-px bg-[rgba(151,151,151,0.2)] my-1" />
+
+              <button
+                onClick={() => navigate('/settings')}
+                className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
+                           hover:bg-white/10 text-[13px] tracking-[0.5px] px-4 py-2 block
+                           transition-colors duration-[var(--transition-fast)]"
+              >
+                {t('common.settings')}
+              </button>
+
+              <div className="h-px bg-[rgba(151,151,151,0.2)] my-1" />
+
+              <button
+                onClick={() => navigate('/profile-select')}
+                className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
+                           hover:bg-white/10 text-[13px] tracking-[0.5px] px-4 py-2 block
+                           transition-colors duration-[var(--transition-fast)]"
+              >
+                {t('navbar.switchProfile')}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </motion.nav>
   );
