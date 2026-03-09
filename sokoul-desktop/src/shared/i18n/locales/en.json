@@ -74,7 +74,9 @@
     "filterAll": "All",
     "filterMovies": "Movies",
     "filterSeries": "Series",
-    "searchHint": "Search for movies, series, and more"
+    "searchHint": "Search for movies, series, and more",
+    "recentSearches": "Recent searches",
+    "clearHistory": "Clear"
   },
   "catalog": {
     "sortPopularity": "Popularity",
