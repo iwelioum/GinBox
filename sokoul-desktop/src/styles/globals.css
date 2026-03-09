@@ -9,66 +9,7 @@
    Motion: Smooth, refined, premium feeling
 ────────────────────────────────────────────────────────────────────────────── */
 
-:root {
-  /* ── Base colors ── */
-  --color-bg-base:       #0a0a0f;
-  --color-bg-elevated:   #111118;
-  --color-bg-overlay:    #1a1a24;
-  --color-border:        rgba(255,255,255,0.06);
-  --color-text-primary:  #f0f0f5;
-  --color-text-secondary:#9898b0;
-  --color-text-muted:    #5a5a70;
-  --color-accent:        #6c63ff;
-  --color-accent-hover:  #7c74ff;
-  --color-danger:        #ff4f4f;
-  --color-success:       #4fca7a;
-
-  /* ── Backwards compat aliases (old dp-* and color-* names) ── */
-  --dp-bg:               var(--color-bg-base);
-  --dp-nav:              var(--color-bg-elevated);
-  --dp-text:             var(--color-text-primary);
-  --dp-card-border:      var(--color-border);
-  --dp-card-hover:       rgba(255,255,255,0.20);
-  --color-bg-primary:    var(--color-bg-base);
-  --color-bg-glass:      rgba(17, 17, 24, 0.75);
-  --color-bg-card:       var(--color-bg-elevated);
-
-  /* ── Typography ── */
-  --text-hero:     clamp(2rem, 5vw, 3.5rem);
-  --text-title:    1.25rem;
-  --text-body:     0.9375rem;
-  --text-caption:  0.8125rem;
-  --font-main:     'Inter', ui-sans-serif, system-ui, sans-serif;
-
-  /* ── Spacing (8px base) ── */
-  --space-xs:  4px;
-  --space-sm:  8px;
-  --space-md:  16px;
-  --space-lg:  24px;
-  --space-xl:  40px;
-  --space-2xl: 64px;
-
-  /* ── Radius ── */
-  --radius-card:   8px;
-  --radius-pill:   9999px;
-  --radius-modal:  16px;
-  --radius-button: 8px;
-
-  /* ── Shadows ── */
-  --shadow-card:       0 8px 24px rgba(0,0,0,0.4);
-  --shadow-card-hover: 0 24px 60px rgba(0,0,0,0.6);
-  --shadow-overlay:    0 24px 60px rgba(0,0,0,0.6);
-
-  /* ── Transitions ── */
-  --transition-fast: 150ms ease;
-  --transition-base: 200ms ease;
-  --transition-slow: 600ms ease;
-
-  /* ── Layout ── */
-  --section-px:       calc(3.5vw + 24px);
-  --navbar-height:    64px;
-  --titlebar-height:  32px;
-}
+/* Tokens defined in tokens.css — imported before this file in main.tsx */
 
 html { scroll-behavior: smooth; }
 
