@@ -30,6 +30,11 @@
     "ready": "Ready",
     "error": "Error",
     "showLess": "Show less",
+    "showMore": "Show more",
+    "seeAll": "See all",
+    "scrollLeft": "Scroll left",
+    "scrollRight": "Scroll right",
+    "movie": "Movie",
     "showAllCount": "Show all ({{count}})",
     "showMoreCount": "Show all (+{{count}})",
     "resultCount_one": "{{count}} result",
@@ -59,12 +64,17 @@
     "series": "SERIES",
     "collections": "COLLECTIONS",
     "logoAlt": "Sokoul",
-    "profile": "Profile"
+    "profile": "Profile",
+    "switchProfile": "Switch Profile"
   },
   "search": {
     "heading": "Search",
     "placeholder": "Search movies or series...",
-    "noResults": "No results found for \"{{query}}\"."
+    "noResults": "No results found for \"{{query}}\".",
+    "filterAll": "All",
+    "filterMovies": "Movies",
+    "filterSeries": "Series",
+    "searchHint": "Search for movies, series, and more"
   },
   "catalog": {
     "sortPopularity": "Popularity",
@@ -218,7 +228,10 @@
     "manageProfiles": "Manage Profiles",
     "done": "Done",
     "editProfile": "Edit Profile",
-    "save": "Save"
+    "save": "Save",
+    "memberSince": "Member since {{date}}",
+    "switchProfile": "Switch Profile",
+    "noActiveProfile": "No active profile"
   },
   "detail": {
     "seasonEpisode": "Season & episode",
@@ -263,6 +276,9 @@
     "unableLaunchSource": "Unable to launch this source.",
     "errorLaunchPlayback": "Error launching playback",
     "addToMyList": "Add to my list",
+    "inMyList": "In my list",
+    "seasons_one": "{{count}} season",
+    "seasons_other": "{{count}} seasons",
     "frAudioUnconfirmed": "FR audio unconfirmed",
     "startPlayback": "Start playback",
     "downloadRealDebrid": "Download via Real-Debrid",
@@ -328,7 +344,29 @@
   },
   "settings": {
     "heading": "Settings",
-    "placeholder": "Application settings — to be implemented"
+    "placeholder": "Application settings — to be implemented",
+    "sectionPlayback": "Playback preferences",
+    "audioLanguage": "Audio language",
+    "audioLanguageDesc": "Preferred language for audio tracks",
+    "langFrench": "French",
+    "langEnglish": "English",
+    "langAny": "Any",
+    "minQuality": "Minimum quality",
+    "minQualityDesc": "Sources below this resolution are ignored",
+    "preferCachedRD": "Prefer Real-Debrid cache",
+    "preferCachedRDDesc": "Prioritise cached torrents for instant playback",
+    "autoPlay": "Auto-play next episode",
+    "autoPlayDesc": "Automatically start the next episode when one finishes",
+    "sectionAccount": "Account",
+    "activeProfile": "Active profile",
+    "noProfile": "No profile selected",
+    "switchProfile": "Switch Profile",
+    "sectionAbout": "About",
+    "appName": "Application",
+    "dataSource": "Powered by",
+    "dataSourceValue": "TMDB — The Movie Database",
+    "backend": "Backend",
+    "backendValue": "Rust + Axum"
   },
   "debug": {
     "diagnostic": "DIAGNOSTIC",
@@ -555,7 +593,8 @@
     "loading": "Loading...",
     "listEmpty": "\"{{name}}\" is empty.",
     "noLists": "No lists.",
-    "addFromDetail": "Add content from the detail page."
+    "addFromDetail": "Add content from the detail page.",
+    "removeItem": "Remove from list"
   },
   "actor": {
     "fallbackName": "Actor",

@@ -30,6 +30,11 @@
     "ready": "Prêt",
     "error": "Erreur",
     "showLess": "Voir moins",
+    "showMore": "Voir plus",
+    "seeAll": "Voir tout",
+    "scrollLeft": "Défiler à gauche",
+    "scrollRight": "Défiler à droite",
+    "movie": "Film",
     "showAllCount": "Tout afficher ({{count}})",
     "showMoreCount": "Tout afficher (+{{count}})",
     "resultCount_one": "{{count}} résultat",
@@ -59,12 +64,17 @@
     "series": "SÉRIES",
     "collections": "COLLECTIONS",
     "logoAlt": "Sokoul",
-    "profile": "Profil"
+    "profile": "Profil",
+    "switchProfile": "Changer de profil"
   },
   "search": {
     "heading": "Recherche",
     "placeholder": "Rechercher des films ou séries...",
-    "noResults": "Aucun résultat trouvé pour « {{query}} »."
+    "noResults": "Aucun résultat trouvé pour « {{query}} ».",
+    "filterAll": "Tout",
+    "filterMovies": "Films",
+    "filterSeries": "Séries",
+    "searchHint": "Recherche films, séries et plus"
   },
   "catalog": {
     "sortPopularity": "Popularité",
@@ -218,7 +228,10 @@
     "manageProfiles": "Gérer les profils",
     "done": "Terminé",
     "editProfile": "Modifier le profil",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "memberSince": "Membre depuis {{date}}",
+    "switchProfile": "Changer de profil",
+    "noActiveProfile": "Aucun profil actif"
   },
   "detail": {
     "seasonEpisode": "Saison et épisode",
@@ -263,6 +276,9 @@
     "unableLaunchSource": "Impossible de lancer cette source.",
     "errorLaunchPlayback": "Erreur de lancement de la lecture",
     "addToMyList": "Ajouter à ma liste",
+    "inMyList": "Dans ma liste",
+    "seasons_one": "{{count}} saison",
+    "seasons_other": "{{count}} saisons",
     "frAudioUnconfirmed": "Audio FR non confirmé",
     "startPlayback": "Lancer la lecture",
     "downloadRealDebrid": "Télécharger via Real-Debrid",
@@ -328,7 +344,29 @@
   },
   "settings": {
     "heading": "Paramètres",
-    "placeholder": "Paramètres de l'application — à implémenter"
+    "placeholder": "Paramètres de l'application — à implémenter",
+    "sectionPlayback": "Préférences de lecture",
+    "audioLanguage": "Langue audio",
+    "audioLanguageDesc": "Langue préférée pour les pistes audio",
+    "langFrench": "Français",
+    "langEnglish": "Anglais",
+    "langAny": "Toutes",
+    "minQuality": "Qualité minimale",
+    "minQualityDesc": "Les sources en dessous de cette résolution sont ignorées",
+    "preferCachedRD": "Privilégier le cache Real-Debrid",
+    "preferCachedRDDesc": "Prioriser les torrents mis en cache pour une lecture instantanée",
+    "autoPlay": "Lecture automatique de l'épisode suivant",
+    "autoPlayDesc": "Démarrer automatiquement l'épisode suivant à la fin du précédent",
+    "sectionAccount": "Compte",
+    "activeProfile": "Profil actif",
+    "noProfile": "Aucun profil sélectionné",
+    "switchProfile": "Changer de profil",
+    "sectionAbout": "À propos",
+    "appName": "Application",
+    "dataSource": "Propulsé par",
+    "dataSourceValue": "TMDB — The Movie Database",
+    "backend": "Backend",
+    "backendValue": "Rust + Axum"
   },
   "debug": {
     "diagnostic": "DIAGNOSTIC",
@@ -555,7 +593,8 @@
     "loading": "Chargement...",
     "listEmpty": "« {{name}} » est vide.",
     "noLists": "Aucune liste.",
-    "addFromDetail": "Ajoutez du contenu depuis la page de détail."
+    "addFromDetail": "Ajoutez du contenu depuis la page de détail.",
+    "removeItem": "Retirer de la liste"
   },
   "actor": {
     "fallbackName": "Acteur",
