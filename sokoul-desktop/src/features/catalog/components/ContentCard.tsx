@@ -1,4 +1,4 @@
-// ContentCard.tsx — Image card with logo overlay (no title text)
+// ContentCard.tsx — Image card with logo overlay + styled text fallback
 
 import * as React from 'react';
 import { Link } from 'react-router-dom';
@@ -36,7 +36,7 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
 }) => {
   const [imageLoaded, setImageLoaded] = React.useState(false);
 
-  const { logoUrl, type, id } = useContentCardData(item);
+  const { identity, type, id } = useContentCardData(item);
 
   const backdrop = buildTmdbImageUrl(item.backdrop_path ?? item.background, 'w780');
   const poster = buildTmdbImageUrl(item.poster_path ?? item.poster, 'w500');
@@ -86,30 +86,48 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
           onLoad={() => setImageLoaded(true)}
         />
 
-        {logoUrl && (
-          <>
-            {/* Bottom gradient */}
-            <div
-              className={[
-                'absolute bottom-0 inset-x-0 pointer-events-none',
-                'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
-                isPoster ? 'h-[55%]' : 'h-[65%]',
-              ].join(' ')}
-            />
+        {/* Bottom gradient — always present for logo or text */}
+        <div
+          className={[
+            'absolute bottom-0 inset-x-0 pointer-events-none',
+            'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
+            isPoster ? 'h-[55%]' : 'h-[65%]',
+          ].join(' ')}
+        />
 
-            {/* Content logo */}
-            <img
-              src={logoUrl}
-              alt={`${title} logo`}
-              className={[
-                'absolute left-1/2 -translate-x-1/2 max-w-[82%] object-contain pointer-events-none',
-                '[filter:drop-shadow(0_1px_5px_rgba(0,0,0,0.95))_drop-shadow(0_0_2px_rgba(0,0,0,0.8))]',
-                isPoster ? 'bottom-3.5 max-h-[52px]' : 'bottom-[9px] max-h-[38px]',
-              ].join(' ')}
-              loading="lazy"
-              draggable={false}
-            />
-          </>
+        {/* Logo image or styled text fallback */}
+        {identity.kind === 'logo' ? (
+          <img
+            src={identity.url}
+            alt={`${title} logo`}
+            className={[
+              'absolute left-1/2 -translate-x-1/2 max-w-[82%] object-contain pointer-events-none',
+              '[filter:drop-shadow(0_1px_5px_rgba(0,0,0,0.95))_drop-shadow(0_0_2px_rgba(0,0,0,0.8))]',
+              isPoster ? 'bottom-3.5 max-h-[52px]' : 'bottom-[9px] max-h-[38px]',
+            ].join(' ')}
+            loading="lazy"
+            draggable={false}
+          />
+        ) : (
+          <span
+            className={[
+              'absolute left-3 right-3 text-center leading-tight pointer-events-none',
+              'line-clamp-2 [word-break:break-word]',
+              isPoster ? 'bottom-3.5' : 'bottom-[9px]',
+            ].join(' ')}
+            style={{
+              fontFamily: identity.style.fontFamily,
+              fontSize: isPoster ? 'clamp(0.8rem, 1.8vw, 1.1rem)' : identity.style.fontSize,
+              fontWeight: identity.style.fontWeight,
+              letterSpacing: identity.style.letterSpacing,
+              textTransform: identity.style.textTransform,
+              fontStyle: identity.style.fontStyle,
+              color: identity.style.color,
+              textShadow: identity.style.textShadow,
+            }}
+          >
+            {identity.title}
+          </span>
         )}
       </Link>
     </motion.div>
