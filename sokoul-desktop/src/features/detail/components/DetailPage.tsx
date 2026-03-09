@@ -51,26 +51,39 @@ const DetailPage: React.FC = () => {
     : null;
 
   return (
-    <div className="bg-[var(--color-bg-base)] min-h-screen">
-      {/* Full-width backdrop with gradients */}
+    <div className="relative min-h-screen" style={{ backgroundColor: 'var(--color-bg-base)' }}>
+      {/* Backdrop — couvre hero + large zone de fondu (130vh).
+          Trois couches CSS stacked sur un seul élément :
+          1) fondu vertical : image visible → fond solide à 90%
+          2) assombrissement gauche : lisibilité du texte hero
+          3) l'image elle-même                                         */}
       {bgBackdrop && (
-        <div className="fixed inset-0 z-0">
-          <img 
-            src={bgBackdrop} 
-            alt="" 
-            className="w-full h-full object-cover"
-          />
-          {/* Double gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-base)] via-[var(--color-bg-base)]/80 to-transparent" />
-        </div>
+        <div
+          style={{
+            position:  'absolute',
+            top: 0, left: 0, right: 0,
+            height:    '130vh',
+            zIndex:    0,
+            backgroundImage: [
+              'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 12%, transparent 48%, var(--color-bg-base) 92%)',
+              'linear-gradient(to right,  rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 45%, transparent 70%)',
+              `url(${bgBackdrop})`,
+            ].join(', '),
+            backgroundSize:     'auto, auto, cover',
+            backgroundPosition: 'top, top, top center',
+            backgroundRepeat:   'no-repeat',
+          }}
+        />
       )}
 
-      {/* Back button */}
+      {/* Tout le contenu est z-10 : passe au-dessus du backdrop z-0 */}
+      <div className="relative z-10">
+
+      {/* Back button — scrolls with content */}
       <button
         onClick={() => navigate(-1)}
-        className="fixed left-5 top-[calc(var(--titlebar-height,0px)+var(--navbar-height,64px)+12px)] z-50 
-                   flex items-center gap-2 px-4 py-2 rounded-lg bg-black/40 text-[var(--color-text-primary)]/90 
+        className="absolute left-5 top-[calc(var(--titlebar-height,0px)+var(--navbar-height,64px)+12px)] z-50
+                   flex items-center gap-2 px-4 py-2 rounded-lg bg-black/40 text-[var(--color-text-primary)]/90
                    text-sm font-medium border border-white/10 hover:bg-black/60 transition-colors"
       >
         <ChevronLeft size={16} />
@@ -105,8 +118,8 @@ const DetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* Content */}
-      <div className="relative z-10 px-[var(--section-px)] py-8">
+      {/* Content — remonte dans le fondu */}
+      <div className="-mt-16 px-[var(--section-px)] pt-0 pb-8">
         <InfoSection item={item} theme={data.theme} />
 
         {data.isSeries && data.seasons.length > 0 && (
@@ -136,6 +149,8 @@ const DetailPage: React.FC = () => {
           <SimilarSection items={data.similar} theme={data.theme} />
         </div>
       </div>
+
+      </div>{/* fin z-10 */}
     </div>
   );
 };
