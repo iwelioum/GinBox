@@ -9,16 +9,17 @@ import { Search, Film, ChevronRight } from 'lucide-react';
 import { endpoints }              from '@/shared/api/client';
 import type { CollectionItem }    from '../../../shared/types/index';
 import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
+import { getGenreStyleByKey }     from '@/shared/config/genreTypography';
 
 const CATEGORIES = [
-  { key: 'all',     label: 'All' },
-  { key: 'action',  label: 'Action' },
-  { key: 'fantasy', label: 'Fantasy' },
-  { key: 'scifi',   label: 'Sci-Fi' },
-  { key: 'horror',  label: 'Horror' },
-  { key: 'anime',   label: 'Anime' },
-  { key: 'comedy',  label: 'Comedy' },
-  { key: 'drama',   label: 'Drama' },
+  { key: 'all',     labelKey: 'collections.categoryAll' },
+  { key: 'action',  labelKey: 'collections.categoryAction' },
+  { key: 'fantasy', labelKey: 'collections.categoryFantasy' },
+  { key: 'scifi',   labelKey: 'collections.categorySciFi' },
+  { key: 'horror',  labelKey: 'collections.categoryHorror' },
+  { key: 'anime',   labelKey: 'collections.categoryAnime' },
+  { key: 'comedy',  labelKey: 'collections.categoryComedy' },
+  { key: 'drama',   labelKey: 'collections.categoryDrama' },
 ] as const;
 
 function detectCategory(name: string): string {
@@ -160,7 +161,7 @@ export default function CollectionsPage() {
                   : 'bg-white/[0.07] text-white/55 border border-white/[0.08] hover:bg-white/[0.12] hover:text-white/80'}
               `}
             >
-              {cat.label}
+              {t(cat.labelKey)}
             </button>
           ))}
         </div>
@@ -214,6 +215,14 @@ function CollectionCard({
         : `${TMDB_IMAGE_BASE}w342${collection.poster_path}`)
     : null;
 
+  // Map collection category to genre typography
+  const category = detectCategory(collection.name);
+  const genreKey = category === 'scifi' ? 'sci-fi'
+    : category === 'anime' ? 'animation'
+    : category === 'other' ? 'default'
+    : category;
+  const genreStyle = getGenreStyleByKey(genreKey);
+
   return (
     <button
       onClick={onClick}
@@ -247,7 +256,7 @@ function CollectionCard({
         </div>
       )}
 
-      {/* Gradient gauche → transparent */}
+      {/* Left gradient → transparent */}
       <div className="absolute inset-0"
            style={{
              background: `linear-gradient(
@@ -259,35 +268,42 @@ function CollectionCard({
              )`,
            }} />
 
-      {/* Gradient bas subtil */}
+      {/* Subtle bottom gradient */}
       <div className="absolute inset-0 bg-gradient-to-t
                       from-[#040714]/50 via-transparent to-transparent" />
 
-      {/* Text content — left */}
+      {/* Text content — genre-styled title */}
       <div className="absolute inset-0 flex flex-col justify-end p-5">
-        <h3 className="text-base font-bold text-white/95
-                       leading-tight line-clamp-2 mb-1"
-            style={{ textShadow: '0 1px 8px rgba(0,0,0,0.6)' }}>
+        <h3
+          className="leading-tight line-clamp-2 mb-1"
+          style={{
+            fontFamily: genreStyle.fontFamily,
+            fontSize: 'clamp(0.9rem, 1.8vw, 1.25rem)',
+            fontWeight: genreStyle.fontWeight,
+            letterSpacing: genreStyle.letterSpacing,
+            textTransform: genreStyle.textTransform,
+            fontStyle: genreStyle.fontStyle,
+            color: genreStyle.color,
+            textShadow: genreStyle.textShadow,
+          }}
+        >
           {collection.name}
         </h3>
 
-        <div className="flex items-center gap-2 mb-2">
+        {/* Film count + Explore — visible on hover */}
+        <div className="flex items-center gap-3
+                        opacity-0 group-hover:opacity-100
+                        translate-y-1 group-hover:translate-y-0
+                        transition-all duration-300">
           {collection.parts_count > 0 && (
             <span className="text-[11px] text-white/45">
               {t('collections.filmCount', { count: collection.parts_count })}
             </span>
           )}
-        </div>
-
-        {/* Explore button — visible on hover */}
-        <div className="flex items-center gap-1.5
-                        opacity-0 group-hover:opacity-100
-                        translate-y-1 group-hover:translate-y-0
-                        transition-all duration-300">
-          <span className="text-xs font-semibold text-white/80">
+          <span className="text-xs font-semibold text-white/80 flex items-center gap-1">
             {t('collections.exploreUniverse')}
+            <ChevronRight className="w-3.5 h-3.5 text-white/60" />
           </span>
-          <ChevronRight className="w-3.5 h-3.5 text-white/60" />
         </div>
       </div>
     </button>
