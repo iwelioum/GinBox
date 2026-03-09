@@ -1,88 +1,121 @@
-// ContentCard.tsx - Clean image-only card (no title, no logo overlay)
+// ContentCard.tsx — Image card with logo overlay (no title text)
 
 import * as React from 'react';
-import { Link }        from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import type { CatalogMeta } from '@/shared/types';
-import { getTopPosterUrl }  from '@/shared/utils/topPosters';
-import { TMDB_IMAGE_BASE }  from '@/shared/constants/tmdb';
+import { getTopPosterUrl } from '@/shared/utils/topPosters';
+import { buildTmdbImageUrl } from '@/shared/utils/image';
+import { useContentCardData } from '../hooks/useContentCardData';
 
-function imgUrl(path: string | undefined | null, size = 'w780'): string | null {
-  if (!path) return null;
-  if (path.startsWith('http')) return path.replace('/w500/', `/${size}/`);
-  return `${TMDB_IMAGE_BASE}${size}${path.startsWith('/') ? '' : '/'}${path}`;
-}
+// -- Types --------------------------------------------------------------------
 
 interface ContentCardProps {
-  item:       CatalogMeta;
-  variant:    'landscape' | 'poster';
+  item: CatalogMeta;
+  variant: 'landscape' | 'poster';
   className?: string;
   onHoverEnter?: (id: string | number, rect: DOMRect) => void;
   onHoverLeave?: () => void;
 }
 
-const ContentCard: React.FC<ContentCardProps> = ({
-  item, variant, className, onHoverEnter, onHoverLeave,
+// -- Constants ----------------------------------------------------------------
+
+const HOVER_TRANSITION = {
+  duration: 0.25,
+  ease: [0.25, 0.46, 0.45, 0.94],
+} as const;
+
+// -- Component ----------------------------------------------------------------
+
+const ContentCardInner: React.FC<ContentCardProps> = ({
+  item,
+  variant,
+  className,
+  onHoverEnter,
+  onHoverLeave,
 }) => {
-  const [hovered, setHovered] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
 
-  const mediaType  = item.media_type ?? item.type ?? 'movie';
-  const backdrop   = imgUrl(item.backdrop_path ?? item.background, 'w780');
-  const poster     = imgUrl(item.poster_path ?? item.poster, 'w500');
-  const topPoster  = getTopPosterUrl(item);
+  const { logoUrl, type, id } = useContentCardData(item);
 
-  const detailPath = `/detail/${mediaType}/${item.id}`;
-  const title      = item.title ?? item.name ?? '';
-
+  const backdrop = buildTmdbImageUrl(item.backdrop_path ?? item.background, 'w780');
+  const poster = buildTmdbImageUrl(item.poster_path ?? item.poster, 'w500');
+  const topPoster = getTopPosterUrl(item);
+  const title = item.title ?? item.name ?? '';
   const isPoster = variant === 'poster';
-  const src      = isPoster ? (topPoster ?? poster ?? backdrop) : (backdrop ?? topPoster);
+  const src = isPoster
+    ? (topPoster ?? poster ?? backdrop)
+    : (backdrop ?? topPoster);
+
   if (!src) return null;
 
   return (
-    <div
-      className={className ?? ''}
-      style={{
-        flex: isPoster ? '0 0 200px' : '0 0 280px',
-        height: isPoster ? 300 : 157,
-        borderRadius: 8,
-        overflow: 'hidden',
-        position: 'relative',
-        cursor: 'pointer',
-        border: '2px solid rgba(249,249,249,0.08)',
-        transition: 'all 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        ...(hovered ? {
-          transform: 'scale(1.05)',
-          borderColor: 'rgba(249,249,249,0.5)',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.7)',
-          zIndex: 2,
-        } : {}),
-      }}
-      onMouseEnter={(e) => {
-        setHovered(true);
-        onHoverEnter?.(item.id, e.currentTarget.getBoundingClientRect());
-      }}
-      onMouseLeave={() => { setHovered(false); onHoverLeave?.(); }}
+    <motion.div
+      className={[
+        'relative overflow-hidden cursor-pointer shrink-0 grow-0',
+        'border-2 border-white/[0.08] rounded-[var(--radius-card)]',
+        'hover:border-white/50 hover:shadow-[var(--shadow-card-hover)] hover:z-[2]',
+        'transition-[border-color,box-shadow] duration-[250ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
+        isPoster ? 'w-[200px] aspect-[2/3]' : 'w-[280px] aspect-video',
+        className,
+      ].filter(Boolean).join(' ')}
+      whileHover={{ scale: 1.05 }}
+      transition={HOVER_TRANSITION}
+      onMouseEnter={(e) =>
+        onHoverEnter?.(item.id, e.currentTarget.getBoundingClientRect())
+      }
+      onMouseLeave={onHoverLeave}
     >
-      <Link
-        to={detailPath}
-        style={{ display: 'block', width: '100%', height: '100%', position: 'relative' }}
-      >
+      <Link to={`/detail/${type}/${id}`} className="block w-full h-full relative">
+        {/* Skeleton placeholder */}
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-[var(--color-bg-elevated)] animate-pulse" />
+        )}
+
+        {/* Main artwork */}
         <img
           src={src}
           alt={title}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            position: 'absolute',
-            inset: 0,
-          }}
+          className={[
+            'absolute inset-0 w-full h-full object-cover',
+            'transition-opacity duration-300',
+            imageLoaded ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}
           loading="lazy"
           draggable={false}
+          onLoad={() => setImageLoaded(true)}
         />
+
+        {logoUrl && (
+          <>
+            {/* Bottom gradient */}
+            <div
+              className={[
+                'absolute bottom-0 inset-x-0 pointer-events-none',
+                'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
+                isPoster ? 'h-[55%]' : 'h-[65%]',
+              ].join(' ')}
+            />
+
+            {/* Content logo */}
+            <img
+              src={logoUrl}
+              alt={`${title} logo`}
+              className={[
+                'absolute left-1/2 -translate-x-1/2 max-w-[82%] object-contain pointer-events-none',
+                '[filter:drop-shadow(0_1px_5px_rgba(0,0,0,0.95))_drop-shadow(0_0_2px_rgba(0,0,0,0.8))]',
+                isPoster ? 'bottom-3.5 max-h-[52px]' : 'bottom-[9px] max-h-[38px]',
+              ].join(' ')}
+              loading="lazy"
+              draggable={false}
+            />
+          </>
+        )}
       </Link>
-    </div>
+    </motion.div>
   );
 };
+
+const ContentCard = React.memo(ContentCardInner);
 
 export { ContentCard };
