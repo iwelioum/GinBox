@@ -82,20 +82,6 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
         </motion.div>
       </AnimatePresence>
 
-      {/* -- Progress bar ----------------------------------------------------- */}
-      {!paused && slideCount > 1 && (
-        <motion.div
-          key={`progress-${safeIdx}`}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: AUTOPLAY_MS / 1000, ease: 'linear' }}
-          style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
-            background: 'rgba(255,255,255,0.52)', transformOrigin: 'left', zIndex: 20,
-          }}
-        />
-      )}
-
       {/* -- Content panel ---------------------------------------------------- */}
       <div style={{
         position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end',

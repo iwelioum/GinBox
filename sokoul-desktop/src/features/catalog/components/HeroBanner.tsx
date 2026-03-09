@@ -85,6 +85,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
         <HeroIndicators
           slides={slides}
           safeIdx={safeIdx}
+          paused={paused}
           onSelect={handleDotSelect}
         />
       )}
