@@ -34,18 +34,40 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
   onHoverEnter,
   onHoverLeave,
 }) => {
-  const [imageLoaded, setImageLoaded] = React.useState(false);
-
   const { identity, type, id } = useContentCardData(item);
 
   const backdrop = buildTmdbImageUrl(item.backdrop_path ?? item.background, 'w780');
-  const poster = buildTmdbImageUrl(item.poster_path ?? item.poster, 'w500');
+  const poster   = buildTmdbImageUrl(item.poster_path  ?? item.poster,       'w500');
   const topPoster = getTopPosterUrl(item);
-  const title = item.title ?? item.name ?? '';
+  const title   = item.title ?? item.name ?? '';
   const isPoster = variant === 'poster';
-  const src = isPoster
-    ? (topPoster ?? poster ?? backdrop)
-    : (backdrop ?? topPoster);
+
+  // Each source is tagged as textless or not so we know whether to overlay the logo.
+  // TopPoster and backdrop images are textless; standard TMDB posters have baked-in title text.
+  const srcs = React.useMemo<{ url: string; textless: boolean }[]>(() => {
+    const chain: { url: string | null; textless: boolean }[] = isPoster
+      ? [
+          { url: topPoster, textless: true  },
+          { url: poster,    textless: false },
+          { url: backdrop,  textless: true  },
+        ]
+      : [
+          { url: backdrop,   textless: true  },
+          { url: topPoster,  textless: true  },
+          { url: poster,     textless: false },
+        ];
+    return chain.filter((s): s is { url: string; textless: boolean } => Boolean(s.url));
+  }, [isPoster, topPoster, poster, backdrop]);
+
+  const [srcIdx,      setSrcIdx]      = React.useState(0);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
+
+  // Reset when item changes
+  React.useEffect(() => { setSrcIdx(0); setImageLoaded(false); }, [item.id]);
+
+  const current = srcs[srcIdx] ?? null;
+  const src = current?.url ?? null;
+  const showOverlay = current?.textless ?? false;
 
   if (!src) return null;
 
@@ -84,19 +106,25 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
           loading="lazy"
           draggable={false}
           onLoad={() => setImageLoaded(true)}
+          onError={() => {
+            if (srcIdx < srcs.length - 1) setSrcIdx(i => i + 1);
+            else setImageLoaded(true); // all sources exhausted — skeleton stays as placeholder
+          }}
         />
 
-        {/* Bottom gradient — always present for logo or text */}
-        <div
-          className={[
-            'absolute bottom-0 inset-x-0 pointer-events-none',
-            'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
-            isPoster ? 'h-[55%]' : 'h-[65%]',
-          ].join(' ')}
-        />
+        {/* Bottom gradient — only when overlaying logo/text on textless image */}
+        {showOverlay && (
+          <div
+            className={[
+              'absolute bottom-0 inset-x-0 pointer-events-none',
+              'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
+              isPoster ? 'h-[55%]' : 'h-[65%]',
+            ].join(' ')}
+          />
+        )}
 
-        {/* Logo image or styled text fallback */}
-        {identity.kind === 'logo' ? (
+        {/* Logo image or styled text — only on textless sources to avoid double-title */}
+        {showOverlay && (identity.kind === 'logo' ? (
           <img
             src={identity.url}
             alt={`${title} logo`}
@@ -128,7 +156,7 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
           >
             {identity.title}
           </span>
-        )}
+        ))}
       </Link>
     </motion.div>
   );
