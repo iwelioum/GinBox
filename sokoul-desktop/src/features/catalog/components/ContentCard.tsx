@@ -36,38 +36,36 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
 }) => {
   const { identity, type, id } = useContentCardData(item);
 
-  const backdrop = buildTmdbImageUrl(item.backdrop_path ?? item.background, 'w780');
-  const poster   = buildTmdbImageUrl(item.poster_path  ?? item.poster,       'w500');
+  const backdrop  = buildTmdbImageUrl(item.backdrop_path ?? item.background, 'w780');
+  const poster    = buildTmdbImageUrl(item.poster_path  ?? item.poster,      'w500');
   const topPoster = getTopPosterUrl(item);
-  const title   = item.title ?? item.name ?? '';
-  const isPoster = variant === 'poster';
+  const title     = item.title ?? item.name ?? '';
+  const isPoster  = variant === 'poster';
+  const hasLogo   = identity.kind === 'logo';
 
-  // Each source is tagged as textless or not so we know whether to overlay the logo.
-  // TopPoster and backdrop images are textless; standard TMDB posters have baked-in title text.
-  const srcs = React.useMemo<{ url: string; textless: boolean }[]>(() => {
-    const chain: { url: string | null; textless: boolean }[] = isPoster
-      ? [
-          { url: topPoster, textless: true  },
-          { url: poster,    textless: false },
-          { url: backdrop,  textless: true  },
-        ]
-      : [
-          { url: backdrop,   textless: true  },
-          { url: topPoster,  textless: true  },
-          { url: poster,     textless: false },
-        ];
-    return chain.filter((s): s is { url: string; textless: boolean } => Boolean(s.url));
-  }, [isPoster, topPoster, poster, backdrop]);
+  // Poster variant: when a logo exists, prefer textless images so the logo
+  // can be overlaid cleanly.  When no logo exists, use the original TMDB
+  // poster (which already has its title baked in).
+  // Landscape variant: always backdrop-first with overlay.
+  const srcs = React.useMemo<string[]>(() => {
+    const chain = isPoster
+      ? hasLogo
+        ? [topPoster, backdrop, poster]   // textless first
+        : [poster, topPoster, backdrop]   // original poster first
+      : [backdrop, topPoster, poster];
+    return chain.filter((s): s is string => Boolean(s));
+  }, [isPoster, hasLogo, topPoster, poster, backdrop]);
 
   const [srcIdx,      setSrcIdx]      = React.useState(0);
   const [imageLoaded, setImageLoaded] = React.useState(false);
 
-  // Reset when item changes
   React.useEffect(() => { setSrcIdx(0); setImageLoaded(false); }, [item.id]);
 
-  const current = srcs[srcIdx] ?? null;
-  const src = current?.url ?? null;
-  const showOverlay = current?.textless ?? false;
+  const src = srcs[srcIdx] ?? null;
+
+  // Poster cards: show overlay only when a logo is available.
+  // Landscape cards: always show overlay (logo or styled text).
+  const showOverlay = isPoster ? hasLogo : true;
 
   if (!src) return null;
 
@@ -112,51 +110,51 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
           }}
         />
 
-        {/* Bottom gradient — only when overlaying logo/text on textless image */}
+        {/* Bottom gradient + identity overlay */}
         {showOverlay && (
-          <div
-            className={[
-              'absolute bottom-0 inset-x-0 pointer-events-none',
-              'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
-              isPoster ? 'h-[55%]' : 'h-[65%]',
-            ].join(' ')}
-          />
-        )}
+          <>
+            <div
+              className={[
+                'absolute bottom-0 inset-x-0 pointer-events-none',
+                'bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.3)_55%,transparent_100%)]',
+                isPoster ? 'h-[55%]' : 'h-[65%]',
+              ].join(' ')}
+            />
 
-        {/* Logo image or styled text — only on textless sources to avoid double-title */}
-        {showOverlay && (identity.kind === 'logo' ? (
-          <img
-            src={identity.url}
-            alt={`${title} logo`}
-            className={[
-              'absolute left-1/2 -translate-x-1/2 max-w-[82%] object-contain pointer-events-none',
-              '[filter:drop-shadow(0_1px_5px_rgba(0,0,0,0.95))_drop-shadow(0_0_2px_rgba(0,0,0,0.8))]',
-              isPoster ? 'bottom-3.5 max-h-[52px]' : 'bottom-[9px] max-h-[38px]',
-            ].join(' ')}
-            loading="lazy"
-            draggable={false}
-          />
-        ) : (
-          <span
-            className={[
-              'absolute left-3 right-3 text-center leading-tight pointer-events-none',
-              'line-clamp-2 [word-break:break-word]',
-              isPoster ? 'bottom-3.5' : 'bottom-[9px]',
-            ].join(' ')}
-            style={{
-              fontFamily: identity.style.fontFamily,
-              fontSize: isPoster ? 'clamp(0.8rem, 1.8vw, 1.1rem)' : identity.style.fontSize,
-              fontWeight: identity.style.fontWeight,
-              letterSpacing: identity.style.letterSpacing,
-              textTransform: identity.style.textTransform,
-              fontStyle: identity.style.fontStyle,
-              color: identity.style.color,
-              textShadow: identity.style.textShadow,
-            }}
-          >
-            {identity.title}
-          </span>
-        ))}
+            {identity.kind === 'logo' ? (
+              <img
+                src={identity.url}
+                alt={`${title} logo`}
+                className={[
+                  'absolute left-1/2 -translate-x-1/2 max-w-[82%] object-contain pointer-events-none',
+                  '[filter:drop-shadow(0_1px_5px_rgba(0,0,0,0.95))_drop-shadow(0_0_2px_rgba(0,0,0,0.8))]',
+                  isPoster ? 'bottom-3.5 max-h-[52px]' : 'bottom-[9px] max-h-[38px]',
+                ].join(' ')}
+                loading="lazy"
+                draggable={false}
+              />
+            ) : !isPoster && (
+              <span
+                className={[
+                  'absolute left-3 right-3 text-center leading-tight pointer-events-none',
+                  'line-clamp-2 [word-break:break-word] bottom-[9px]',
+                ].join(' ')}
+                style={{
+                  fontFamily: identity.style.fontFamily,
+                  fontSize: identity.style.fontSize,
+                  fontWeight: identity.style.fontWeight,
+                  letterSpacing: identity.style.letterSpacing,
+                  textTransform: identity.style.textTransform,
+                  fontStyle: identity.style.fontStyle,
+                  color: identity.style.color,
+                  textShadow: identity.style.textShadow,
+                }}
+              >
+                {identity.title}
+              </span>
+            )}
+          </>
+        )}
       </Link>
     </motion.div>
   );
