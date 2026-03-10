@@ -307,11 +307,10 @@ fn first_url(val: &Value) -> Option<String> {
         .map(String::from)
 }
 
-/// Language-preferring selection from Fanart image array: fr > en > first.
+/// Language-preferring selection from Fanart image array: en > first.
 fn best_by_lang(val: &Value) -> Option<String> {
     let arr = val.as_array()?;
-    arr.iter().find(|i| i["lang"] == "fr")
-        .or_else(|| arr.iter().find(|i| i["lang"] == "en"))
+    arr.iter().find(|i| i["lang"] == "en")
         .or_else(|| arr.first())
         .and_then(|i| i["url"].as_str())
         .map(String::from)

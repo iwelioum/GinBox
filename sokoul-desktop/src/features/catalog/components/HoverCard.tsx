@@ -65,7 +65,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
         ) : (
           <div className="w-full h-full flex items-center justify-center
                           text-white/10 text-4xl">
-            Movie
+            {t('common.noImage')}
           </div>
         )}
 

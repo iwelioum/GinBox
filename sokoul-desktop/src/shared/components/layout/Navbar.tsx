@@ -44,8 +44,6 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('keydown', handler);
   }, [navigate]);
 
-  const isMac = navigator.platform.toUpperCase().includes('MAC');
-
   return (
     <motion.nav
       className="fixed top-0 left-0 right-0 z-40 pt-[var(--titlebar-height)] tracking-[16px]"
@@ -100,13 +98,6 @@ const Navbar: React.FC = () => {
                   {label}
                 </span>
 
-                {to === '/search' && (
-                  <kbd className="hidden lg:inline ml-2 text-[10px] text-white/30
-                                 bg-white/[0.06] border border-white/10
-                                 rounded px-1.5 py-0.5 font-mono leading-none">
-                    {isMac ? '⌘K' : 'Ctrl K'}
-                  </kbd>
-                )}
               </NavLink>
             );
           })}

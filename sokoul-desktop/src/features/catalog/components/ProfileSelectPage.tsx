@@ -4,7 +4,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { endpoints } from '@/shared/api/client'
 import { useProfileStore } from '@/stores/profileStore'
 import { TitleBar } from '@/shared/components/layout/TitleBar'
@@ -17,10 +17,13 @@ import type { Profile } from '@/shared/types/index'
 export default function ProfileSelectPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const qc = useQueryClient()
+  const activeProfile    = useProfileStore((s) => s.activeProfile)
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile)
 
   const [showForm, setShowForm] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
+  const [editingProfile, setEditingProfile] = useState<Profile | null>(null)
 
   const { data: profiles = [], isLoading } = useQuery<Profile[]>({
     queryKey: ['profiles'],
@@ -34,17 +37,26 @@ export default function ProfileSelectPage() {
   }
 
   const handleCreateProfile = () => {
+    setEditingProfile(null)
     setShowForm(true)
   }
 
   const handleEditProfile = (profile: Profile) => {
-    // TODO: Implement edit functionality
-    console.log('Edit profile:', profile)
+    setEditingProfile(profile)
+    setShowForm(true)
   }
 
-  const handleDeleteProfile = (profile: Profile) => {
-    // TODO: Implement delete functionality  
-    console.log('Delete profile:', profile)
+  const handleDeleteProfile = async (profile: Profile) => {
+    try {
+      await endpoints.profiles.delete(profile.id)
+      // Clear active profile if we just deleted it
+      if (activeProfile?.id === profile.id) {
+        setActiveProfile(null)
+      }
+      qc.invalidateQueries({ queryKey: ['profiles'] })
+    } catch (err) {
+      console.error('Failed to delete profile:', err)
+    }
   }
 
   return (
@@ -121,10 +133,14 @@ export default function ProfileSelectPage() {
           {isEditMode ? t('profile.done') : t('profile.manageProfiles')}
         </button>
 
-        {/* Profile creation form */}
+        {/* Profile creation / edit form */}
         <ProfileForm
           isOpen={showForm}
-          onClose={() => setShowForm(false)}
+          onClose={() => {
+            setShowForm(false)
+            setEditingProfile(null)
+          }}
+          profileToEdit={editingProfile ?? undefined}
         />
       </div>
     </>

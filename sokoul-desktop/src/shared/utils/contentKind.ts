@@ -115,24 +115,24 @@ export type ContentKind =
   | 'news'         // News, TV journalism
   | 'special';     // Special episode, concert, stand-up
 
-/** Pairs each ContentKind with an English label and emoji icon for use in filter chips and category headers. */
+/** Pairs each ContentKind with an i18n label key and emoji icon for use in filter chips and category headers. */
 export interface ContentKindMeta {
-  kind:  ContentKind;
-  label: string;
-  icon:  string;
+  kind:     ContentKind;
+  labelKey: string;
+  icon:     string;
 }
 
 /** Ordered list of content categories displayed in the catalog filter bar; order determines UI presentation priority. */
 export const CONTENT_KINDS: ContentKindMeta[] = [
-  { kind: 'movie',       label: 'Movies',          icon: '🎬' },
-  { kind: 'tv',          label: 'Series',           icon: '📺' },
-  { kind: 'anime',       label: 'Anime',            icon: '⛩️' },
-  { kind: 'animation',   label: 'Animation',        icon: '🎨' },
-  { kind: 'documentary', label: 'Documentaries',    icon: '🎥' },
-  { kind: 'miniseries',  label: 'Miniseries',       icon: '📖' },
-  { kind: 'reality',     label: 'Reality TV',       icon: '🎭' },
-  { kind: 'short',       label: 'Short Films',      icon: '⏱️' },
-  { kind: 'special',     label: 'Specials',         icon: '⭐' },
+  { kind: 'movie',       labelKey: 'catalog.kindMovie',        icon: '🎬' },
+  { kind: 'tv',          labelKey: 'catalog.kindTv',           icon: '📺' },
+  { kind: 'anime',       labelKey: 'catalog.kindAnime',        icon: '⛩️' },
+  { kind: 'animation',   labelKey: 'catalog.kindAnimation',    icon: '🎨' },
+  { kind: 'documentary', labelKey: 'catalog.kindDocumentary',  icon: '🎥' },
+  { kind: 'miniseries',  labelKey: 'catalog.kindMiniseries',   icon: '📖' },
+  { kind: 'reality',     labelKey: 'catalog.kindReality',      icon: '🎭' },
+  { kind: 'short',       labelKey: 'catalog.kindShort',        icon: '⏱️' },
+  { kind: 'special',     labelKey: 'catalog.kindSpecial',      icon: '⭐' },
 ];
 
 /** Infers a precise content kind from TMDB metadata using a strict priority chain (short > documentary > anime > ...) to avoid ambiguous multi-genre classification. */
@@ -151,17 +151,17 @@ export function classifyContentKind(item: CatalogMeta): ContentKind {
   const episodeCount  = item.number_of_episodes ?? 0;
   const seasonCount   = item.number_of_seasons ?? 0;
 
-  // Genre detection (FR + EN, robust partial matching)
+  // Genre detection (EN only, robust partial matching)
   const isAnimation   = genres.some((g) => g.includes('animation'));
   const isDocumentary = genres.some((g) => g.includes('document'));
   const isReality     = genres.some((g) =>
-    g.includes('réalité') || g === 'reality' || g === 'télé-réalité'
+    g.includes('reality') || g === 'reality tv'
   );
   const isTalk = genres.some((g) =>
     g.includes('talk') || g === 'talk show'
   );
   const isNews = genres.some((g) =>
-    g.includes('actualit') || g === 'news'
+    g.includes('news')
   );
 
   // 1. Short film

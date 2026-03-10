@@ -2,7 +2,7 @@
 
 /**
  * Extracts the best logo URL from a Fanart.tv API response.
- * Prefers French logos, falls back to English, then any available.
+ * Prefers English logos, falls back to any available.
  */
 export function extractLogo(data: unknown): string | null {
   if (!data) return null;
@@ -19,7 +19,7 @@ export function extractLogo(data: unknown): string | null {
   for (const key of keys) {
     const arr = d[key];
     if (!Array.isArray(arr) || arr.length === 0) continue;
-    const match = arr.find(l => l.lang === 'fr') ?? arr.find(l => l.lang === 'en') ?? arr[0];
+    const match = arr.find(l => l.lang === 'en') ?? arr[0];
     if (match?.url) return match.url;
   }
 

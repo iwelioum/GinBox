@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 const TMDB_BASE_URL: &str = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE: &str = "https://image.tmdb.org/t/p/w500";
-const TMDB_LANGUAGE: &str = "fr-FR";
+const TMDB_LANGUAGE: &str = "en-US";
 #[allow(dead_code)]
 pub const TMDB_CACHE_TTL_SECS: u64 = 604_800;
 
@@ -710,7 +710,7 @@ pub async fn fetch_person_movies(
                 content_type,
                 name,
                 poster: item.poster_path.map(|p| format!("{}{}", TMDB_IMAGE_BASE, p)),
-                backdrop_path: None, // TmdbPersonCastItem n'a pas de backdrop
+                backdrop_path: None, // TmdbPersonCastItem has no backdrop field
                 release_info,
                 genres: None,
                 imdb_rating: None,
@@ -737,7 +737,7 @@ pub async fn fetch_tmdb_images(
     };
 
     let url = format!(
-        "https://api.themoviedb.org/3/{kind}/{id}/images?api_key={}&include_image_language=fr,en,es,de,it,pt,ru,ja,zh,null",
+        "https://api.themoviedb.org/3/{kind}/{id}/images?api_key={}&include_image_language=en,null",
         state.tmdb_key
     );
 

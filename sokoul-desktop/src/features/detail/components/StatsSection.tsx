@@ -3,6 +3,7 @@
 // IntersectionObserver → triggers animations on scroll
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/shared/api/client';
 import type { CatalogMeta, ContentType } from '../../../shared/types/index';
@@ -135,6 +136,7 @@ interface StatsSectionProps {
 }
 
 export const StatsSection: React.FC<StatsSectionProps> = (props) => {
+  const { t } = useTranslation();
   const type       = (props.item?.type ?? props.type) as ContentType;
   const id         = props.item?.id   ?? props.id ?? '';
   const tmdbRating = props.item?.vote_average ?? props.tmdbRating;
@@ -169,27 +171,27 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
   const stats: StatEntry[] = [];
 
   if (tmdbRating != null && tmdbRating > 0)
-    stats.push({ label: 'TMDB Rating', value: tmdbRating, decimals: 1, suffix: '/10',
+    stats.push({ label: t('detail.tmdbRating'), value: tmdbRating, decimals: 1, suffix: '/10',
       percent: toPercent(tmdbRating, 10), color: '#f5c518' });
 
   if (tmdbVotes != null && tmdbVotes > 0)
-    stats.push({ label: 'TMDB Votes', value: tmdbVotes,
+    stats.push({ label: t('detail.tmdbVotes'), value: tmdbVotes,
       percent: toPercent(tmdbVotes, 50000) });
 
   if (trakt && trakt.votes > 0) {
-    stats.push({ label: 'Trakt Rating', value: trakt.rating, decimals: 1, suffix: '/10',
+    stats.push({ label: t('detail.traktRating'), value: trakt.rating, decimals: 1, suffix: '/10',
       percent: toPercent(trakt.rating, 10), color: '#ed1c24' });
     if (trakt.pctLiked > 0)
-      stats.push({ label: 'Liked', value: trakt.pctLiked, suffix: '%',
+      stats.push({ label: t('detail.liked'), value: trakt.pctLiked, suffix: '%',
         percent: trakt.pctLiked, color: '#22c55e' });
   }
 
   if (type === 'movie' && budget != null && budget > 0)
-    stats.push({ label: 'Budget', value: Math.round(budget / 1_000_000),
+    stats.push({ label: t('detail.budget'), value: Math.round(budget / 1_000_000),
       prefix: '$', suffix: 'M', percent: toPercent(budget, 500_000_000) });
 
   if (type === 'movie' && revenue != null && revenue > 0)
-    stats.push({ label: 'Box-office', value: Math.round(revenue / 1_000_000),
+    stats.push({ label: t('detail.boxOffice'), value: Math.round(revenue / 1_000_000),
       prefix: '$', suffix: 'M', percent: toPercent(revenue, 2_000_000_000) });
 
   if (stats.length === 0 && !(trakt?.comments?.length)) return null;
@@ -197,7 +199,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
   return (
     <section ref={sectionRef} className="mb-[40px]">
       <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-6">
-        In numbers
+        {t('detail.inNumbers')}
       </h2>
 
       {stats.length > 0 && (
@@ -211,7 +213,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
       {trakt?.comments && trakt.comments.length > 0 && (
         <div>
           <h3 className="text-[11px] font-semibold text-white/30 uppercase tracking-widest mb-4">
-            Trakt Reviews
+            {t('detail.traktReviews')}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {trakt.comments.map((c: TraktCommentData) => (

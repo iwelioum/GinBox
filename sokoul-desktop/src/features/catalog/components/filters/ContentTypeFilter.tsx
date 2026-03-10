@@ -34,7 +34,7 @@ export const ContentTypeFilter: React.FC<ContentTypeFilterProps> = ({
         {t('filters.contentType')}
       </h3>
       <div className="grid grid-cols-3 gap-2">
-        {CONTENT_KINDS.map(({ kind, label }) => {
+        {CONTENT_KINDS.map(({ kind, labelKey }) => {
           const count  = kindCounts[kind] ?? 0;
           const active = filters.kinds.includes(kind);
           const KindIcon = KIND_ICONS[kind] ?? Clapperboard;
@@ -42,13 +42,13 @@ export const ContentTypeFilter: React.FC<ContentTypeFilterProps> = ({
           return (
             <button key={kind} onClick={() => toggleKind(kind)}
               className={`flex flex-col items-center gap-2 py-3 px-2 rounded-lg text-center transition-all duration-200 border ${
-                active 
-                  ? 'bg-accent text-white border-accent font-semibold' 
+                active
+                  ? 'bg-accent text-white border-accent font-semibold'
                   : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5 hover:text-text-primary'
               }`}
             >
               <KindIcon size={16} strokeWidth={2.2} />
-              <span className="text-xs leading-tight font-medium">{label}</span>
+              <span className="text-xs leading-tight font-medium">{t(labelKey)}</span>
               <span className={`text-xs font-mono ${active ? 'text-white/70' : 'text-text-muted'}`}>{count}</span>
             </button>
           );

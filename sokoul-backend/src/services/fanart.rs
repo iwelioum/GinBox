@@ -24,7 +24,7 @@ struct FanartApiResponse {
     #[serde(default)] moviebackground: Vec<FanartImage>,
     #[serde(default)] showbackground:  Vec<FanartImage>,
 
-    // Posters alternatifs
+    // Alternative posters
     #[serde(default)] movieposter:    Vec<FanartImage>,
     #[serde(default)] tvposter:       Vec<FanartImage>,
 
@@ -65,8 +65,7 @@ pub async fn fetch_all_fanart_data(
 
 
 fn select_best_logo(logos: &[FanartImage]) -> Option<String> {
-    logos.iter().find(|l| l.lang == "fr")
-        .or_else(|| logos.iter().find(|l| l.lang == "en"))
+    logos.iter().find(|l| l.lang == "en")
         .or_else(|| logos.first())
         .map(|l| l.url.clone())
 }
@@ -149,8 +148,8 @@ pub async fn fetch_and_cache_logo(
         logos.sort_by(|a, b| {
             let la = a.lang.as_str();
             let lb = b.lang.as_str();
-            let pa = if la == "fr" { 0 } else if la == "en" { 1 } else { 2 };
-            let pb = if lb == "fr" { 0 } else if lb == "en" { 1 } else { 2 };
+            let pa = if la == "en" { 0 } else { 1 };
+            let pb = if lb == "en" { 0 } else { 1 };
             pa.cmp(&pb)
         });
 

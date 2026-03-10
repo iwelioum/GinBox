@@ -16,7 +16,6 @@ const MyListsPage          = lazy(() => import('../features/catalog/components/M
 const ActorPage            = lazy(() => import('../features/catalog/components/ActorPage'));
 const CollectionsPage      = lazy(() => import('../features/catalog/components/CollectionsPage'));
 const CollectionDetailPage = lazy(() => import('../features/catalog/components/CollectionDetailPage'));
-const BrowsePage           = lazy(() => import('../features/catalog/components/BrowsePage'));
 const ProfilePage          = lazy(() => import('../features/catalog/components/ProfilePage'));
 const SettingsPage         = lazy(() => import('../features/catalog/components/SettingsPage'));
 const DebugPage            = lazy(() => import('../features/catalog/components/DebugPage'));
@@ -47,8 +46,8 @@ function App() {
         <Route path="/detail/:type/:id"    element={<ErrorBoundary area="detail"><DetailPage /></ErrorBoundary>} />
         <Route path="/sources/:type/:id"   element={<ErrorBoundary area="sources"><SourcesPage /></ErrorBoundary>} />
         <Route path="/lists"               element={<ErrorBoundary area="lists"><MyListsPage /></ErrorBoundary>} />
-        <Route path="/films"               element={<ErrorBoundary area="catalog"><BrowsePage mode="movie" /></ErrorBoundary>} />
-        <Route path="/series"              element={<ErrorBoundary area="catalog"><BrowsePage mode="series" /></ErrorBoundary>} />
+        <Route path="/films"               element={<ErrorBoundary area="catalog"><HomePage mode="movie" /></ErrorBoundary>} />
+        <Route path="/series"              element={<ErrorBoundary area="catalog"><HomePage mode="series" /></ErrorBoundary>} />
         <Route path="/collections"          element={<ErrorBoundary area="collections"><CollectionsPage /></ErrorBoundary>} />
         <Route path="/collection/:id"      element={<ErrorBoundary area="collection"><CollectionDetailPage /></ErrorBoundary>} />
         <Route path="/actor/:id"           element={<ErrorBoundary area="actor"><ActorPage /></ErrorBoundary>} />
