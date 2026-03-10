@@ -85,7 +85,7 @@ export const HeroSlide: React.FC<HeroSlideProps> = ({
       {/* -- Content panel ---------------------------------------------------- */}
       <div style={{
         position: 'absolute', inset: 0, display: 'flex', alignItems: 'flex-end',
-        paddingBottom: 60, paddingLeft: 'calc(3.5vw + 5px)', paddingRight: 'calc(3.5vw + 5px)',
+        paddingBottom: 60, paddingLeft: 'var(--section-px)', paddingRight: 'var(--section-px)',
       }}>
         <AnimatePresence mode="wait">
           <motion.div

@@ -292,12 +292,12 @@ export default function HomePage({ mode }: HomePageProps) {
   const getItems = (key: string): CatalogMeta[] => railItems[key] ?? [];
 
   if (loading && !catalog) return (
-    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 calc(3.5vw + 5px)' }}>
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 var(--section-px)' }}>
       <LoadingState />
     </div>
   );
   if (error && !catalog) return (
-    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 calc(3.5vw + 5px)' }}>
+    <div style={{ position: 'relative', minHeight: 'calc(100vh - 250px)', top: 0, padding: '0 var(--section-px)' }}>
       <ErrorState />
     </div>
   );
@@ -351,18 +351,10 @@ export default function HomePage({ mode }: HomePageProps) {
           overflowX: 'hidden',
           display: 'block',
           top: 0,
-          padding: '0 calc(3.5vw + 5px)',
+          padding: '0 var(--section-px)',
+          background: 'url("/images/home-background.png") center center / cover no-repeat fixed',
         }}
       >
-        <div
-          style={{
-            background: 'url("/images/home-background.png") center center / cover no-repeat fixed',
-            position: 'absolute',
-            inset: 0,
-            opacity: 1,
-            zIndex: -1,
-          }}
-        />
 
         {heroItems.length > 0 && <HeroBanner items={heroItems.slice(0, 5)} />}
 

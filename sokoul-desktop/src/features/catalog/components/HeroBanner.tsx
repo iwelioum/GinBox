@@ -61,8 +61,8 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
     <div
       style={{
         position:    'relative',
-        marginLeft:  'calc(-3.5vw - 5px)',
-        marginRight: 'calc(-3.5vw - 5px)',
+        marginLeft:  'calc(-1 * var(--section-px))',
+        marginRight: 'calc(-1 * var(--section-px))',
         marginTop:   0,
         height:      '65vh',
         minHeight:    520,

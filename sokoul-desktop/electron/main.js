@@ -173,16 +173,19 @@ async function createWindow() {
       ? [
           "default-src 'self'",
           "script-src 'self' 'unsafe-eval'",
-          "style-src 'self' 'unsafe-inline'",
-          "img-src 'self' https://image.tmdb.org https://assets.fanart.tv data: blob:",
-          "connect-src 'self' http://127.0.0.1:3000 https://api.themoviedb.org https://api.trakt.tv",
-          "font-src 'self' data:",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "img-src 'self' https://image.tmdb.org https://assets.fanart.tv https://api.top-streaming.stream data: blob:",
+          "connect-src 'self' http://127.0.0.1:3000 https://api.themoviedb.org https://api.trakt.tv https://*.tmdb.org",
+          "font-src 'self' https://fonts.gstatic.com data:",
+          "media-src 'self' blob: https:",
         ].join('; ')
       : [
           "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
-          "img-src 'self' https://image.tmdb.org https://assets.fanart.tv data: blob:",
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          "img-src 'self' https://image.tmdb.org https://assets.fanart.tv https://api.top-streaming.stream http://localhost:5173 data: blob:",
           "connect-src 'self' http://127.0.0.1:3000 https://api.themoviedb.org https://api.trakt.tv https://*.tmdb.org ws://localhost:5173",
-          "font-src 'self' data:",
+          "font-src 'self' https://fonts.gstatic.com data:",
+          "media-src 'self' blob: https:",
         ].join('; ')
 
     cb({ responseHeaders: { ...details.responseHeaders, 'Content-Security-Policy': [csp] } })

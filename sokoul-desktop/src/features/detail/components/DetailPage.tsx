@@ -62,7 +62,7 @@ const DetailPage: React.FC = () => {
           style={{
             position:  'absolute',
             top: 0, left: 0, right: 0,
-            height:    '130vh',
+            height:    '100vh',
             zIndex:    0,
             backgroundImage: [
               'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 12%, transparent 48%, var(--color-bg-base) 92%)',
@@ -95,9 +95,11 @@ const DetailPage: React.FC = () => {
         item={item}
         theme={data.theme}
         logoUrl={data.logoUrl ?? undefined}
+        backdropUrl={bgBackdrop ?? undefined}
         isFavorite={data.isFavorite}
         isAddingToList={playback.isAddingToList}
         isPlayLoading={playback.isPlayLoading}
+        accentColor={data.theme.accentColor}
         onPlay={playback.handlePlay}
         onDownload={playback.handleDownload}
         onToggleFavorite={data.activeProfile ? playback.handleToggleFavorite : () => {}}
