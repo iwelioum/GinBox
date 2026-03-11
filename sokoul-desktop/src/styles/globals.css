@@ -134,3 +134,65 @@ button:active, [role="button"]:active {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ── Cinematic Effects (Detail Page) ──────────────────────────────────── */
+
+.hero-glow {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(108,99,255,0.3), transparent 40%),
+    radial-gradient(circle at 80% 20%, rgba(122,92,255,0.2), transparent 40%);
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.section-atmosphere {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(108,99,255,0.12), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(122,92,255,0.08), transparent 40%);
+  filter: blur(120px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.hero-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.75));
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-gradient {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 60%;
+  background: linear-gradient(to top, var(--color-bg-base) 0%, rgba(10,10,15,0.8) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+@keyframes shimmer-slide {
+  0%   { background-position: -200% 0 }
+  100% { background-position:  200% 0 }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg, var(--color-bg-elevated) 25%, var(--color-bg-overlay) 50%, var(--color-bg-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-slide 1.5s infinite;
+}
+
+@keyframes cinematic-breathe {
+  from { transform: scale(1.08) }
+  to   { transform: scale(1.0)  }
+}
+.backdrop-breathe {
+  animation: cinematic-breathe 8s linear forwards;
+}
+
+@keyframes trophy-shimmer {
+  0%   { filter: brightness(1) }
+  50%  { filter: brightness(1.6) drop-shadow(0 0 8px rgba(255,215,0,0.6)) }
+  100% { filter: brightness(1) }
+}

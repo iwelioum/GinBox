@@ -1,7 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { endpoints } from '@/shared/api/client';
 import type { ContentType } from '../../../shared/types/index';
-import type { MediaImages } from '../components/GallerySection';
+
+export interface MediaImages {
+  backdrops?: { file_path: string }[];
+  posters?: { file_path: string }[];
+  logos?: string[];
+}
 
 /**
  * Fetches gallery images (scenes, posters, logos) for a content item.

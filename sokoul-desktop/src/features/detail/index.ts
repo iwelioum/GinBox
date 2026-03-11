@@ -1,15 +1,6 @@
 export { default as DetailPage } from './components/DetailPage';
 export { default as SourcesPage } from './components/SourcesPage';
-export { DetailSkeleton } from './components/DetailSkeleton';
-export { HeroSection } from './components/HeroSection';
-export { InfoSection } from './components/InfoSection';
-export { StatsSection } from './components/StatsSection';
-export { CastSection } from './components/CastSection';
-export { GallerySection } from './components/GallerySection';
-export { SimilarSection } from './components/SimilarSection';
-export { SagaSection } from './components/SagaSection';
-export { TrailerSection } from './components/TrailerSection';
-export { DetailEpisodes } from './components/DetailEpisodes';
+export { DetailSkeleton } from './components/sections/DetailSkeleton';
 export { SourceRow } from './components/SourceRow';
 export { useDetailQuery } from './hooks/useDetailQuery';
 export { useCreditsQuery } from './hooks/useCreditsQuery';
