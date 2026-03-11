@@ -25,7 +25,11 @@ function registerIpcHandlers() {
   ipcMain.handle('window:close',         () => mainWindow?.close())
   ipcMain.handle('window:isMaximized',   () => mainWindow?.isMaximized() ?? false)
   ipcMain.handle('window:setFullscreen', (_, flag) => mainWindow?.setFullScreen(flag))
-  ipcMain.handle('shell:openExternal',   (_, url)  => shell.openExternal(url))
+  ipcMain.handle('shell:openExternal',   (_, url)  => {
+    if (typeof url === 'string' && /^(https?|magnet):/i.test(url)) {
+      return shell.openExternal(url);
+    }
+  })
 
   // ── MPV (notifications handled by mpv-manager via setWindows) ──────────
   ipcMain.handle('mpv:launch', (_, { url, mediaTitle }) => mpvManager.launch(url, mainWindowHwnd, mediaTitle))
@@ -116,6 +120,7 @@ function createOverlay() {
       preload:          path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration:  false,
+      sandbox:          true,
     },
   })
 
@@ -172,7 +177,7 @@ async function createWindow() {
     const csp = app.isPackaged
       ? [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-eval'",
+          "script-src 'self'",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
           "img-src 'self' https://image.tmdb.org https://assets.fanart.tv https://api.top-streaming.stream data: blob:",
           "connect-src 'self' http://127.0.0.1:3000 https://api.themoviedb.org https://api.trakt.tv https://*.tmdb.org",
