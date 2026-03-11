@@ -9,9 +9,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface UsePlayerLifecycleOptions {
   url:            string;
+  mediaTitle?:    string;
   startAt:        number;
   returnTo:       string;
-  launch:         (url: string) => Promise<void>;
+  launch:         (url: string, mediaTitle?: string) => Promise<void>;
   kill:           () => Promise<void>;
   waitUntilReady: (retries?: number, delayMs?: number) => Promise<boolean>;
   seekTo:         (seconds: number) => Promise<void>;
@@ -20,7 +21,7 @@ interface UsePlayerLifecycleOptions {
 }
 
 export function usePlayerLifecycle(opts: UsePlayerLifecycleOptions) {
-  const { url, startAt, returnTo, launch, kill, waitUntilReady, seekTo, play, saveProgress } = opts;
+  const { url, mediaTitle, startAt, returnTo, launch, kill, waitUntilReady, seekTo, play, saveProgress } = opts;
 
   const navigate   = useNavigate();
   const [isLoaded,    setIsLoaded]    = useState(false);
@@ -56,7 +57,7 @@ export function usePlayerLifecycle(opts: UsePlayerLifecycleOptions) {
     const start = async () => {
       setLaunchError(null);
       try {
-        await launch(url);
+        await launch(url, mediaTitle);
         const ready = await waitUntilReady(24, 150);
         if (!ready) throw new Error('MPV pipe unavailable');
         if (startAt > 0) await seekTo(startAt);

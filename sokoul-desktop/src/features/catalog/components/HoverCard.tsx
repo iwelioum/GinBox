@@ -1,9 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { EnrichedItem } from './CatalogFilters';
 import { calcHoverPosition } from '@/shared/utils/hoverCardPosition';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
+import { endpoints } from '@/shared/api/client';
+import type { VideoItem, ContentType } from '@/shared/types/index';
 
 const KIND_LABELS: Record<string, string> = {
   movie:       'Movie',
@@ -29,6 +32,29 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   const { t } = useTranslation();
   const { top, left, transformOrigin } = calcHoverPosition(anchorRect);
 
+  // Delay trailer fetch by 600ms to avoid unnecessary requests on brief hovers
+  const [trailerReady, setTrailerReady] = React.useState(false);
+  React.useEffect(() => {
+    const timer = setTimeout(() => setTrailerReady(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const contentType: ContentType = (item.type === 'tv' ? 'series' : item.type) as ContentType;
+  const { data: videos } = useQuery({
+    queryKey: ['catalogMeta', contentType, String(item.id)],
+    queryFn: () => endpoints.catalog.getMeta(contentType, String(item.id)).then(r => r.data),
+    enabled: trailerReady,
+    staleTime: 5 * 60 * 1000,
+    select: (data) => data.videos ?? [],
+  });
+
+  const trailerKey = React.useMemo(() => {
+    if (!videos || videos.length === 0) return null;
+    const trailer = videos.find((v: VideoItem) => v.site === 'YouTube' && v.type === 'Trailer')
+      ?? videos.find((v: VideoItem) => v.site === 'YouTube');
+    return trailer?.key ?? null;
+  }, [videos]);
+
   const backdropUrl = item.backdrop_path
     ? `${TMDB_IMAGE_BASE}w500${item.backdrop_path}`
     : item.poster_path
@@ -53,9 +79,16 @@ export const HoverCard: React.FC<HoverCardProps> = ({
       style={{ top, left, transformOrigin }}
       onMouseLeave={onLeave}
     >
-      {/* Image backdrop 16:9 */}
+      {/* Video / Image backdrop 16:9 */}
       <div className="relative w-full aspect-video bg-white/5 overflow-hidden">
-        {backdropUrl ? (
+        {trailerKey ? (
+          <iframe
+            src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${trailerKey}`}
+            className="absolute inset-0 w-full h-full border-0"
+            allow="autoplay; encrypted-media"
+            title={`${title} trailer`}
+          />
+        ) : backdropUrl ? (
           <img
             src={backdropUrl}
             alt={title}

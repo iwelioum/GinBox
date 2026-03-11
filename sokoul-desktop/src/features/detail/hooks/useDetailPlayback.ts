@@ -4,6 +4,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePreferencesStore } from '@/stores/preferencesStore';
 import { useAddToList, useRemoveFromList } from '@/shared/hooks/useLists';
+import { useToast } from '@/shared/hooks/useToast';
 import { pickBestSource } from '@/shared/utils/parsing';
 import { extractErrorMessage } from '@/shared/utils/error';
 import { endpoints } from '@/shared/api/client';
@@ -16,6 +17,7 @@ export function useDetailPlayback(d: UseDetailDataResult) {
   const prefs = usePreferencesStore();
   const addToList = useAddToList();
   const removeFromList = useRemoveFromList();
+  const { toast } = useToast();
   const [isPlayLoading, setIsPlayLoading] = React.useState(false);
   const [playError, setPlayError] = React.useState<string | null>(null);
 
@@ -48,6 +50,7 @@ export function useDetailPlayback(d: UseDetailDataResult) {
       const startAt = resumeMs > 0
         ? `&startAt=${encodeURIComponent(String(Math.floor(resumeMs / 1000)))}`
         : '';
+      const episodeTitle = d.getEpisodeTitle(season, episode);
       const url =
         `/player?url=${encodeURIComponent(data.stream_url)}` +
         `&title=${encodeURIComponent(d.item.title || d.item.name || '')}` +
@@ -57,6 +60,7 @@ export function useDetailPlayback(d: UseDetailDataResult) {
         `&contentType=series&contentId=${encodeURIComponent(d.id)}` +
         `&season=${encodeURIComponent(String(season))}` +
         `&episode=${encodeURIComponent(String(episode))}` +
+        (episodeTitle ? `&episodeTitle=${encodeURIComponent(episodeTitle)}` : '') +
         startAt +
         (d.detailPath ? `&returnTo=${encodeURIComponent(d.detailPath)}` : '');
       navigate(url, {
@@ -64,8 +68,13 @@ export function useDetailPlayback(d: UseDetailDataResult) {
         state: {
           sources, current: best, mediaId: d.id, mediaType: 'series',
           season, episode, resumeAt: resumeMs,
-          episodeTitle: d.getEpisodeTitle(season, episode),
-          episodes: d.episodeVideos, fromDetail: true, returnTo: d.detailPath,
+          episodeTitle,
+          selectedSeason: season, selectedEpisode: episode,
+          episodes: d.episodeVideos.map(e => ({
+            season: e.season, episode: e.episode,
+            title: e.title, still_path: e.still_path,
+          })),
+          fromDetail: true, returnTo: d.detailPath,
         },
       });
     } catch (err: unknown) {
@@ -128,12 +137,15 @@ export function useDetailPlayback(d: UseDetailDataResult) {
   const handleToggleFavorite = (): void => {
     if (!d.favoritesList || !d.item || !d.activeProfile) return;
     const ct = d.item.type || d.item.media_type || 'movie';
+    const title = d.item.name || d.item.title || '';
     if (d.isFavorite) {
       removeFromList.mutate({ listId: d.favoritesList.id, contentId: d.item.id });
+      toast(`${title} retiré de votre liste`, 'info', 2500);
     } else {
       addToList.mutate({
         listId: d.favoritesList.id, contentId: d.item.id, contentType: ct,
       });
+      toast(`${title} ajouté à votre liste`, 'success', 2500);
     }
   };
 

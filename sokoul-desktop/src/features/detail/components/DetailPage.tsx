@@ -12,15 +12,16 @@ import { useDetailPlayback } from '../hooks/useDetailPlayback';
 import { DetailSkeleton } from './DetailSkeleton';
 import { HeroSection } from './HeroSection';
 import { InfoSection } from './InfoSection';
-import { CastSection } from './CastSection';
-import { GallerySection } from './GallerySection';
-import { TrailerSection } from './TrailerSection';
-import { SagaSection } from './SagaSection';
-import { StatsSection } from './StatsSection';
-import { SimilarSection } from './SimilarSection';
 import { DetailEpisodes } from './DetailEpisodes';
 import { Button } from '@/shared/components/ui/Button';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
+
+const CastSection = React.lazy(() => import('./CastSection').then(m => ({ default: m.CastSection })));
+const GallerySection = React.lazy(() => import('./GallerySection').then(m => ({ default: m.GallerySection })));
+const TrailerSection = React.lazy(() => import('./TrailerSection').then(m => ({ default: m.TrailerSection })));
+const SagaSection = React.lazy(() => import('./SagaSection').then(m => ({ default: m.SagaSection })));
+const StatsSection = React.lazy(() => import('./StatsSection').then(m => ({ default: m.StatsSection })));
+const SimilarSection = React.lazy(() => import('./SimilarSection').then(m => ({ default: m.SimilarSection })));
 
 const DetailPage: React.FC = () => {
   const { t } = useTranslation();
@@ -143,12 +144,14 @@ const DetailPage: React.FC = () => {
         )}
 
         <div className="max-w-[1400px] mx-auto pt-8 pb-24 space-y-8">
-          <TrailerSection videos={data.videos} theme={data.theme} />
-          <StatsSection item={item} theme={data.theme} />
-          <CastSection credits={data.credits} theme={data.theme} />
-          {data.images && <GallerySection images={data.images} />}
-          {data.collection && <SagaSection collection={data.collection} currentId={Number(data.id)} />}
-          <SimilarSection items={data.similar} theme={data.theme} />
+          <React.Suspense fallback={null}>
+            <TrailerSection videos={data.videos} theme={data.theme} />
+            <StatsSection item={item} theme={data.theme} />
+            <CastSection credits={data.credits} theme={data.theme} />
+            {data.images && <GallerySection images={data.images} />}
+            {data.collection && <SagaSection collection={data.collection} currentId={Number(data.id)} />}
+            <SimilarSection items={data.similar} theme={data.theme} />
+          </React.Suspense>
         </div>
       </div>
 

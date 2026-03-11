@@ -27,6 +27,8 @@ pub struct AppState {
     pub realdebrid_token: String,
     pub prowlarr_url: String,
     pub prowlarr_key: String,
+    pub flaresolverr_url: String,
+    pub flaresolverr_prowlarr_url: String,
     pub tmdb_key: String,
     pub fanart_key: String,
     pub tvdb_key: String,
@@ -37,6 +39,9 @@ pub struct AppState {
     pub trakt_client_secret: String,
     pub top_posters_key: String,
     pub cinematerial_key: String,
+    /// Full Wastream base URL including credentials: http://host/{uuid}/{enc_pw}
+    /// Empty string = disabled
+    pub wastream_url: String,
 }
 
 #[tokio::main]
@@ -109,6 +114,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         realdebrid_token,
         prowlarr_url: env::var("PROWLARR_URL").unwrap_or_default(),
         prowlarr_key: env::var("PROWLARR_API_KEY").unwrap_or_default(),
+        flaresolverr_url: env::var("FLARESOLVERR_URL").unwrap_or_default(),
+        flaresolverr_prowlarr_url: env::var("FLARESOLVERR_PROWLARR_URL").unwrap_or_default(),
         tmdb_key,
         fanart_key: env::var("FANART_API_KEY").unwrap_or_default(),
         tvdb_key: env::var("TVDB_API_KEY").unwrap_or_default(),
@@ -119,9 +126,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         trakt_client_secret: env::var("TRAKT_CLIENT_SECRET").unwrap_or_default(),
         top_posters_key: env::var("TOP_POSTERS_API_KEY").unwrap_or_default(),
         cinematerial_key: env::var("CINEMATERIAL_API_KEY").unwrap_or_default(),
+        wastream_url: env::var("WASTREAM_URL").unwrap_or_default(),
     });
 
-    // 5. Router - Orchestration des Services
+    // 5. FlareSolverr auto-setup (non-blocking, best-effort)
+    {
+        let state_clone = Arc::clone(&app_state);
+        tokio::spawn(async move {
+            services::flaresolverr::setup_flaresolverr_proxy(&state_clone).await;
+        });
+    }
+
+    // 6. Router - Orchestration des Services
     let app = Router::new()
         .route("/health", get(|| async { "Sokoul Desktop Backend OK" }))
         .nest("/catalog", routes::catalog::router())
@@ -141,7 +157,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .layer(middleware::cors::cors_layer())
         .layer(middleware::rate_limit::trace_layer());
 
-    // 6. Binding TCP
+    // 7. Binding TCP
     let host = env::var("SERVER_HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
     let port = env::var("SERVER_PORT").unwrap_or_else(|_| "3000".to_string());
     let addr: SocketAddr = format!("{}:{}", host, port).parse()?;

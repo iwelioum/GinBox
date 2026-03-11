@@ -5,16 +5,18 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Subtitles, Settings } from 'lucide-react';
 
 export interface HeaderOverlayProps {
-  title:         string;
-  year?:         string;
-  rating?:       string;
-  onBack:        () => void;
-  onSubtitles?:  () => void;
-  onSettings?:   () => void;
+  title:          string;
+  episodeTitle?:  string;
+  year?:          string;
+  rating?:        string;
+  onBack:         () => void;
+  onSubtitles?:   () => void;
+  onSettings?:    () => void;
 }
 
 export function HeaderOverlay({
   title,
+  episodeTitle,
   year,
   rating,
   onBack,
@@ -75,19 +77,27 @@ export function HeaderOverlay({
           justifyContent: 'center',
         }}
       >
-        <span
-          style={{
-            color:         'var(--player-text, #F5F5F5)',
-            fontSize:      15,
-            fontWeight:    600,
-            letterSpacing: '1.42px',
-            whiteSpace:    'nowrap',
-            overflow:      'hidden',
-            textOverflow:  'ellipsis',
-          }}
-        >
-          {title}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
+          <span
+            style={{
+              color:         'var(--player-text, #F5F5F5)',
+              fontSize:      15,
+              fontWeight:    600,
+              letterSpacing: '1.42px',
+              whiteSpace:    'nowrap',
+              overflow:      'hidden',
+              textOverflow:  'ellipsis',
+            }}
+          >
+            {title}
+          </span>
+
+          {episodeTitle && (
+            <span style={{ color: 'var(--player-text-muted, rgba(245,245,245,0.6))', fontSize: 12, fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {episodeTitle}
+            </span>
+          )}
+        </div>
 
         {year && (
           <span style={{ color: 'var(--player-text-muted, rgba(245,245,245,0.6))', fontSize: 13 }}>

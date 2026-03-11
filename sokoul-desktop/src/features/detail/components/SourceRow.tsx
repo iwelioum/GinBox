@@ -1,8 +1,25 @@
-import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Source } from '../../../shared/types/index';
-import { Play, Download, Zap, Volume2, MessageSquare, AlertTriangle } from 'lucide-react';
-import { parseTorrentName } from '../../../shared/utils/parsing';
+import type { Source } from '@/shared/types/index';
+import { Play, Download } from 'lucide-react';
+import { parseTorrentName } from '@/shared/utils/parsing';
+import { SourceBadges } from './SourceBadges';
+
+function ProviderBadge({ provider }: { provider: string }) {
+  const config: Record<string, { bg: string; color: string; label: string; icon: string }> = {
+    torrentio: { bg: '#1a1a2e', color: '#7c6aff', label: 'Torrentio', icon: '⚡' },
+    prowlarr:  { bg: '#1a2a1a', color: '#4ade80', label: 'Prowlarr',  icon: '🔍' },
+    wastream:  { bg: '#2a1a10', color: '#fb923c', label: 'Wastream',  icon: '🌊' },
+  };
+  const c = config[provider] ?? { bg: '#1a1a1a', color: '#6b7280', label: provider || 'Unknown', icon: '?' };
+  return (
+    <span
+      style={{ background: c.bg, color: c.color }}
+      className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide whitespace-nowrap"
+    >
+      {c.icon} {c.label}
+    </span>
+  );
+}
 
 interface SourceRowProps {
   source: Source;
@@ -13,33 +30,11 @@ interface SourceRowProps {
 export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
   const { t } = useTranslation();
   const meta = parseTorrentName(source.title);
-  const badgeStyle = "flex items-center gap-1.5 px-[7px] py-[3px] rounded-[4px] text-[11px] font-[800] whitespace-nowrap";
 
   return (
     <div className="flex items-center justify-between gap-[12px] w-full px-[16px] py-[14px] rounded-[10px] border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-150 group">
       
-      {/* Badges Container */}
-      <div className="flex items-center gap-[6px] shrink-0">
-        {meta.hasFrenchAudio && (
-          <span className={`${badgeStyle} bg-green-600 text-white`}>
-            <Volume2 size={12} strokeWidth={3} /> FR
-          </span>
-        )}
-        {meta.hasSubFr && (
-          <span className={`${badgeStyle} bg-gray-600 text-gray-300`}>
-            <MessageSquare size={12} strokeWidth={3} /> FR
-          </span>
-        )}
-        {meta.isMultiSuspect && (
-          <span title={t('detail.frAudioUnconfirmed')} className={`${badgeStyle} bg-orange-600 text-white`}>
-            <AlertTriangle size={12} strokeWidth={3} /> MULTI
-          </span>
-        )}
-        {meta.quality === '2160p' && <span className={`${badgeStyle} bg-purple-700 text-white`}>2160p</span>}
-        {meta.quality === '1080p' && <span className={`${badgeStyle} bg-blue-700 text-white`}>1080p</span>}
-        {meta.hdr === 'DV' && <span className={`${badgeStyle} bg-pink-700 text-white`}>DV</span>}
-        {meta.hdr === 'HDR10+' && <span className={`${badgeStyle} bg-amber-600 text-white`}>HDR10+</span>}
-      </div>
+      <SourceBadges meta={meta} source={source} />
 
       {/* Title */}
       <div className="flex-1 min-w-0">
@@ -50,14 +45,6 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
 
       {/* Metadata */}
       <div className="hidden sm:flex items-center gap-[16px] shrink-0">
-        {source.cached_rd ? (
-          <span className="flex items-center gap-[4px] text-[12px] font-[700] text-[#34D399]">
-            <Zap size={14} className="fill-current" /> RD Cache
-          </span>
-        ) : (
-          <span className="text-[12px] text-white/30 font-medium">Non-cache</span>
-        )}
-        
         <span className="text-[13px] text-white/50 w-[60px] text-right font-mono">
           {source.size_gb.toFixed(1)} GB
         </span>
@@ -66,9 +53,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
           {source.seeders}S
         </span>
         
-        <span className="text-[12px] text-white/30 uppercase w-[70px] text-right">
-          {source.source}
-        </span>
+        <ProviderBadge provider={source.source} />
       </div>
 
       {/* Actions */}
@@ -80,6 +65,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
             onPlay();
           }}
           title={t('detail.startPlayback')}
+          aria-label={t('detail.startPlayback')}
         >
           <Play size={18} className="fill-current ml-0.5" />
         </button>
@@ -92,6 +78,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
               onDownload();
             }}
             title={t('detail.downloadRealDebrid')}
+            aria-label={t('detail.downloadRealDebrid')}
           >
             <Download size={18} />
           </button>

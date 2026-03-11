@@ -17,6 +17,8 @@ const Spinner = React.forwardRef<SVGSVGElement, SpinnerProps>(
         xmlns="http://www.w3.org/2000/svg"
         width={size}
         height={size}
+        role="status"
+        aria-label="Loading"
         {...props}
         className={cn('animate-spin', className)}
         viewBox="0 0 24 24"

@@ -76,10 +76,11 @@ export const QUALITY_SECTIONS = [
 ] as const;
 
 export const FILTER_GROUPS = [
-  { label: 'sources.filterQuality', tags: ['4K/2160p', '1080p', '720p', 'SD']       },
-  { label: 'sources.filterAudio',   tags: ['VF/FR', 'VOSTFR', 'VO', 'Multi']        },
-  { label: 'sources.filterCodec',   tags: ['HEVC/x265', 'AVC/x264', 'AV1', 'Remux'] },
-  { label: 'sources.filterSource',  tags: ['BluRay', 'WEB-DL', 'WEBRip', 'HDTV']    },
+  { label: 'sources.filterQuality',  tags: ['4K/2160p', '1080p', '720p', 'SD']       },
+  { label: 'sources.filterAudio',    tags: ['VF/FR', 'VOSTFR', 'VO', 'Multi']        },
+  { label: 'sources.filterCodec',    tags: ['HEVC/x265', 'AVC/x264', 'AV1', 'Remux'] },
+  { label: 'sources.filterSource',   tags: ['BluRay', 'WEB-DL', 'WEBRip', 'HDTV']    },
+  { label: 'sources.filterProvider', tags: ['Torrentio', 'Prowlarr', 'Wastream']     },
 ] as const;
 
 export const SORT_LABELS: [SortKey, string][] = [
@@ -88,7 +89,11 @@ export const SORT_LABELS: [SortKey, string][] = [
 ];
 
 export const QUALITY_ORDER: Record<string, number> = {
-  '2160p': 4, '1080p': 3, '720p': 2, '480p': 1, 'unknown': 0,
+  '2160p': 4, '4K': 4, '4k': 4,
+  '1080p': 3,
+  '720p': 2,
+  '480p': 1,
+  'unknown': 0,
 };
 
 /* ─── Derived types & helpers ─── */
@@ -97,19 +102,19 @@ export type QKey = typeof QUALITY_SECTIONS[number]['key'];
 export type FilterTag = typeof FILTER_GROUPS[number]['tags'][number];
 
 export function getQKey(m: TorrentMeta): QKey {
-  if (m.quality === '2160p') return '4k';
+  if (m.quality === '2160p' || (m.quality as string) === '4K' || (m.quality as string) === '4k') return '4k';
   if (m.quality === '1080p') return '1080p';
   if (m.quality === '720p')  return '720p';
   return 'sd';
 }
 
-export function matchFilter(tag: FilterTag, m: TorrentMeta, u: string): boolean {
+export function matchFilter(tag: FilterTag, m: TorrentMeta, u: string, provider?: string): boolean {
   switch (tag) {
-    case '4K/2160p':  return m.quality === '2160p';
+    case '4K/2160p':  return m.quality === '2160p' || (m.quality as string) === '4K' || (m.quality as string) === '4k';
     case '1080p':     return m.quality === '1080p';
     case '720p':      return m.quality === '720p';
     case 'SD':        return m.quality === '480p' || m.quality === 'unknown';
-    case 'VF/FR':     return m.hasFrenchAudio;
+    case 'VF/FR':     return m.hasFrenchAudio || m.isMultiSuspect;
     case 'VOSTFR':    return m.hasSubFr;
     case 'VO':        return !m.hasFrenchAudio && !m.hasSubFr && !m.isMultiSuspect;
     case 'Multi':     return m.isMultiSuspect;
@@ -121,5 +126,9 @@ export function matchFilter(tag: FilterTag, m: TorrentMeta, u: string): boolean 
     case 'WEB-DL':    return u.includes('WEB-DL') || u.includes('WEBDL');
     case 'WEBRip':    return u.includes('WEBRIP') || u.includes('WEB-RIP');
     case 'HDTV':      return u.includes('HDTV');
+    case 'Torrentio': return provider === 'torrentio';
+    case 'Prowlarr':  return provider === 'prowlarr';
+    case 'Wastream':  return provider === 'wastream';
+    default:          return false;
   }
 }

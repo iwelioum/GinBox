@@ -8,17 +8,23 @@
 import { useEffect } from 'react';
 import type { Source } from '../../../shared/types/index';
 
+type EpisodeRef = { season: number; episode: number; title?: string };
+
 interface BroadcastPayload {
-  title:        string;
-  year:         string;
-  rating:       string;
-  contentType:  string;
-  contentId:    string;
-  sources:      Source[];
-  current:      Source | null;
-  season?:      number;
-  episode?:     number;
-  episodeTitle?: string;
+  title:            string;
+  year:             string;
+  rating:           string;
+  contentType:      string;
+  contentId:        string;
+  sources:          Source[];
+  current:          Source | null;
+  season?:          number;
+  episode?:         number;
+  episodeTitle?:    string;
+  nextEpisode?:     EpisodeRef | null;
+  prevEpisode?:     EpisodeRef | null;
+  switchingEpisode?: boolean;
+  autoplayCountdown?: number | null;
 }
 
 /**
@@ -48,5 +54,9 @@ export function usePlayerBroadcast(payload: BroadcastPayload) {
     payload.season,
     payload.episode,
     payload.episodeTitle,
+    payload.nextEpisode,
+    payload.prevEpisode,
+    payload.switchingEpisode,
+    payload.autoplayCountdown,
   ]);
 }

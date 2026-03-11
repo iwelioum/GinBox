@@ -52,8 +52,10 @@ export function parseTorrentName(name: string): TorrentMeta {
     hasSubFr = true;
     hasFrenchAudio = false; // As per the rule
   }
-  // Rule 2 & 3: Standard French audio tags (including MULTI+VF/FRENCH case)
-  else if (upperName.includes('FRENCH') || upperName.includes('.VF.') || upperName.includes('-VF-') || upperName.includes('_VF_')) {
+  // Rule 2 & 3: Standard French audio tags
+  // \bVF\b catches all separators: "Movie.VF", "Movie VF", "Movie-VF", "(VF)", "Movie.VF" at end
+  // Safe: does not match VFF (word char follows) nor VOSTFR (starts with V but VF not a boundary)
+  else if (upperName.includes('FRENCH') || /\bVF\b/.test(upperName)) {
     hasFrenchAudio = true;
   }
   // Rule 4: MULTI "alone" (i.e. without another FR audio tag detected by previous rules)
@@ -108,7 +110,13 @@ export function pickBestSource(
       const parsed = parseTorrentName(s.title);
       return parsed.hasFrenchAudio || parsed.isMultiSuspect;
     });
-    if (frSources.length > 0) candidates = frSources;
+    if (frSources.length > 0) {
+      candidates = frSources;
+    } else {
+      // Fallback: VOSTFR before giving up on French content entirely
+      const vostfrSources = candidates.filter(s => parseTorrentName(s.title).hasSubFr);
+      if (vostfrSources.length > 0) candidates = vostfrSources;
+    }
   }
 
   const qualityOrder = ['480p', '720p', '1080p', '2160p'];
@@ -131,6 +139,20 @@ export function pickBestSource(
   if (prefs.preferCachedRD) {
     const rdCached = candidates.filter(s => s.cached_rd);
     if (rdCached.length > 0) candidates = rdCached;
+  }
+
+  // When language pref is FR: VF confirmé > MULTI suspect > VO/VOSTFR, then by score.
+  // Pre-compute metadata once to avoid O(n log n) parseTorrentName calls inside comparator.
+  if (prefs.preferredLanguage === 'fr') {
+    const metaMap = new Map(candidates.map(s => [s, parseTorrentName(s.title)]));
+    return [...candidates].sort((a, b) => {
+      const mA = metaMap.get(a)!;
+      const mB = metaMap.get(b)!;
+      const certA = mA.hasFrenchAudio ? 2 : mA.isMultiSuspect ? 1 : 0;
+      const certB = mB.hasFrenchAudio ? 2 : mB.isMultiSuspect ? 1 : 0;
+      if (certA !== certB) return certB - certA;
+      return (b.score ?? 0) - (a.score ?? 0);
+    })[0] ?? null;
   }
 
   const sortedByScore = [...candidates].sort((a, b) => (b.score ?? 0) - (a.score ?? 0));

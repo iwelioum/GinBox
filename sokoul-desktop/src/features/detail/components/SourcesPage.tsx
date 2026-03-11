@@ -9,6 +9,7 @@ import { ResumeModal } from '@/shared/components/modals/ResumeModal';
 import type { CatalogMeta, ContentType, Source } from '@/shared/types/index';
 import { useLogStore } from '@/stores/logStore';
 import { useProfileStore } from '@/stores/profileStore';
+import { useToast } from '@/shared/hooks/useToast';
 import { extractErrorMessage } from '@/shared/utils/error';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 import { BestSourceCard, QualitySection } from './SourceCard';
@@ -33,6 +34,7 @@ export default function SourcesPage() {
   const shouldReturn = navState?.fromDetail === true;
   const { addLog } = useLogStore();
   const { activeProfile } = useProfileStore();
+  const { toast } = useToast();
   const { t } = useTranslation();
   const { data: meta } = useQuery<CatalogMeta>({
     queryKey: ['catalogMeta', type, id],
@@ -90,9 +92,15 @@ export default function SourcesPage() {
           addLog('warn', 'PLAYBACK', 'Resume unavailable', { err: extractErrorMessage(err) });
         }
       }
+      if (!source.cached_rd) {
+        toast(t('sources.toastRdDownloading'), 'warning', 5000);
+      }
       goToPlayer(data.stream_url);
+      toast(`${t('sources.toastPlaybackStarted')}: ${titleText}`, 'success', 3000);
     } catch (err: unknown) {
-      setLaunchError(extractErrorMessage(err, 'Debrid error')); setLaunching(false);
+      const msg = extractErrorMessage(err, 'Debrid error');
+      toast(msg, 'error', 6000);
+      setLaunchError(msg); setLaunching(false);
     }
   }
 
@@ -157,6 +165,15 @@ export default function SourcesPage() {
                     ? t('sources.sourceCountFiltered', { count: sortedAndFiltered.length })
                     : t('sources.sourceCountAvailable', { count: sortedAndFiltered.length })}
                 </p>
+                {isStale && (
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[12px]">
+                    <AlertTriangle size={14} />
+                    <span>{t('sources.staleBadge')}</span>
+                    <button onClick={handleForceRefresh} className="ml-auto px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-semibold transition-colors">
+                      <RefreshCw size={12} className="inline mr-1" />{t('sources.refresh')}
+                    </button>
+                  </div>
+                )}
                 {bestSource && <BestSourceCard source={bestSource} onPlay={() => handlePlay(bestSource)} launching={launching} />}
                 {groupedSections.map(s => (
                   <QualitySection key={s.key} label={s.label} Icon={s.Icon} color={s.color}

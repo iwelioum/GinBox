@@ -75,8 +75,10 @@ export function useSourceFiltering({
         loaded.sort((a, b) => {
           if (a.score !== b.score) return b.score - a.score;
           const mA = parseTorrentName(a.title), mB = parseTorrentName(b.title);
-          if (mA.hasFrenchAudio && !mB.hasFrenchAudio) return -1;
-          if (!mA.hasFrenchAudio && mB.hasFrenchAudio) return  1;
+          const aHasFr = mA.hasFrenchAudio || mA.isMultiSuspect;
+          const bHasFr = mB.hasFrenchAudio || mB.isMultiSuspect;
+          if (aHasFr && !bHasFr) return -1;
+          if (!aHasFr && bHasFr) return  1;
           const qA = QUALITY_ORDER[mA.quality] ?? 0, qB = QUALITY_ORDER[mB.quality] ?? 0;
           if (qA !== qB) return qB - qA;
           return b.seeders - a.seeders;
@@ -98,29 +100,36 @@ export function useSourceFiltering({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, normalizedType, selectedSeason, selectedEpisode, refreshState.counter]);
 
-  const bestSource = useMemo(() => pickBestSource(sources, prefs), [sources, prefs]);
+  const parsed = useMemo(
+    () => sources.map(s => ({ source: s, meta: parseTorrentName(s.title) })),
+    [sources]
+  );
 
   const filteredSources = useMemo(() => {
     if (activeFilters.size === 0) return sources;
-    return sources.filter(source => {
-      const u = source.title.toUpperCase();
-      const m = parseTorrentName(source.title);
-      for (const group of FILTER_GROUPS) {
-        const active = (group.tags as readonly string[]).filter(t => activeFilters.has(t)) as FilterTag[];
-        if (active.length === 0) continue;
-        if (!active.some(tag => matchFilter(tag, m, u))) return false;
-      }
-      return true;
-    });
-  }, [sources, activeFilters]);
+    return parsed
+      .filter(({ source, meta: m }) => {
+        const u = source.title.toUpperCase();
+        for (const group of FILTER_GROUPS) {
+          const active = (group.tags as readonly string[]).filter(t => activeFilters.has(t)) as FilterTag[];
+          if (active.length === 0) continue;
+          if (!active.some(tag => matchFilter(tag, m, u, source.source))) return false;
+        }
+        return true;
+      })
+      .map(({ source }) => source);
+  }, [parsed, activeFilters]);
+
+  const bestSource = useMemo(() => pickBestSource(filteredSources, prefs), [filteredSources, prefs]);
 
   const sortedAndFiltered = useMemo(() => {
     if (sortBy === 'score') return filteredSources;
+    const metaMap = new Map(parsed.map(({ source, meta }) => [source, meta]));
     return [...filteredSources].sort((a, b) => {
       switch (sortBy) {
         case 'quality': {
-          const qA = QUALITY_ORDER[parseTorrentName(a.title).quality] ?? 0;
-          const qB = QUALITY_ORDER[parseTorrentName(b.title).quality] ?? 0;
+          const qA = QUALITY_ORDER[metaMap.get(a)?.quality ?? 'unknown'] ?? 0;
+          const qB = QUALITY_ORDER[metaMap.get(b)?.quality ?? 'unknown'] ?? 0;
           return qB - qA;
         }
         case 'seeders':  return b.seeders - a.seeders;
@@ -128,14 +137,15 @@ export function useSourceFiltering({
         default:         return 0;
       }
     });
-  }, [filteredSources, sortBy]);
+  }, [filteredSources, sortBy, parsed]);
 
-  const groupedSections = useMemo(() =>
-    QUALITY_SECTIONS.map(s => ({
+  const groupedSections = useMemo(() => {
+    const metaMap = new Map(parsed.map(({ source, meta }) => [source, meta]));
+    return QUALITY_SECTIONS.map(s => ({
       ...s,
-      sources: sortedAndFiltered.filter(src => getQKey(parseTorrentName(src.title)) === s.key),
-    })),
-  [sortedAndFiltered]);
+      sources: sortedAndFiltered.filter(src => getQKey(metaMap.get(src) ?? parseTorrentName(src.title)) === s.key),
+    }));
+  }, [sortedAndFiltered, parsed]);
 
   return {
     sources, loading, fetchError, cachedAt, isStale,

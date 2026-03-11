@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
 // ── MPV ──────────────────────────────────────────────────
 contextBridge.exposeInMainWorld('mpv', {
-  launch:  (url) => ipcRenderer.invoke('mpv:launch',  { url }),
+  launch:  (url, mediaTitle) => ipcRenderer.invoke('mpv:launch',  { url, mediaTitle }),
   kill:    ()    => ipcRenderer.invoke('mpv:kill'),
   waitUntilReady: (retries, delayMs) => ipcRenderer.invoke('mpv:waitUntilReady', retries, delayMs),
   command: (cmd) => ipcRenderer.invoke('mpv:command', cmd),

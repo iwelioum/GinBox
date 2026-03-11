@@ -1,15 +1,16 @@
 // SearchPage.tsx — Role: Content search page
 // RULES: None
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Search as SearchIcon, Clock, X } from 'lucide-react';
+import { Search as SearchIcon, Clock, X, TrendingUp } from 'lucide-react';
 import { endpoints } from '@/shared/api/client';
 import { ContentCard } from '@/features/catalog/components/ContentCard';
 import { Spinner } from '../../../shared/components/ui/Spinner';
 import { useSearchHistory } from '@/shared/hooks/useSearchHistory';
+import { useCatalogStore } from '@/features/catalog/store/catalog.store';
 import type { CatalogMeta } from '../../../shared/types/index';
 
 type FilterTab = 'all' | 'movies' | 'series';
@@ -22,12 +23,21 @@ export default function SearchPage() {
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const { history, addEntry, removeEntry, clearHistory } = useSearchHistory();
+  const { sections } = useCatalogStore();
 
-  // Debounce 500ms
+  const popularSuggestions = useMemo((): CatalogMeta[] => {
+    const trending: CatalogMeta[] = sections['trending'] ?? [];
+    return trending
+      .filter((item: CatalogMeta) => (item.vote_average ?? 0) >= 6)
+      .sort((a: CatalogMeta, b: CatalogMeta) => (b.vote_average ?? 0) - (a.vote_average ?? 0))
+      .slice(0, 10);
+  }, [sections]);
+
+  // Debounce 300ms
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(query);
-    }, 500);
+    }, 300);
     return () => clearTimeout(handler);
   }, [query]);
 
@@ -56,12 +66,12 @@ export default function SearchPage() {
   const filteredResults: CatalogMeta[] = (() => {
     if (activeTab === 'movies') {
       return allMetas.filter(
-        (item) => (item.type || (item as any).media_type) === 'movie',
+        (item) => (item.type || item.media_type) === 'movie',
       );
     }
     if (activeTab === 'series') {
       return allMetas.filter(
-        (item) => (item.type || (item as any).media_type) !== 'movie',
+        (item) => (item.type || item.media_type) !== 'movie',
       );
     }
     return allMetas;
@@ -183,9 +193,33 @@ export default function SearchPage() {
       )}
 
       {!isLoading && !debouncedQuery && history.length === 0 && (
-        <div className="flex flex-col items-center justify-center mt-24 gap-5 select-none">
-          <SearchIcon size={72} className="text-white/10" strokeWidth={1} />
-          <p className="text-xl text-white/15 text-center">{t('search.searchHint')}</p>
+        <div className="max-w-4xl mx-auto mt-8">
+          {popularSuggestions.length > 0 ? (
+            <>
+              <div className="flex items-center gap-2 mb-5">
+                <TrendingUp size={16} className="text-white/30" />
+                <h2 className="text-xs text-white/40 uppercase tracking-[1.2px] font-semibold">
+                  {t('search.popularSuggestions')}
+                </h2>
+              </div>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                  gap: '1.5rem',
+                }}
+              >
+                {popularSuggestions.map((item) => (
+                  <ContentCard key={item.id} item={item} variant="poster" />
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center mt-16 gap-5 select-none">
+              <SearchIcon size={72} className="text-white/10" strokeWidth={1} />
+              <p className="text-xl text-white/15 text-center">{t('search.searchHint')}</p>
+            </div>
+          )}
         </div>
       )}
 

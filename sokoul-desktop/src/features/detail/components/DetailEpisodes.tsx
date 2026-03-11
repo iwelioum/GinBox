@@ -68,6 +68,10 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = React.useState<'episodes' | 'similar' | 'extras'>('episodes');
 
+  const previewProgress = getEpisodeProgress(selectedEpisodeData?.season, selectedEpisodeData?.episode);
+  const previewCanResume = !!previewProgress && !previewProgress.watched && (previewProgress.positionMs ?? 0) > 0;
+  const previewStill = getImageUrl(selectedEpisodeData?.still_path, 'w780');
+
   return (
     <section className="space-y-6">
       {/* Tabs */}
@@ -109,6 +113,58 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
       {/* Episodes Tab Content */}
       {activeTab === 'episodes' && (
         <div className="space-y-6">
+          {/* Selected episode preview */}
+          {selectedEpisodeData && (
+            <div className="rounded-[var(--radius-card)] overflow-hidden bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+              <div className="relative w-full aspect-video bg-[var(--color-bg-overlay)]">
+                {previewStill ? (
+                  <img src={previewStill} className="w-full h-full object-cover" alt={selectedEpisodeData.title} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-sm">
+                    S{String(selectedEpisodeData.season).padStart(2, '0')}E{String(selectedEpisodeData.episode).padStart(2, '0')}
+                  </div>
+                )}
+                {previewProgress && previewProgress.progressPct > 0 && !previewProgress.watched && (
+                  <div className="absolute left-0 right-0 bottom-0 h-1 bg-[var(--color-border)]">
+                    <div className="h-full bg-[var(--color-accent)]" style={{ width: `${Math.min(100, previewProgress.progressPct)}%` }} />
+                  </div>
+                )}
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      S{String(selectedEpisodeData.season).padStart(2, '0')}E{String(selectedEpisodeData.episode).padStart(2, '0')}
+                      {selectedEpisodeData.runtime ? ` · ${selectedEpisodeData.runtime} ${t('common.min')}` : ''}
+                    </p>
+                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
+                      {selectedEpisodeData.title ?? `Episode ${selectedEpisodeData.episode}`}
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void onWatchEpisode(
+                      selectedEpisodeData.season ?? selectedSeason,
+                      selectedEpisodeData.episode ?? 1,
+                      previewCanResume ? previewProgress?.positionMs : undefined,
+                    )}
+                    disabled={isPlayLoading}
+                    className="flex-shrink-0 bg-[var(--color-accent)] text-white text-xs font-semibold
+                               px-4 py-2 rounded-[var(--radius-card)] hover:bg-[var(--color-accent-hover)]
+                               transition-all duration-200 disabled:opacity-70 disabled:cursor-default"
+                  >
+                    {previewCanResume ? t('detail.resumeButton') : t('detail.playButton')}
+                  </button>
+                </div>
+                {selectedEpisodeData.overview && (
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
+                    {selectedEpisodeData.overview}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Season selector */}
           <div className="flex items-center gap-4">
             <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">

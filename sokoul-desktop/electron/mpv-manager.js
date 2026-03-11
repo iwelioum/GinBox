@@ -189,8 +189,9 @@ function isAlive() {
  *
  * @param {string} url         — URL or path to the media to play
  * @param {string | number} wid — Electron BrowserWindow HWND
+ * @param {string} [mediaTitle] — Optional title shown in MPV window
  */
-async function launch(url, wid) {
+async function launch(url, wid, mediaTitle) {
   // ── Reuse: if MPV alive → loadfile instead of respawn ───────────────
   if (mpvProcess && mpvProcess.exitCode === null) {
     const result = await mpvIpc.loadFile(url)
@@ -228,6 +229,10 @@ async function launch(url, wid) {
     '--keep-open=yes',
     '--volume=100',
   ]
+
+  if (mediaTitle) {
+    args.push(`--force-media-title=${mediaTitle}`)
+  }
 
   console.log(`[MPV] Launching: ${url} (wid: ${widInt})`)
 

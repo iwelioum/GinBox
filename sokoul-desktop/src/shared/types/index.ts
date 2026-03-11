@@ -160,6 +160,8 @@ export interface Source {
   size_gb: number;
   seeders: number;
   language: string;
+  /** Raw French variant tag from backend: TRUEFRENCH | VFF | VF | VOSTFR | MULTi | FRENCH */
+  language_variant?: string;
   info_hash: string;
   magnet?: string;
   source: string;

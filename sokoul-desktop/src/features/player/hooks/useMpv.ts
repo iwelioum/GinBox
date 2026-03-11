@@ -86,12 +86,12 @@ export function useMpv() {
     }
   }, [duration]);
 
-  async function launch(url: string): Promise<void> {
+  async function launch(url: string, mediaTitle?: string): Promise<void> {
     tracksLoadedRef.current = false;
     failCountRef.current = 0;
     setAudioTracks([]);
     setSubTracks([]);
-    await window.mpv?.launch(url);
+    await window.mpv?.launch(url, mediaTitle);
     setIsActive(true);  // PlayerPage activates polling directly
   }
 

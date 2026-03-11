@@ -8,7 +8,7 @@
  * are delegated to extracted hooks.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { useMpv } from '../hooks/useMpv';
 import { usePlayerBroadcast } from '../hooks/usePlayerBroadcast';
@@ -18,8 +18,6 @@ import { usePlayerLifecycle } from '../hooks/usePlayerLifecycle';
 import { LoadingScreen } from './LoadingScreen';
 import { VideoContainer } from './VideoContainer';
 import {
-  PrevEpisodeCard,
-  NextEpisodeCard,
   SwitchErrorBanner,
   LaunchErrorOverlay,
 } from './EpisodeOverlay';
@@ -29,15 +27,17 @@ import type { Source, EpisodeVideo } from '../../../shared/types/index';
 import '@/styles/player.tokens.css';
 
 interface PlayerNavigationState {
-  sources?:      Source[];
-  current?:      Source;
-  mediaId?:      string;
-  mediaType?:    string;
-  season?:       number;
-  episode?:      number;
-  resumeAt?:     number;
-  episodeTitle?: string;
-  episodes?:     EpisodeVideo[];
+  sources?:         Source[];
+  current?:         Source;
+  mediaId?:         string;
+  mediaType?:       string;
+  season?:          number;
+  episode?:         number;
+  selectedSeason?:  number;
+  selectedEpisode?: number;
+  resumeAt?:        number;
+  episodeTitle?:    string;
+  episodes?:        EpisodeVideo[];
 }
 
 export default function PlayerPage() {
@@ -97,22 +97,20 @@ export default function PlayerPage() {
     duration,
   });
 
-  const { isLoaded, launchError, goBack } = usePlayerLifecycle({
-    url, startAt, returnTo,
-    launch, kill, waitUntilReady, seekTo, play, saveProgress,
-  });
+  // Build display title for MPV window
+  const mediaTitle = (() => {
+    if (contentType === 'series' || contentType === 'tv') {
+      const s = String(activeSeason ?? 0).padStart(2, '0');
+      const e = String(activeEpisode ?? 0).padStart(2, '0');
+      const epTitle = activeEpisodeTitle ? ` — ${activeEpisodeTitle}` : '';
+      return `${title} — S${s}E${e}${epTitle}`;
+    }
+    return title || undefined;
+  })();
 
-  usePlayerBroadcast({
-    title,
-    year,
-    rating,
-    contentType,
-    contentId,
-    sources:      activeSources,
-    current:      activeCurrent,
-    season:       activeSeason ?? undefined,
-    episode:      activeEpisode ?? undefined,
-    episodeTitle: activeEpisodeTitle || undefined,
+  const { isLoaded, launchError, goBack } = usePlayerLifecycle({
+    url, mediaTitle, startAt, returnTo,
+    launch, kill, waitUntilReady, seekTo, play, saveProgress,
   });
 
   const onEpisodeChanged = useCallback((data: {
@@ -134,7 +132,6 @@ export default function PlayerPage() {
   const {
     nextEpisodeData,
     prevEpisodeData,
-    showNextEpisode,
     switchingEpisode,
     switchError,
     autoplayCountdown,
@@ -156,6 +153,38 @@ export default function PlayerPage() {
     onEpisodeChanged,
   });
 
+  usePlayerBroadcast({
+    title,
+    year,
+    rating,
+    contentType,
+    contentId,
+    sources:           activeSources,
+    current:           activeCurrent,
+    season:            activeSeason ?? undefined,
+    episode:           activeEpisode ?? undefined,
+    episodeTitle:      activeEpisodeTitle || undefined,
+    nextEpisode:       nextEpisodeData
+      ? { season: nextEpisodeData.season ?? 0, episode: nextEpisodeData.episode ?? 0, title: nextEpisodeData.title }
+      : null,
+    prevEpisode:       prevEpisodeData
+      ? { season: prevEpisodeData.season ?? 0, episode: prevEpisodeData.episode ?? 0, title: prevEpisodeData.title }
+      : null,
+    switchingEpisode,
+    autoplayCountdown,
+  });
+
+  /** Command channel: overlay sends episode commands → player executes */
+  useEffect(() => {
+    const bc = new BroadcastChannel('player_commands');
+    bc.onmessage = (e: MessageEvent<{ action: string }>) => {
+      if (e.data.action === 'nextEpisode') void handleNextEpisode();
+      if (e.data.action === 'prevEpisode') void handlePrevEpisode();
+      if (e.data.action === 'cancelAutoplay') cancelAutoplay();
+    };
+    return () => bc.close();
+  }, [handleNextEpisode, handlePrevEpisode, cancelAutoplay]);
+
   const handleTogglePlay = async () => {
     if (launchError) return;
     if (isPlaying) await pause();
@@ -166,24 +195,6 @@ export default function PlayerPage() {
     <div className="relative h-screen w-screen select-none overflow-hidden bg-black">
       <LoadingScreen title={title} poster={poster} visible={!isLoaded && !launchError} />
       <VideoContainer onClick={handleTogglePlay} />
-
-      {prevEpisodeData && !launchError && (
-        <PrevEpisodeCard
-          episode={prevEpisodeData}
-          switchingEpisode={switchingEpisode}
-          onSwitch={() => { void handlePrevEpisode(); }}
-        />
-      )}
-
-      {showNextEpisode && nextEpisodeData && !launchError && (
-        <NextEpisodeCard
-          episode={nextEpisodeData}
-          switchingEpisode={switchingEpisode}
-          autoplayCountdown={autoplayCountdown}
-          onSwitch={() => { void handleNextEpisode(); }}
-          onCancelAutoplay={cancelAutoplay}
-        />
-      )}
 
       {switchError && !launchError && <SwitchErrorBanner error={switchError} />}
       {launchError && <LaunchErrorOverlay error={launchError} onBack={() => { void goBack(); }} />}

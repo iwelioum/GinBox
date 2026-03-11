@@ -20,7 +20,7 @@ export function SourcesSidebar({
 }: SourcesSidebarProps) {
   const { t } = useTranslation();
   return (
-    <aside className="w-[210px] shrink-0 border-r border-[var(--color-border)] py-5 px-3.5
+    <aside aria-label={t('sources.filterSidebar')} className="w-[210px] shrink-0 border-r border-[var(--color-border)] py-5 px-3.5
                       overflow-y-auto flex flex-col gap-5 scrollbar-hide">
       {/* Sort by */}
       <div>
@@ -68,6 +68,7 @@ export function SourcesSidebar({
                     for (const t of group.tags) next.delete(t);
                     return next;
                   })}
+                  aria-label={t('sources.clearGroupFilter')}
                   className="bg-transparent border-none cursor-pointer text-white/25 text-[9px] px-[3px] py-px"
                 >✕</button>
               )}
@@ -78,6 +79,7 @@ export function SourcesSidebar({
                 return (
                   <button
                     key={tag} onClick={() => toggleFilter(tag)}
+                    aria-pressed={on}
                     className={[
                       'px-2 py-[3px] rounded-[5px] cursor-pointer',
                       'text-[10px] font-bold tracking-[0.05em] uppercase whitespace-nowrap',
@@ -119,6 +121,7 @@ export function SourcesSidebar({
         )}
         <button
           onClick={onForceRefresh}
+          aria-label={t('sources.refreshSources')}
           className="flex items-center gap-1.5 px-2.5 py-[7px] rounded-[7px]
                      border border-[var(--color-border-medium)] bg-[var(--color-white-4)]
                      text-white/[0.55] text-[11px] font-semibold cursor-pointer

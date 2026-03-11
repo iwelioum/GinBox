@@ -92,19 +92,20 @@ export function useEpisodeNavigation({
     return normalizedEpisodes[idx - 1];
   }, [normalizedEpisodes, activeSeason, activeEpisode]);
 
-  /** Show "next episode" card when playback reaches 90% or last 12 seconds */
+  /** Show "next episode" card 30 seconds before the end (or 90% for short content) */
   useEffect(() => {
     if (!nextEpisodeData || duration <= 0 || switchingEpisode) {
       setShowNextEpisode(false);
       return;
     }
+    const remainingSec = duration - position;
     const progressPct = (position / duration) * 100;
-    const reachedEnd = progressPct >= 90 || position >= Math.max(0, duration - 12);
+    const reachedEnd = remainingSec <= 30 || (duration < 60 && progressPct >= 90);
     if (reachedEnd && position > 0) {
       setShowNextEpisode(true);
       return;
     }
-    if (progressPct < 80) {
+    if (remainingSec > 45) {
       setShowNextEpisode(false);
     }
   }, [nextEpisodeData, duration, position, switchingEpisode]);

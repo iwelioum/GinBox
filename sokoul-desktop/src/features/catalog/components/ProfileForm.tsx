@@ -3,12 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { endpoints } from '@/shared/api/client'
+import type { Profile } from '@/shared/types/index'
 
 interface ProfileFormProps {
   isOpen: boolean
   onClose: () => void
-  profileToEdit?: any // Profile object when editing
+  profileToEdit?: Profile
 }
+
+const AVATAR_COLORS = [
+  '#6c63ff', '#e63946', '#2a9d8f', '#f4a261',
+  '#e76f51', '#457b9d', '#8338ec', '#06d6a0',
+  '#ef476f', '#118ab2', '#073b4c', '#ffd166',
+];
 
 export function ProfileForm({ isOpen, onClose, profileToEdit }: ProfileFormProps) {
   const { t } = useTranslation()
@@ -16,6 +23,7 @@ export function ProfileForm({ isOpen, onClose, profileToEdit }: ProfileFormProps
   
   const [name, setName] = useState(profileToEdit?.name || '')
   const [kids, setKids] = useState(profileToEdit?.isKids || false)
+  const [selectedColor, setSelectedColor] = useState(AVATAR_COLORS[0])
   const [formError, setFormError] = useState<string | null>(null)
 
   const createProfile = useMutation({
@@ -96,6 +104,39 @@ export function ProfileForm({ isOpen, onClose, profileToEdit }: ProfileFormProps
                   transition-colors duration-[var(--transition-fast)]
                 `}
               />
+            </div>
+
+            {/* Avatar Color Picker */}
+            <div className="mb-6">
+              <label className="block text-[var(--color-text-secondary)] text-sm mb-3">
+                {t('profile.avatarColor')}
+              </label>
+              <div className="flex items-center gap-4">
+                {/* Preview */}
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold shrink-0 transition-colors duration-200"
+                  style={{ backgroundColor: selectedColor }}
+                >
+                  {name.trim() ? name.trim()[0].toUpperCase() : '?'}
+                </div>
+                {/* Color grid */}
+                <div className="flex flex-wrap gap-2">
+                  {AVATAR_COLORS.map(color => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setSelectedColor(color)}
+                      aria-label={`Avatar color ${color}`}
+                      className={`w-7 h-7 rounded-full transition-all duration-150 ${
+                        selectedColor === color
+                          ? 'ring-2 ring-white ring-offset-2 ring-offset-[var(--color-bg-overlay)] scale-110'
+                          : 'hover:scale-110'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Kids Mode Toggle */}

@@ -138,14 +138,40 @@ pub async fn post_unrestrict(
             return Ok(Json(json!({ "stream_url": magnet_raw, "is_cached": true })));
         }
 
+        // Wastream DDL direct playback URL — same origin as WASTREAM_URL
+        if !state.wastream_url.is_empty() {
+            if let (Some(req_origin), Some(ws_origin)) = (
+                extract_url_origin(magnet_raw),
+                extract_url_origin(&state.wastream_url),
+            ) {
+                if req_origin.eq_ignore_ascii_case(&ws_origin) {
+                    tracing::info!("Wastream direct playback URL detected, passing through.");
+                    return Ok(Json(json!({ "stream_url": magnet_raw, "is_cached": false })));
+                }
+            }
+        }
+
         tracing::warn!("Rejecting unknown HTTP URL: {}", magnet_raw);
         return Err(AppError::BadRequest(
-            "Unknown HTTP URL — only magnet:, Real-Debrid, Prowlarr, and Torrentio links are accepted".into()
+            "Unknown HTTP URL — only magnet:, Real-Debrid, Prowlarr, Torrentio, and Wastream links are accepted".into()
         ));
     }
 
     tracing::warn!("Unrecognized link format: {}", magnet_raw);
     Err(AppError::NotFound("Unrecognized link format (must be magnet: or http)".into()))
+}
+
+// ── Extract URL origin (scheme://host[:port]) ────────────────────────
+fn extract_url_origin(url: &str) -> Option<String> {
+    let (scheme, rest) = if let Some(r) = url.strip_prefix("https://") {
+        ("https", r)
+    } else if let Some(r) = url.strip_prefix("http://") {
+        ("http", r)
+    } else {
+        return None;
+    };
+    let host = rest.split('/').next()?;
+    Some(format!("{}://{}", scheme, host))
 }
 
 // ── Extract info_hash from magnet link ──────────────────────────────

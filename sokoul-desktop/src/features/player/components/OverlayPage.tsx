@@ -15,6 +15,7 @@ import { ControlsBar } from './ControlsBar';
 import { AudioPanel } from './AudioPanel';
 import { SubtitlesPanel } from './SubtitlesPanel';
 import { SourcePanel, SourceButton } from './SourcePanel';
+import { PrevEpisodeCard, NextEpisodeCard } from './EpisodeOverlay';
 import '@/styles/player.tokens.css';
 
 export default function OverlayPage() {
@@ -103,6 +104,12 @@ export default function OverlayPage() {
     window.overlay?.back();
   };
 
+  const sendEpisodeCommand = useCallback((action: 'nextEpisode' | 'prevEpisode' | 'cancelAutoplay') => {
+    const bc = new BroadcastChannel('player_commands');
+    bc.postMessage({ action });
+    bc.close();
+  }, []);
+
   const uiVisible: React.CSSProperties = {
     opacity: showControls ? 1 : 0,
     pointerEvents: showControls ? 'auto' : 'none',
@@ -113,6 +120,24 @@ export default function OverlayPage() {
     <div className="w-screen h-screen flex flex-col" style={{ pointerEvents: 'none', background: 'transparent' }}>
       {isActive && sources.length > 0 && (
         <SourceButton sourceCount={sources.length} onClick={handleSourcePanelOpen} />
+      )}
+
+      {playerInfo.prevEpisode && isActive && (
+        <PrevEpisodeCard
+          episode={playerInfo.prevEpisode as import('../../../shared/types/index').EpisodeVideo}
+          switchingEpisode={playerInfo.switchingEpisode ?? false}
+          onSwitch={() => sendEpisodeCommand('prevEpisode')}
+        />
+      )}
+
+      {playerInfo.nextEpisode && isActive && (
+        <NextEpisodeCard
+          episode={playerInfo.nextEpisode as import('../../../shared/types/index').EpisodeVideo}
+          switchingEpisode={playerInfo.switchingEpisode ?? false}
+          autoplayCountdown={playerInfo.autoplayCountdown ?? null}
+          onSwitch={() => sendEpisodeCommand('nextEpisode')}
+          onCancelAutoplay={() => sendEpisodeCommand('cancelAutoplay')}
+        />
       )}
 
       {sourcePanelOpen && (
@@ -147,6 +172,7 @@ export default function OverlayPage() {
           title={playerInfo.title}
           year={playerInfo.year || undefined}
           rating={playerInfo.rating || undefined}
+          episodeTitle={playerInfo.episodeTitle || undefined}
           onBack={handleBack}
         />
       </div>

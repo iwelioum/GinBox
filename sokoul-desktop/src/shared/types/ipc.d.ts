@@ -32,7 +32,7 @@ export type MpvCommand =
 
 /** MPV player control bridge for launching, seeking, and querying playback state via JSON IPC; all calls must be wrapped in try/catch. */
 export interface MpvAPI {
-  launch: (url: string) => Promise<void>;
+  launch: (url: string, mediaTitle?: string) => Promise<void>;
   kill: () => Promise<void>;
   waitUntilReady: (retries?: number, delayMs?: number) => Promise<boolean>;
   command: (cmd: MpvCommand | string[]) => Promise<unknown>;

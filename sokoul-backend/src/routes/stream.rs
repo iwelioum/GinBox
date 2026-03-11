@@ -26,9 +26,9 @@ use tokio::time::timeout;
 use crate::AppState;
 use crate::errors::AppError;
 use crate::models::{ContentType, Source};
-use crate::services::{cache, prowlarr, tmdb, torrentio};
+use crate::services::{cache, prowlarr, tmdb, torrentio, wastream};
 
-const MAX_RESULTS: usize = 20;
+const MAX_RESULTS: usize = 200;
 const MIN_SIZE_GB: f32 = 0.195;  // ~200 MB
 const MAX_SIZE_GB: f32 = 80.0;
 
@@ -75,10 +75,13 @@ pub async fn get_stream(
             let age = now.saturating_sub(cache_result.cached_at);
 
             if age < ttl {
-                // Fresh cache → respond immediately
+                // Fresh cache → also fetch live Wastream (never persisted, TTL can be days)
                 let mut results: Vec<Source> = cache_result.streams.iter()
                     .filter_map(|s| stream_to_source(s, "cache"))
                     .collect();
+                results.extend(
+                    fetch_wastream_for_cache(&id, &content_type, season, episode, &state).await
+                );
                 score_sources(&mut results);
                 post_process_sources(&mut results);
                 return Ok(Json(json!({
@@ -89,11 +92,15 @@ pub async fn get_stream(
             }
 
             // Stale cache → stale-while-revalidate:
-            // 1. Return old results immediately (is_stale: true)
+            // 1. Return old results immediately with live Wastream (is_stale: true)
             // 2. Launch new search in background
             let mut stale_results: Vec<Source> = cache_result.streams.iter()
                 .filter_map(|s| stream_to_source(s, "cache"))
                 .collect();
+            // Wastream with short timeout (2s) — don't delay stale response
+            stale_results.extend(
+                fetch_wastream_for_cache(&id, &content_type, season, episode, &state).await
+            );
             score_sources(&mut stale_results);
             post_process_sources(&mut stale_results);
 
@@ -157,8 +164,8 @@ async fn do_fresh_fetch(
 
     let torrentio_id = imdb_id.as_deref().unwrap_or(id);
 
-    // Torrentio: timeout 20s — Prowlarr: timeout 12s (indexer search)
-    let (torrentio_result, prowlarr_result) = tokio::join!(
+    // Torrentio: timeout 20s — Prowlarr: timeout 12s — Wastream: timeout 15s
+    let (torrentio_result, prowlarr_result, wastream_sources) = tokio::join!(
         async {
             timeout(
                 Duration::from_secs(20),
@@ -184,6 +191,18 @@ async fn do_fresh_fetch(
             } else {
                 Ok(vec![])
             }
+        },
+        async {
+            let imdb = imdb_id.as_deref().unwrap_or(id);
+            timeout(
+                Duration::from_secs(15),
+                wastream::fetch_wastream_streams(imdb, content_type, season, episode, state),
+            )
+            .await
+            .unwrap_or_else(|_| {
+                tracing::warn!("Wastream request timed out (15s)");
+                vec![]
+            })
         }
     );
 
@@ -208,6 +227,9 @@ async fn do_fresh_fetch(
             all_sources.push(source);
         }
     }
+    // Wastream DDL sources are already Source objects — merge directly
+    // (not added to all_for_cache: playback URLs are short-lived tokens)
+    all_sources.extend(wastream_sources);
 
     // Filter series packs (keep only targeted episode)
     if matches!(content_type, ContentType::Series) {
@@ -545,6 +567,33 @@ fn compute_title_relevance_penalty(source_title: &str, expected_title: &str) -> 
         return 450;
     }
     0
+}
+
+// ── Wastream live fetch for cache-hit responses ────────────────────────────────
+// Wastream URLs are short-lived tokens — never persisted. On every cache hit
+// (TTL can be up to 7 days) we re-fetch Wastream with a 3s timeout so they
+// appear alongside cached Torrentio/Prowlarr results without blocking the response.
+async fn fetch_wastream_for_cache(
+    id: &str,
+    content_type: &ContentType,
+    season: Option<u32>,
+    episode: Option<u32>,
+    state: &Arc<AppState>,
+) -> Vec<Source> {
+    if state.wastream_url.is_empty() {
+        return vec![];
+    }
+    let imdb_id = tmdb::resolve_to_imdb_id(id, content_type, state).await;
+    let imdb = imdb_id.as_deref().unwrap_or(id);
+    timeout(
+        Duration::from_secs(3),
+        wastream::fetch_wastream_streams(imdb, content_type, season, episode, state),
+    )
+    .await
+    .unwrap_or_else(|_| {
+        tracing::warn!("Wastream timeout on cache hit (3s)");
+        vec![]
+    })
 }
 
 // ── Internal Stream → frontend Source format conversion ───────────────────────

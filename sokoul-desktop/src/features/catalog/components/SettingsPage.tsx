@@ -9,6 +9,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { client as apiClient } from '@/shared/api/client';
 import type { StreamPreferences } from '@/stores/preferencesStore';
 import { SectionHeader, SettingsRow, Toggle, Select, ServiceTestButton } from './settingsWidgets';
+import { useToast } from '@/shared/hooks/useToast';
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -18,6 +19,7 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const {
     preferredLanguage,
@@ -33,6 +35,7 @@ export default function SettingsPage() {
 
   function update(partial: Partial<StreamPreferences>) {
     setPreferences(partial);
+    toast(t('settings.saved'), 'success', 2000);
   }
 
   // RD status
@@ -63,10 +66,11 @@ export default function SettingsPage() {
         queryClient.removeQueries({ queryKey: ['catalog'] });
         queryClient.removeQueries({ queryKey: ['detail'] });
       }
+      toast(t('settings.cacheCleared'), 'success', 2500);
     } finally {
       setClearingCache(null);
     }
-  }, [queryClient]);
+  }, [queryClient, toast, t]);
 
   // Options
   const languageOptions: { value: StreamPreferences['preferredLanguage']; label: string }[] = [
@@ -250,7 +254,7 @@ export default function SettingsPage() {
             </SettingsRow>
             <SettingsRow label={t('settings.resetPreferences')} description={t('settings.resetPreferencesDesc')}>
               <button
-                onClick={resetPreferences}
+                onClick={() => { resetPreferences(); toast(t('settings.preferencesReset'), 'info', 2500); }}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/[0.07] border border-[var(--color-white-12)]
                            text-white/60 hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30 transition-colors"
               >

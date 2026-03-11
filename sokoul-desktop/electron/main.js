@@ -28,7 +28,7 @@ function registerIpcHandlers() {
   ipcMain.handle('shell:openExternal',   (_, url)  => shell.openExternal(url))
 
   // ── MPV (notifications handled by mpv-manager via setWindows) ──────────
-  ipcMain.handle('mpv:launch', (_, { url }) => mpvManager.launch(url, mainWindowHwnd))
+  ipcMain.handle('mpv:launch', (_, { url, mediaTitle }) => mpvManager.launch(url, mainWindowHwnd, mediaTitle))
   ipcMain.handle('mpv:kill', () => mpvManager.kill())
 
   ipcMain.handle('mpv:waitUntilReady', async (_, retries = 20, delayMs = 150) => {

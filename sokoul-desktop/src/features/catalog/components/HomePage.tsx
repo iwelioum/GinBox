@@ -11,7 +11,7 @@ import { ContentRail }      from './ContentRail';
 import { Skeleton }         from '@/shared/components/ui';
 import { useProfileStore }  from '@/stores/profileStore';
 import { endpoints }        from '@/shared/api/client';
-import type { CatalogMeta, PlaybackEntry } from '@/shared/types';
+import type { CatalogMeta, PlaybackEntry, ListItem, UserList } from '@/shared/types';
 import {
   RAILS, SERIES_ONLY_RAIL_KEYS, MIN_RAIL_ITEMS,
   shuffle, getPositionVariant,
@@ -60,6 +60,40 @@ export default function HomePage({ mode }: HomePageProps) {
     enabled: profileId !== null,
     staleTime: 30_000,
   });
+
+  // Fetch user's lists to find the favorites/default list
+  const { data: userLists } = useQuery<UserList[]>({
+    queryKey: ['lists', profileId],
+    queryFn: () => endpoints.lists.list(profileId!).then(r => r.data),
+    enabled: profileId !== null,
+    staleTime: 60_000,
+  });
+  const favListId = userLists?.find(l => l.isDefault)?.id ?? null;
+
+  // Fetch items from the favorites list for "Recently Added" rail
+  const { data: favItems } = useQuery<ListItem[]>({
+    queryKey: ['list-items', favListId],
+    queryFn: () => endpoints.lists.getItems(favListId!).then(r => r.data),
+    enabled: favListId !== null,
+    staleTime: 60_000,
+  });
+
+  // Build "Recently Added to My List" rail from favorites
+  const recentlyAddedItems = React.useMemo(() => {
+    if (!favItems || favItems.length === 0) return [];
+    return [...favItems]
+      .sort((a, b) => b.addedAt - a.addedAt)
+      .slice(0, 20)
+      .map((li): CatalogMeta => ({
+        id: li.contentId,
+        type: li.contentType,
+        name: li.title,
+        poster: li.posterUrl,
+        poster_path: li.posterUrl,
+        backdrop_path: li.backdropUrl,
+        vote_average: li.rating,
+      }));
+  }, [favItems]);
 
   // Build "Continue Watching" items by matching history with catalog
   const continueWatchingItems = React.useMemo(() => {
@@ -222,6 +256,15 @@ export default function HomePage({ mode }: HomePageProps) {
             title={t('home.continueWatching')}
             items={continueWatchingItems}
             cardVariant="landscape"
+          />
+        )}
+
+        {/* Recently Added to My List */}
+        {recentlyAddedItems.length > 0 && (
+          <ContentRail
+            title={t('home.recentlyAdded')}
+            items={recentlyAddedItems}
+            cardVariant="poster"
           />
         )}
 
