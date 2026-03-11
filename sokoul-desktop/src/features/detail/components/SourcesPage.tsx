@@ -137,7 +137,7 @@ export default function SourcesPage() {
           <AlertTriangle size={40} className="text-red-400" />
           <p className="text-[22px] font-[700] m-0 text-red-400">{t('sources.loadingError')}</p>
           <p className="text-[14px] text-white/50 m-0 max-w-[400px] break-words">{fetchError}</p>
-          <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
+          <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-[6px] text-[14px] font-[600] transition-colors mt-[8px]">
             <RefreshCw size={16} /> {t('common.retry')}
           </button>
         </div>

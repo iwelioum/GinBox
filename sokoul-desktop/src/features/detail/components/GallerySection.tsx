@@ -64,7 +64,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-3 py-1 rounded-full text-[13px] font-[600]
-                            transition-all duration-200 cursor-pointer border ${
+                            transition-opacity duration-200 cursor-pointer border ${
                   activeTab === tab.key
                     ? 'border-[var(--color-accent)] text-[var(--color-accent)]'
                     : 'border-white/20 text-white/40 hover:border-white/40'
@@ -126,3 +126,4 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
     </section>
   );
 };
+

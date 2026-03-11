@@ -88,7 +88,7 @@ const Navbar: React.FC = () => {
                     'before:absolute before:bottom-[-6px] before:left-0 before:right-0',
                     'before:h-[2px] before:rounded-b-[4px] before:bg-dp-text',
                     'before:scale-x-0 before:origin-left before:opacity-0',
-                    'before:transition-all before:duration-[250ms]',
+                    'before:transition-[width,background-color,color] before:duration-[250ms]',
                     'before:[transition-timing-function:cubic-bezier(0.25,0.46,0.45,0.94)]',
                     'group-hover/link:before:scale-x-100 group-hover/link:before:opacity-100',
                     'text-[var(--color-text-primary)] text-sm tracking-[1.42px]',
@@ -164,3 +164,4 @@ const Navbar: React.FC = () => {
 };
 
 export { Navbar };
+

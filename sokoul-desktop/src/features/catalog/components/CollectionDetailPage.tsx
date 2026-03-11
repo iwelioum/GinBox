@@ -142,7 +142,7 @@ export default function CollectionDetailPage() {
                   <div className="aspect-[2/3] rounded-xl overflow-hidden
                                   bg-white/[0.04] ring-1 ring-white/[0.07]
                                   group-hover:ring-white/25 mb-2
-                                  transition-all duration-300">
+                                  transition-colors duration-300">
                     {film.poster ? (
                       <img
                         src={film.poster.startsWith('http')
@@ -191,4 +191,4 @@ export default function CollectionDetailPage() {
     </div>
   );
 }
-
+

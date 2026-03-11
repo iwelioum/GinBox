@@ -76,7 +76,7 @@ export function useHomePersonalized(
       .filter((e: PlaybackEntry) => e.progressPct > 5 && e.progressPct < 95 && !e.watched)
       .sort((a: PlaybackEntry, b: PlaybackEntry) => b.updatedAt - a.updatedAt)
       .map((e: PlaybackEntry) => {
-        const id = e.contentId.includes(':') ? e.contentId.split(':').pop()! : e.contentId;
+        const id = e.contentId.includes(':') ? e.contentId.split(':').pop() ?? e.contentId : e.contentId;
         return itemMap.get(id);
       })
       .filter((item): item is CatalogMeta => item !== undefined)
@@ -91,7 +91,7 @@ export function useHomePersonalized(
   }, [playbackHistory]);
 
   const recentlyWatchedId = recentlyWatched?.contentId?.includes(':')
-    ? recentlyWatched.contentId.split(':').pop()!
+    ? recentlyWatched.contentId.split(':').pop() ?? recentlyWatched.contentId
     : recentlyWatched?.contentId ?? '';
   const recentlyWatchedType = recentlyWatched?.contentType ?? 'movie';
 
@@ -120,3 +120,4 @@ export function useHomePersonalized(
     },
   };
 }
+

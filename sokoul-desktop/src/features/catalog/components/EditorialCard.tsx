@@ -28,7 +28,7 @@ export function EditorialCard({
   const [hovered, setHovered] = React.useState(false);
   const [loaded,  setLoaded]  = React.useState(false);
 
-  const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
+  const tmdbId     = item.id.includes(':') ? item.id.split(':').pop() ?? item.id : item.id;
   const fanartType = (item.type === 'series' ? 'tv' : 'movie') as 'movie' | 'tv';
 
   const { data: fanartData, isError: fanartError } = useQuery({
@@ -115,3 +115,4 @@ export function EditorialCard({
     </button>
   );
 }
+

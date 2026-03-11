@@ -86,7 +86,7 @@ export function useBrowseData(
   const playbackHistoryMap = React.useMemo(() => {
     const map = new Map<string, PlaybackEntry>();
     for (const e of (playbackHistoryRes ?? [])) {
-      const key = e.contentId.includes(':') ? e.contentId.split(':').pop()! : e.contentId;
+      const key = e.contentId.includes(':') ? e.contentId.split(':').pop() ?? e.contentId : e.contentId;
       if (!map.has(key)) map.set(key, e);
     }
     return map;
@@ -247,3 +247,4 @@ export function useBrowseData(
     resolveItemType,
   };
 }
+

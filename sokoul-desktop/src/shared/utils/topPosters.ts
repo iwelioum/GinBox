@@ -12,7 +12,7 @@ const APIKEY    = import.meta.env.VITE_TOP_POSTERS_KEY as string | undefined;
 function extractTmdbId(id: string): string | null {
   // "movie:123" or "series:456"
   if (id.includes(':')) {
-    const n = id.split(':').pop()!;
+    const n = id.split(':').pop() ?? id;
     return /^\d+$/.test(n) ? n : null;
   }
   // "movie-123" or "series-123"
@@ -48,3 +48,4 @@ export function getTopPosterUrl(item: CatalogMeta): string | null {
   const params = fallbackUrl ? `?fallback_url=${encodeURIComponent(fallbackUrl)}` : '';
   return `${BASE}/${APIKEY}/tmdb/poster/${contentType}-${numericId}.jpg${params}`;
 }
+

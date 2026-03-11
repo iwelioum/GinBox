@@ -112,7 +112,7 @@ const ActorPage: React.FC = () => {
         <button
           onClick={() => navigate(-1)}
           style={{ top: 'calc(var(--titlebar-height) + var(--navbar-height) + 8px)' }}
-          className="absolute left-5 z-50 flex items-center gap-1.5 px-4 py-2 bg-transparent  text-white/90 rounded text-[13px] font-medium transition-all duration-200 hover:bg-black/60 hover:text-white"
+          className="absolute left-5 z-50 flex items-center gap-1.5 px-4 py-2 bg-transparent  text-white/90 rounded text-[13px] font-medium transition-colors duration-200 hover:bg-black/60 hover:text-white"
         >
           <ChevronLeft size={18} />
           {t('actor.back')}

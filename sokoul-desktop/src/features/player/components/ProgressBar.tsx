@@ -30,7 +30,7 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         className={`
-          group/progress w-full cursor-pointer relative rounded-full transition-all duration-150
+          group/progress w-full cursor-pointer relative rounded-full transition-[color,background-color,opacity] duration-150
           ${hovered ? 'h-[5px]' : 'h-[3px]'}
           bg-white/15
         `}
@@ -38,7 +38,7 @@ export const ProgressBar = ({ position, duration, onSeek }: ProgressBarProps) =>
       >
         {/* Fill */}
         <div
-          className="h-full bg-accent rounded-full relative transition-all duration-300 ease-linear"
+          className="h-full bg-accent rounded-full relative transition-[color,background-color,opacity] duration-300 ease-linear"
           style={{ width: `${progress}%` }}
         >
           {/* Scrubber — visible only on hover */}

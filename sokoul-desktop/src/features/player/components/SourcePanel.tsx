@@ -155,7 +155,7 @@ export function SourcePanel({
               <div
                 id={`group-${quality}`}
                 role="region"
-                className={`grid transition-all duration-200 ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+                className={`grid transition-[color,background-color,opacity] duration-200 ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
               >
                 <div className="overflow-hidden">
                   {sorted.map((source, i) => (
@@ -194,7 +194,7 @@ export function SourceButton({ sourceCount, onClick }: SourceButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="absolute top-4 right-4 z-30 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/15 text-white/70 text-xs font-medium hover:bg-black/70 hover:text-white transition-all duration-200"
+      className="absolute top-4 right-4 z-30 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/15 text-white/70 text-xs font-medium hover:bg-black/70 hover:text-white transition-[color,background-color,opacity] duration-200"
       style={{ pointerEvents: 'auto' }}
     >
       <ListVideo className="w-4 h-4" />

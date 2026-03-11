@@ -201,7 +201,7 @@ export default function SearchPage() {
                   aria-label="Remove"
                   className="p-2 mr-1 bg-transparent border-none cursor-pointer text-white/20
                              hover:text-white/60 opacity-0 group-hover/entry:opacity-100
-                             transition-all duration-[var(--transition-fast)]"
+                             transition-colors duration-[var(--transition-fast)]"
                 >
                   <X size={14} />
                 </button>

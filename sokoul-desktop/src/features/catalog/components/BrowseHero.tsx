@@ -36,7 +36,7 @@ export function BrowseHero({ items, onPlay, onInfo }: BrowseHeroProps) {
 
   const fanartQueries = useQueries({
     queries: heroItems.map(item => {
-      const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
+      const tmdbId     = item.id.includes(':') ? item.id.split(':').pop() ?? item.id : item.id;
       const fanartType = (item.type === 'series' ? 'tv' : 'movie') as 'movie' | 'tv';
       return {
         queryKey:  ['hero-fanart', fanartType, tmdbId] as const,
@@ -207,4 +207,5 @@ export function BrowseHero({ items, onPlay, onInfo }: BrowseHeroProps) {
     </section>
   );
 }
+
 

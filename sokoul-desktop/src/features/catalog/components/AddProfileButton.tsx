@@ -21,7 +21,7 @@ export function AddProfileButton({ onClick }: AddProfileButtonProps) {
         border-2 border-dashed border-[var(--color-border)]
         flex flex-col items-center justify-center gap-1
         text-[var(--color-text-muted)]
-        transition-all duration-[var(--transition-base)]
+        transition-[border-color,box-shadow] duration-[var(--transition-base)]
         hover:border-[var(--color-accent)] hover:bg-[var(--color-bg-overlay)]
         hover:text-[var(--color-text-secondary)]
         group cursor-pointer

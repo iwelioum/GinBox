@@ -130,7 +130,7 @@ export default function ProfileSelectPage() {
           onClick={() => setIsEditMode(!isEditMode)}
           className={`
             px-6 py-3 rounded-lg text-sm font-medium
-            transition-all duration-[var(--transition-base)]
+            transition-[border-color,box-shadow] duration-[var(--transition-base)]
             ${isEditMode 
               ? 'bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)]'
               : 'bg-[var(--color-bg-elevated)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
@@ -153,3 +153,4 @@ export default function ProfileSelectPage() {
     </>
   )
 }
+

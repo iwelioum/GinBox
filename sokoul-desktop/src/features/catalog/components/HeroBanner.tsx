@@ -34,7 +34,7 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
   // Fanart logos (preloaded for all slides)
   const fanartQueries = useQueries({
     queries: slides.map(item => {
-      const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
+      const tmdbId     = item.id.includes(':') ? item.id.split(':').pop() ?? item.id : item.id;
       const fanartType = (item.type === 'series' ? 'tv' : 'movie') as 'movie' | 'tv';
       return {
         queryKey:  ['hero-fanart-home', fanartType, tmdbId] as const,
@@ -94,3 +94,4 @@ const HeroBanner: React.FC<HeroBannerProps> = ({ items }) => {
 };
 
 export { HeroBanner };
+

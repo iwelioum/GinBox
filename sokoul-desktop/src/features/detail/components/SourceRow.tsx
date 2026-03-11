@@ -33,7 +33,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
   const meta = useMemo(() => parseTorrentName(source.title), [source.title]);
 
   return (
-    <div className="flex items-center justify-between gap-[12px] w-full px-[16px] py-[14px] rounded-[10px] border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-150 group">
+    <div className="flex items-center justify-between gap-[12px] w-full px-[16px] py-[14px] rounded-[10px] border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-colors duration-150 group">
       
       <SourceBadges meta={meta} source={source} />
 

@@ -148,17 +148,17 @@ export function useMpv() {
 
   async function selectAudioTrack(id: number): Promise<void> {
     await window.mpv?.command({ command: ['set_property', 'aid', id] });
-    setTimeout(loadTracks, 150);
+    setTimeout(() => { loadTracks().catch(() => {}); }, 150);
   }
 
   async function selectSubTrack(id: number): Promise<void> {
     await window.mpv?.command({ command: ['set_property', 'sid', id] });
-    setTimeout(loadTracks, 150);
+    setTimeout(() => { loadTracks().catch(() => {}); }, 150);
   }
 
   async function disableSubs(): Promise<void> {
     await window.mpv?.command({ command: ['set_property', 'sid', 'no'] });
-    setTimeout(loadTracks, 150);
+    setTimeout(() => { loadTracks().catch(() => {}); }, 150);
   }
 
   async function setSpeed(rate: number): Promise<void> {

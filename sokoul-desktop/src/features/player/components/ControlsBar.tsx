@@ -45,7 +45,7 @@ function IconBtn({
       aria-label={title}
       className={`
         text-white/70 hover:text-white hover:scale-110 
-        transition-all duration-150 ease-out
+        transition-[color,background-color,opacity] duration-150 ease-out
         flex items-center justify-center
         p-2 rounded-full
         ${isActive ? 'text-accent' : ''}
@@ -71,7 +71,7 @@ function VolumeSlider({
   return (
     <div 
       className={`
-        overflow-hidden transition-all duration-150 ease-out
+        overflow-hidden transition-[color,background-color,opacity] duration-150 ease-out
         ${expanded ? 'w-20' : 'w-0'}
       `}
     >

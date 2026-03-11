@@ -47,7 +47,7 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
         />
         {/* Dark overlay + "Trailer" text at bottom left */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent
-                        group-hover:from-black/50 transition-all duration-300" />
+                        group-hover:from-black/50 transition-[transform,opacity] duration-300" />
         <span className="absolute bottom-4 left-5 text-white/60 text-[13px] font-semibold
                          uppercase tracking-[0.15em]">
           {t('detail.officialTrailer')}
@@ -58,7 +58,7 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
             className="w-20 h-20 rounded-full flex items-center justify-center
                        bg-dp-text/15 border border-dp-text/30
                        group-hover:scale-110 group-hover:bg-dp-text/25
-                       transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
+                       transition-[transform,opacity] duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
           >
             <Play size={34} className="fill-white text-white ml-1.5" />
           </div>
@@ -95,3 +95,4 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
     </section>
   );
 };
+

@@ -117,7 +117,7 @@ export default function MyListsPage() {
                     />
                     {hoveredId === item.contentId && (
                       <button
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all z-10"
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors z-10"
                         style={{
                           backgroundColor: 'rgba(0,0,0,0.70)',
                           color: '#ffffff',
