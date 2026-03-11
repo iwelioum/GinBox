@@ -8,6 +8,7 @@ import { useLists, useListItems, useRemoveFromList }  from '../../../shared/hook
 import { ContentCard }                                from './ContentCard'
 import { Skeleton }                                   from '@/shared/components/ui'
 import { EmptyState }                                 from '@/shared/components/ui/EmptyState'
+import { QueryErrorState }                            from '@/shared/components/ui/QueryErrorState'
 import { Heart, List }                                from 'lucide-react'
 import type { UserList, ListItem, CatalogMeta }       from '../../../shared/types/index'
 
@@ -28,7 +29,7 @@ export default function MyListsPage() {
 
   const activeList = lists.find((l) => l.id === selectedListId)
 
-  const { data: items = [], isLoading: itemsLoading } = useListItems(selectedListId)
+  const { data: items = [], isLoading: itemsLoading, isError, refetch } = useListItems(selectedListId)
 
   return (
     <div
@@ -85,6 +86,8 @@ export default function MyListsPage() {
               <Skeleton variant="card" />
               <Skeleton variant="card" />
             </div>
+          ) : isError ? (
+            <QueryErrorState error={null} refetch={refetch} />
           ) : items.length === 0 ? (
             <EmptyState
               icon={<List />}

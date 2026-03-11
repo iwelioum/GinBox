@@ -164,7 +164,7 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
                     : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-overlay)]'
                 }`}
               >
-                {t('detail.seasonNumber', { number: s }).replace('{{number}}', s.toString())}
+                {t('detail.seasonNumber', { number: s })}
               </button>
             ))}
           </div>

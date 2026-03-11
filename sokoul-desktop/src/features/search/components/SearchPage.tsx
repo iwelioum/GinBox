@@ -110,7 +110,7 @@ export default function SearchPage() {
             placeholder={t('search.placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full px-5 py-3 pr-12 rounded-xl bg-white/[0.06] border border-white/[0.08] focus:outline-none focus:border-white/20 text-lg text-white/90 placeholder-white/30 transition-colors"
+            className="w-full px-5 py-3 pr-12 rounded-xl bg-white/[0.06] border border-white/[0.08] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-white/20 text-lg text-white/90 placeholder-white/30 transition-colors"
           />
           <SearchIcon
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none"

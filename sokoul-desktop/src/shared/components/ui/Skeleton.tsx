@@ -4,7 +4,7 @@ import * as React from 'react';
 const cn = (...classes: (string | undefined | false | null)[]) => classes.filter(Boolean).join(' ');
 
 export interface SkeletonProps {
-  variant?: 'text' | 'card' | 'circle' | 'rail' | 'poster';
+  variant?: 'text' | 'card' | 'circle' | 'rail' | 'poster' | 'hero' | 'inline';
   width?: string | number;
   height?: string | number;
   count?: number;
@@ -17,6 +17,8 @@ const variantClasses: Record<NonNullable<SkeletonProps['variant']>, string> = {
   circle: 'h-12 w-12 rounded-full',
   rail: 'w-56 aspect-[2/3] flex-shrink-0 rounded-[var(--radius-card)]',
   poster: 'w-40 h-60 aspect-[2/3] flex-shrink-0 rounded-[var(--radius-card)]',
+  hero: 'w-full h-[65vh] rounded-none',
+  inline: 'h-4 rounded',
 };
 
 export function Skeleton({

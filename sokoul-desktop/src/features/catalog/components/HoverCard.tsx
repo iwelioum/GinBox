@@ -2,10 +2,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { EnrichedItem } from './CatalogFilters';
 import { calcHoverPosition } from '@/shared/utils/hoverCardPosition';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 import { endpoints } from '@/shared/api/client';
+import { useLists, useAddToList } from '@/shared/hooks/useLists';
 import type { VideoItem, ContentType } from '@/shared/types/index';
 
 const KIND_KEYS: Record<string, string> = {
@@ -30,6 +32,9 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   item, anchorRect, onLeave,
 }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { data: lists } = useLists();
+  const addToList = useAddToList();
   const { top, left, transformOrigin } = calcHoverPosition(anchorRect);
 
   // Delay trailer fetch by 600ms to avoid unnecessary requests on brief hovers
@@ -111,14 +116,20 @@ export const HoverCard: React.FC<HoverCardProps> = ({
                         flex items-center justify-between">
           <div className="flex gap-2">
             {/* Play button */}
-            <button className="flex items-center gap-1.5 px-4 py-2
+            <button
+              onClick={() => navigate(`/detail/${item.type === 'tv' ? 'series' : item.type}/${item.id}`)}
+              aria-label={t('common.play')}
+              className="flex items-center gap-1.5 px-4 py-2
                                bg-white text-black rounded-full
                                text-xs font-bold hover:bg-white/90
                                transition-colors">
               ▶ {t('common.play')}
             </button>
             {/* + List button */}
-            <button className="w-8 h-8 rounded-full bg-white/20
+            <button
+              onClick={() => { if (lists?.[0]) addToList.mutate({ listId: lists[0].id, contentId: String(item.id), contentType: (item.type === 'tv' ? 'series' : item.type) as ContentType }); }}
+              aria-label={t('detail.addToMyList')}
+              className="w-8 h-8 rounded-full bg-white/20
                                border border-white/30 text-white
                                flex items-center justify-center
                                hover:bg-white/30 transition-colors

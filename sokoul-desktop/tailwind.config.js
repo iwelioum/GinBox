@@ -28,7 +28,8 @@ export default {
       },
 
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['Clash Display', 'Plus Jakarta Sans', 'sans-serif'],
       },
 
       height: {

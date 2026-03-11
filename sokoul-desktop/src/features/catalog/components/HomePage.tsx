@@ -29,11 +29,16 @@ function LoadingState(): React.ReactElement {
 function ErrorState(): React.ReactElement {
   const { t } = useTranslation();
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: 16, color: 'rgba(249,249,249,0.4)' }}>
-      <p style={{ fontSize: 18, fontWeight: 600, color: 'rgba(249,249,249,0.6)' }}>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-[var(--color-text-muted)]">
+      <div className="text-[var(--color-text-muted)]">
+        <svg className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12 20.5h.01" />
+        </svg>
+      </div>
+      <p className="text-lg font-semibold text-[var(--color-text-secondary)]">
         {t('home.catalogNotResponding')}
       </p>
-      <p style={{ fontSize: 13, textAlign: 'center', maxWidth: 400, lineHeight: 1.6 }}>
+      <p className="text-sm text-center max-w-[400px] leading-relaxed text-[var(--color-text-muted)]">
         {t('home.catalogHelpText')}
       </p>
     </div>

@@ -287,6 +287,8 @@
     "errorLaunchPlayback": "Error launching playback",
     "addToMyList": "Add to my list",
     "inMyList": "In my list",
+    "readMore": "Read more",
+    "readLess": "Read less",
     "seasons_one": "{{count}} season",
     "seasons_other": "{{count}} seasons",
     "frAudioUnconfirmed": "FR audio unconfirmed",

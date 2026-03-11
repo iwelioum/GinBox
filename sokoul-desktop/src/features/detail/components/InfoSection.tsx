@@ -119,7 +119,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme: _theme })
               className="text-[var(--color-accent)] text-sm font-medium hover:text-[var(--color-accent-hover)] 
                          transition-colors"
             >
-              {synopsisExpanded ? 'Lire moins' : 'Lire plus'}
+              {synopsisExpanded ? t('detail.readLess') : t('detail.readMore')}
             </button>
           )}
         </div>

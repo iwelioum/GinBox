@@ -287,6 +287,8 @@
     "errorLaunchPlayback": "Erreur de lancement de la lecture",
     "addToMyList": "Ajouter à ma liste",
     "inMyList": "Dans ma liste",
+    "readMore": "Lire plus",
+    "readLess": "Lire moins",
     "seasons_one": "{{count}} saison",
     "seasons_other": "{{count}} saisons",
     "frAudioUnconfirmed": "Audio FR non confirmé",

@@ -86,10 +86,10 @@ const ContentCardInner: React.FC<ContentCardProps> = ({
       }
       onMouseLeave={onHoverLeave}
     >
-      <Link to={`/detail/${type}/${id}`} className="block w-full h-full relative">
+      <Link to={`/detail/${type}/${id}`} className="block w-full h-full relative focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)] focus-visible:outline-none rounded-[var(--radius-card)]">
         {/* Skeleton placeholder */}
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-[var(--color-bg-elevated)] animate-pulse" />
+          <div className="absolute inset-0 bg-[var(--color-bg-elevated)] skeleton-shimmer" />
         )}
 
         {/* Main artwork */}

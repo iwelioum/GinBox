@@ -24,6 +24,7 @@ import { ContentSection }           from './ContentSection';
 import { EmptyBrowseState }         from './EmptyBrowseState';
 import { FilterDrawer }             from './FilterDrawer';
 import { QueryErrorState }          from '@/shared/components/ui/QueryErrorState';
+import { Skeleton }                 from '@/shared/components/ui';
 
 /* ═══════════════════════════════════════════════════════════
    BrowsePage — main page component (composes sub-components)
@@ -175,7 +176,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
           {isLoading && rawItems.length === 0 && (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
               {Array.from({ length: 28 }).map((_, i) => (
-                <div key={i} className="aspect-[2/3] rounded-lg bg-[--color-bg-elevated] animate-pulse" />
+                <Skeleton key={i} variant="card" />
               ))}
             </div>
           )}

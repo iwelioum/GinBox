@@ -118,14 +118,16 @@ const Navbar: React.FC = () => {
 
             {/* Dropdown — visible on hover */}
             <div
-              className="absolute right-0 top-12 opacity-0 group-hover/avatar:opacity-100
-                         pointer-events-none group-hover/avatar:pointer-events-auto
-                         bg-[rgb(19,19,19)] border border-[rgba(151,151,151,0.34)]
+              role="menu"
+              className="absolute right-0 top-12 opacity-0 group-hover/avatar:opacity-100 group-focus-within/avatar:opacity-100
+                         pointer-events-none group-hover/avatar:pointer-events-auto group-focus-within/avatar:pointer-events-auto
+                         bg-[var(--color-bg-elevated)] border border-[var(--color-border-medium)]
                          rounded-[var(--radius-card)] shadow-[0_8px_32px_rgba(0,0,0,0.6)]
                          py-1.5 text-sm tracking-normal min-w-[160px]
                          transition-opacity duration-[var(--transition-base)] whitespace-nowrap"
             >
               <button
+                role="menuitem"
                 onClick={() => navigate('/profile')}
                 className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
                            hover:bg-white/10 text-sm tracking-[0.5px] px-4 py-2 block
@@ -134,9 +136,10 @@ const Navbar: React.FC = () => {
                 {t('navbar.profile')}
               </button>
 
-              <div className="h-px bg-[rgba(151,151,151,0.2)] my-1" />
+              <div className="h-px bg-[var(--color-border)] my-1" />
 
               <button
+                role="menuitem"
                 onClick={() => navigate('/settings')}
                 className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
                            hover:bg-white/10 text-sm tracking-[0.5px] px-4 py-2 block
@@ -145,9 +148,10 @@ const Navbar: React.FC = () => {
                 {t('common.settings')}
               </button>
 
-              <div className="h-px bg-[rgba(151,151,151,0.2)] my-1" />
+              <div className="h-px bg-[var(--color-border)] my-1" />
 
               <button
+                role="menuitem"
                 onClick={() => navigate('/profile-select')}
                 className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
                            hover:bg-white/10 text-sm tracking-[0.5px] px-4 py-2 block

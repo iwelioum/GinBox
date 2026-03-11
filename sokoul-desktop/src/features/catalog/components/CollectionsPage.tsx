@@ -157,7 +157,7 @@ export default function CollectionsPage() {
               className="w-full pl-10 pr-4 py-2.5 rounded-xl
                          bg-white/[0.06] border border-white/[0.08]
                          text-white/80 text-sm placeholder:text-white/30
-                         focus:outline-none focus:border-white/20
+                         focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]/40 focus:border-white/20
                          focus:bg-white/[0.08] transition-colors duration-200"
             />
           </div>

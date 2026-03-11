@@ -62,7 +62,7 @@ export function Toggle({ checked, onChange }: ToggleProps) {
       onClick={() => onChange(!checked)}
       className={[
         'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full',
-        'transition-colors duration-200 ease-in-out focus:outline-none',
+        'transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]',
         checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-white-15)]',
       ].join(' ')}
     >
@@ -92,7 +92,7 @@ export function Select<T extends string>({ value, options, onChange }: SelectPro
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as T)}
-      className="rounded-lg px-3 py-1.5 text-sm focus:outline-none cursor-pointer
+      className="rounded-lg px-3 py-1.5 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] cursor-pointer
                  bg-white/[0.07] border border-[var(--color-white-12)] text-white/[0.85]
                  min-w-[120px]"
     >

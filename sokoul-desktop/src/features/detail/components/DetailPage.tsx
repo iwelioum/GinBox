@@ -144,7 +144,16 @@ const DetailPage: React.FC = () => {
         )}
 
         <div className="max-w-[1400px] mx-auto pt-8 pb-24 space-y-8">
-          <React.Suspense fallback={null}>
+          <React.Suspense fallback={
+            <div className="space-y-8 animate-pulse">
+              <div className="h-6 w-32 rounded bg-[var(--color-bg-elevated)]" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="aspect-[2/3] rounded-[var(--radius-card)] skeleton-shimmer bg-[var(--color-bg-elevated)]" />
+                ))}
+              </div>
+            </div>
+          }>
             <TrailerSection videos={data.videos} theme={data.theme} />
             <StatsSection item={item} theme={data.theme} />
             <CastSection credits={data.credits} theme={data.theme} />
