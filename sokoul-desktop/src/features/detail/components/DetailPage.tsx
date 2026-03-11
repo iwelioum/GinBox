@@ -25,8 +25,8 @@ const StatsSection = React.lazy(() => import('./StatsSection').then(m => ({ defa
 const SimilarSection = React.lazy(() => import('./SimilarSection').then(m => ({ default: m.SimilarSection })));
 
 const sectionVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
 function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -35,7 +35,7 @@ function RevealSection({ children, className = '' }: { children: React.ReactNode
       variants={sectionVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.15 }}
+      viewport={{ once: true, amount: 0.1 }}
       className={className}
     >
       {children}
@@ -54,7 +54,8 @@ const DetailPage: React.FC = () => {
 
   if (data.metaError || !data.item) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg-base)] flex flex-col items-center justify-center text-[var(--color-text-secondary)] gap-4">
+      <div className="min-h-screen bg-[var(--color-bg-base)] flex flex-col items-center justify-center
+                      text-[var(--color-text-secondary)] gap-4">
         <p>{t('detail.errorLoading')}</p>
         <Button variant="secondary" onClick={() => navigate(-1)}>← {t('common.back')}</Button>
       </div>
@@ -81,18 +82,15 @@ const DetailPage: React.FC = () => {
             className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)] bg-cover bg-top bg-no-repeat"
             style={{ backgroundImage: `url(${bgBackdrop})` }}
           />
-          {/* Vertical fade — image → base */}
           <div className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)]
-                          bg-gradient-to-b from-black/50 via-transparent via-40% to-[var(--color-bg-base)]" />
-          {/* Left text-readability gradient */}
+                          bg-gradient-to-b from-black/40 via-transparent via-40% to-[var(--color-bg-base)]" />
           <div className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)]
                           bg-gradient-to-r from-black/80 via-black/30 via-50% to-transparent" />
-          {/* Accent glow — genre-aware radial */}
           <div
-            className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)] accent-glow-pulse mix-blend-color pointer-events-none"
+            className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)] accent-glow-pulse
+                       mix-blend-color pointer-events-none"
             style={{ background: `radial-gradient(ellipse 80% 60% at 15% 75%, ${accent}, transparent 65%)` }}
           />
-          {/* Bottom hard edge into content */}
           <div className="absolute inset-x-0 bottom-0 h-48 -translate-y-[calc(100vh-var(--detail-hero-height))]
                           bg-gradient-to-t from-[var(--color-bg-base)] to-transparent pointer-events-none" />
         </>
@@ -151,18 +149,21 @@ const DetailPage: React.FC = () => {
               <span className="text-sm font-semibold">{playback.playError}</span>
               <button
                 onClick={() => playback.setPlayError(null)}
-                className="ml-2 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors"
+                className="ml-2 px-3 py-1 rounded-lg bg-[var(--color-white-8)]
+                           hover:bg-[var(--color-white-15)] text-xs font-bold transition-colors"
               >✕</button>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* ── Content sections ─────────────────────────────────────── */}
-        <div className="-mt-16 px-[var(--section-px)] pb-8">
+        <div className="-mt-12 px-[var(--section-px)] pb-8">
+          {/* Info metadata grid */}
           <RevealSection>
             <InfoSection item={item} theme={data.theme} />
           </RevealSection>
 
+          {/* Episodes (series only) */}
           {data.isSeries && data.seasons.length > 0 && (
             <RevealSection className="mt-8">
               <DetailEpisodes
@@ -181,22 +182,38 @@ const DetailPage: React.FC = () => {
             </RevealSection>
           )}
 
-          <div className="max-w-[var(--detail-content-max)] mx-auto pt-8 pb-24 space-y-12">
+          {/* Below-fold sections */}
+          <div className="max-w-[var(--detail-content-max)] mx-auto pt-10 pb-24 space-y-14">
             <React.Suspense fallback={
               <div className="space-y-8">
-                <div className="h-6 w-32 rounded skeleton-shimmer bg-[var(--color-bg-elevated)]" />
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="aspect-[2/3] rounded-[var(--radius-card)] skeleton-shimmer bg-[var(--color-bg-elevated)]" />
+                <div className="h-4 w-28 rounded skeleton-shimmer" />
+                <div className="flex gap-5">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="w-[72px] h-[72px] rounded-full skeleton-shimmer" />
                   ))}
                 </div>
               </div>
             }>
-              <RevealSection><TrailerSection videos={data.videos} theme={data.theme} /></RevealSection>
-              <RevealSection><StatsSection item={item} theme={data.theme} /></RevealSection>
+              {/* Cast & crew */}
               <RevealSection><CastSection credits={data.credits} theme={data.theme} /></RevealSection>
+
+              {/* Trailers */}
+              <RevealSection><TrailerSection videos={data.videos} theme={data.theme} /></RevealSection>
+
+              {/* Stats & ratings */}
+              <RevealSection><StatsSection item={item} theme={data.theme} /></RevealSection>
+
+              {/* Gallery */}
               {data.images && <RevealSection><GallerySection images={data.images} /></RevealSection>}
-              {data.collection && <RevealSection><SagaSection collection={data.collection} currentId={Number(data.id)} /></RevealSection>}
+
+              {/* Collection/saga */}
+              {data.collection && (
+                <RevealSection>
+                  <SagaSection collection={data.collection} currentId={Number(data.id)} />
+                </RevealSection>
+              )}
+
+              {/* Similar content */}
               <RevealSection><SimilarSection items={data.similar} theme={data.theme} /></RevealSection>
             </React.Suspense>
           </div>

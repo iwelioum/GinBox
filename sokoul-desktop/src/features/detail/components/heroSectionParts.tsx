@@ -1,101 +1,9 @@
-// heroSectionParts.tsx — Sub-components for HeroSection
+// heroSectionParts.tsx — HeroActions sub-component for HeroSection
 // Extracted to keep HeroSection under 300 lines (AGENTS.md Rule 4)
 
 import * as React from 'react';
-import { Play, Plus, Check, Download, Loader2, Star } from 'lucide-react';
+import { Play, Plus, Check, Download, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-export function ratingColor(r: number): string {
-  if (r >= 7.5) return 'var(--color-success)';
-  if (r >= 6)   return 'var(--color-warning)';
-  return 'var(--color-danger)';
-}
-
-export function formatVotes(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}k`;
-  return String(n);
-}
-
-// ── Metadata badges ──────────────────────────────────────────────────────────
-
-interface HeroMetaBadgesProps {
-  ratingStr: string;
-  rating: number;
-  voteCount: number;
-  year: string;
-  runtime: string;
-  isSeries: boolean;
-  seasons?: number;
-  genreNames: string[];
-}
-
-export const HeroMetaBadges: React.FC<HeroMetaBadgesProps> = ({
-  ratingStr, rating, voteCount, year, runtime, isSeries, seasons, genreNames,
-}) => {
-  const { t } = useTranslation();
-  const rc = ratingColor(rating);
-
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-6">
-      {ratingStr && (
-        <span
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold
-                     backdrop-blur-sm border transition-shadow duration-300
-                     hover:shadow-[0_0_16px_var(--color-success)/20]"
-          style={{
-            background: `color-mix(in srgb, ${rc} 12%, transparent)`,
-            borderColor: `color-mix(in srgb, ${rc} 30%, transparent)`,
-            color: rc,
-          }}
-        >
-          <Star size={12} className="fill-current" />
-          {ratingStr}
-          {voteCount > 0 && (
-            <span className="opacity-50 font-normal text-xs">({formatVotes(voteCount)})</span>
-          )}
-        </span>
-      )}
-
-      {(year || runtime || (isSeries && seasons)) && ratingStr && (
-        <span className="text-[var(--color-text-muted)] select-none">·</span>
-      )}
-
-      {year && <span className="text-[var(--color-text-secondary)] text-sm font-medium">{year}</span>}
-
-      {(runtime || (isSeries && seasons)) && (
-        <>
-          <span className="text-[var(--color-text-muted)] select-none">·</span>
-          <span className="text-[var(--color-text-secondary)] text-sm font-medium">
-            {isSeries && seasons
-              ? t('detail.seasons', { count: seasons })
-              : runtime}
-          </span>
-        </>
-      )}
-
-      {genreNames.length > 0 && (
-        <>
-          <span className="text-[var(--color-text-muted)] select-none">·</span>
-          <div className="flex flex-wrap gap-1.5">
-            {genreNames.slice(0, 3).map((genre) => (
-              <span
-                key={genre}
-                className="px-2.5 py-1 rounded-full text-xs font-medium
-                           text-[var(--color-text-secondary)] bg-[var(--color-white-8)]
-                           backdrop-blur-sm border border-[var(--color-border)]
-                           transition-colors duration-200 hover:bg-[var(--color-white-12)]
-                           hover:text-[var(--color-text-primary)]"
-              >
-                {genre}
-              </span>
-            ))}
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
 
 // ── Action buttons ───────────────────────────────────────────────────────────
 
@@ -124,7 +32,7 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
         type="button"
         onClick={onPlay}
         disabled={isPlayLoading}
-        className="group relative h-13 rounded-2xl px-8 overflow-hidden flex items-center gap-3
+        className="group relative h-12 rounded-2xl px-8 overflow-hidden flex items-center gap-3
                    font-bold text-base text-white active:scale-[0.96]
                    transition-all duration-300 disabled:opacity-60
                    hover:shadow-[0_0_40px_8px] hover:brightness-110
@@ -142,9 +50,9 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
                          bg-gradient-to-r from-transparent via-white/25 to-transparent
                          transition-transform duration-700 ease-in-out pointer-events-none" />
         {isPlayLoading ? (
-          <Loader2 size={21} className="animate-spin flex-shrink-0" />
+          <Loader2 size={20} className="animate-spin flex-shrink-0" />
         ) : (
-          <Play size={21} className="fill-current flex-shrink-0" />
+          <Play size={20} className="fill-current flex-shrink-0" />
         )}
         <span>{isPlayLoading ? t('detail.searching') : t('common.play')}</span>
       </button>
@@ -154,7 +62,7 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
         type="button"
         onClick={onToggleFavorite}
         disabled={isAddingToList}
-        className="h-13 rounded-2xl px-6 flex items-center gap-2.5
+        className="h-12 rounded-2xl px-5 flex items-center gap-2
                    bg-[var(--color-white-8)] backdrop-blur-xl
                    border border-[var(--color-border-medium)]
                    text-[var(--color-text-primary)]/90 font-medium text-sm
@@ -163,11 +71,11 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
                    focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none"
       >
         {isAddingToList ? (
-          <Loader2 size={18} className="animate-spin" />
+          <Loader2 size={17} className="animate-spin" />
         ) : isFavorite ? (
-          <Check size={18} style={{ color: accent }} />
+          <Check size={17} style={{ color: accent }} />
         ) : (
-          <Plus size={18} />
+          <Plus size={17} />
         )}
         <span>{isFavorite ? t('detail.inMyList') : t('detail.addToMyList')}</span>
       </button>
@@ -178,7 +86,7 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
         onClick={onDownload}
         title={t('common.sources')}
         aria-label={t('common.sources')}
-        className="h-13 w-13 rounded-2xl flex items-center justify-center
+        className="h-12 w-12 rounded-2xl flex items-center justify-center
                    bg-[var(--color-white-8)] backdrop-blur-xl
                    border border-[var(--color-border-medium)]
                    text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]
@@ -186,7 +94,7 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
                    active:scale-[0.96] transition-all duration-200
                    focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none"
       >
-        <Download size={19} />
+        <Download size={18} />
       </button>
     </div>
   );

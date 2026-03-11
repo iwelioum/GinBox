@@ -1,6 +1,5 @@
-// components/detail/SagaSection.tsx — Step 11
-// Films from a TMDB collection
-// Current film highlighted with colored ring
+// components/detail/SagaSection.tsx — Collection/franchise timeline
+// Poster cards with current film highlighting · Number badges · Collection overview
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +16,7 @@ interface CollectionPart {
 interface Collection {
   id:       number;
   name:     string;
+  overview?: string;
   parts?:   CollectionPart[];
 }
 
@@ -32,16 +32,26 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
 
   if (!col?.parts || col.parts.length === 0) return null;
 
+  const sorted = [...col.parts].sort((a, b) => {
+    const da = a.release_date ? new Date(a.release_date).getTime() : 0;
+    const db = b.release_date ? new Date(b.release_date).getTime() : 0;
+    return da - db;
+  });
+
   return (
-    <section className="mb-[40px]">
-      <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-4">
+    <section>
+      <h2 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-widest mb-2">
         {t('detail.sagaPrefix', { name: col.name })}
       </h2>
-      <div
-        className="flex gap-4 overflow-x-auto pb-4 scroll-smooth"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
-      >
-        {col.parts.map(part => {
+      {col.overview && (
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-5 max-w-2xl line-clamp-2">
+          {col.overview}
+        </p>
+      )}
+
+      <div className="flex gap-4 overflow-x-auto pb-4 scroll-smooth
+                      scrollbar-thin scrollbar-thumb-[var(--color-white-8)] scrollbar-track-transparent">
+        {sorted.map((part, idx) => {
           const isCurrent = part.id === currentId;
           const posterUrl = part.poster_path
             ? `${TMDB_IMAGE_BASE}w185${part.poster_path}`
@@ -53,44 +63,49 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
               key={part.id}
               type="button"
               onClick={() => !isCurrent && navigate(`/detail/movie/${part.id}`)}
-              className="flex-shrink-0 flex flex-col items-center gap-2 w-[90px] group cursor-pointer"
+              disabled={isCurrent}
+              className={`flex-shrink-0 flex flex-col items-center gap-2 w-24 group cursor-pointer
+                         focus-visible:outline-none focus-visible:ring-2
+                         focus-visible:ring-[var(--color-accent)] rounded-lg
+                         transition-opacity duration-200
+                         ${isCurrent ? 'cursor-default' : 'hover:opacity-90'}`}
             >
-              <div
-                className="w-[90px] h-[135px] rounded-lg overflow-hidden relative"
-                style={{
-                  outline: isCurrent ? '2px solid var(--color-accent)' : '2px solid transparent',
-                  outlineOffset: '2px',
-                  boxShadow: isCurrent ? '0 0 16px rgba(var(--accent-rgb,0,114,210),0.4)' : 'none',
-                  transition: 'box-shadow 0.3s',
-                }}
-              >
+              <div className={`relative w-24 h-36 rounded-lg overflow-hidden
+                              transition-shadow duration-300
+                              ${isCurrent
+                                ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--color-bg-base)] shadow-[0_0_16px_rgba(108,99,255,0.3)]'
+                                : 'shadow-[var(--shadow-card)] group-hover:shadow-[var(--shadow-card-hover)]'
+                              }`}>
                 {posterUrl ? (
                   <img
                     src={posterUrl}
                     alt={part.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500
+                               group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/20 text-xs">
+                  <div className="w-full h-full bg-[var(--color-bg-elevated)] flex items-center justify-center
+                                  text-[var(--color-text-muted)] text-xs">
                     ?
                   </div>
                 )}
 
-                {/* Current film badge */}
-                {isCurrent && (
-                  <div
-                    className="absolute top-1.5 right-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full text-white"
-                    style={{ background: 'var(--color-accent)' }}
-                  >
-                    {t('detail.here')}
-                  </div>
-                )}
+                {/* Number badge */}
+                <span className={`absolute top-1.5 left-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full
+                                 ${isCurrent
+                                   ? 'bg-[var(--color-accent)] text-white'
+                                   : 'bg-black/60 text-[var(--color-text-secondary)]'}`}>
+                  {idx + 1}
+                </span>
               </div>
-              <p className="text-white/70 text-xs text-center leading-tight line-clamp-2 w-full">
+              <p className={`text-xs text-center leading-tight line-clamp-2 w-full
+                            ${isCurrent ? 'text-[var(--color-text-primary)] font-semibold' : 'text-[var(--color-text-secondary)]'}`}>
                 {part.title}
               </p>
-              {year && <p className="text-white/35 text-[11px]">{year}</p>}
+              {year && (
+                <p className="text-[var(--color-text-muted)] text-[11px] -mt-1">{year}</p>
+              )}
             </button>
           );
         })}

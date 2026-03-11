@@ -1,6 +1,5 @@
 // components/detail/StatsSection.tsx
-// Grid 2×4 · EaseOut counters · Animated bars var(--accent)
-// IntersectionObserver → triggers animations on scroll
+// Rating gauges · Animated counters · Trakt reviews · Design tokens
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +33,7 @@ interface AnimatedNumberProps {
 const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   value, active, decimals = 0, suffix = '', prefix = '',
 }) => {
-  const raw       = useCountUp(Math.round(value * 10 ** decimals), active, 1500);
+  const raw = useCountUp(Math.round(value * 10 ** decimals), active, 1500);
   const formatted = decimals > 0
     ? (raw / 10 ** decimals).toFixed(decimals)
     : raw.toLocaleString('en-US');
@@ -52,7 +51,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 interface StatEntry {
   label:    string;
   value:    number;
-  percent:  number; // 0–100 for the bar
+  percent:  number;
   decimals?: number;
   suffix?:   string;
   prefix?:   string;
@@ -60,8 +59,10 @@ interface StatEntry {
 }
 
 const StatCard: React.FC<{ stat: StatEntry; active: boolean }> = ({ stat, active }) => (
-  <div className="flex flex-col gap-2 p-4 rounded-xl bg-white/5 border border-white/10">
-    <span className="text-xs text-white/30 uppercase tracking-wide">
+  <div className="flex flex-col gap-2 p-4 rounded-xl bg-[var(--color-white-4)]
+                  border border-[var(--color-border)] hover:border-[var(--color-border-medium)]
+                  transition-colors duration-200">
+    <span className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest font-medium">
       {stat.label}
     </span>
     <span
@@ -76,8 +77,7 @@ const StatCard: React.FC<{ stat: StatEntry; active: boolean }> = ({ stat, active
         prefix={stat.prefix ?? ''}
       />
     </span>
-    {/* Progress bar */}
-    <div className="h-0.5 bg-white/10 rounded-full mt-1">
+    <div className="h-0.5 bg-[var(--color-white-8)] rounded-full mt-1">
       <div
         className="h-full rounded-full"
         style={{
@@ -104,26 +104,26 @@ const ReviewCard: React.FC<{ review: TraktCommentData }> = ({ review }) => {
     year: 'numeric', month: 'short', day: 'numeric',
   });
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
+    <div className="bg-[var(--color-white-4)] border border-[var(--color-border)]
+                    rounded-xl p-4 flex flex-col gap-2
+                    hover:border-[var(--color-border-medium)] transition-colors duration-200">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-white">{review.author}</span>
-        <span className="text-[13px] text-white/40">{date}</span>
+        <span className="text-sm font-semibold text-[var(--color-text-primary)]">{review.author}</span>
+        <span className="text-xs text-[var(--color-text-muted)]">{date}</span>
       </div>
-      <p className="text-sm text-white/65 leading-relaxed line-clamp-4">
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-4">
         {review.comment}
       </p>
       {review.likes > 0 && (
-        <span className="text-[13px] text-white/35">♥ {review.likes}</span>
+        <span className="text-xs text-[var(--color-text-muted)]">♥ {review.likes}</span>
       )}
     </div>
   );
 };
 
 interface StatsSectionProps {
-  // New API
   item?:  CatalogMeta;
   theme?: GenreTheme;
-  // Legacy API (compatibility)
   type?:        ContentType;
   id?:          string;
   tmdbRating?: number;
@@ -154,14 +154,13 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
     return () => obs.disconnect();
   }, []);
 
-  const { data: trakt, isError: traktError } = useQuery({
+  const { data: trakt } = useQuery({
     queryKey:  ['trakt-reviews', type, id],
     queryFn:   () => endpoints.trakt.getReviews(type, id).then(r => r.data),
     enabled:   !!type && !!id,
     staleTime: 15 * 60 * 1000,
   });
 
-  // Normalization → bar percentage
   const toPercent = (val: number, max: number) =>
     Math.min(100, Math.round((val / max) * 100));
 
@@ -194,13 +193,13 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
   if (stats.length === 0 && !(trakt?.comments?.length)) return null;
 
   return (
-    <section ref={sectionRef} className="mb-[40px]">
-      <h2 className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-6">
+    <section ref={sectionRef}>
+      <h2 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-widest mb-6">
         {t('detail.inNumbers')}
       </h2>
 
       {stats.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
           {stats.map(s => (
             <StatCard key={s.label} stat={s} active={isVisible} />
           ))}
@@ -209,7 +208,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
 
       {trakt?.comments && trakt.comments.length > 0 && (
         <div>
-          <h3 className="text-[13px] font-semibold text-white/30 uppercase tracking-widest mb-4">
+          <h3 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-widest mb-4">
             {t('detail.traktReviews')}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
