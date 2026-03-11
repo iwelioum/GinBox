@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE playback_entries SET watched = 1, progress_pct = 100.0, updated_at = ? WHERE profile_id = ? AND content_id = ? AND season = ? AND episode = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "b25673e0693b5fc53389839c893de2d7739d510597c83a4919d3efa76d2b7460"
+}

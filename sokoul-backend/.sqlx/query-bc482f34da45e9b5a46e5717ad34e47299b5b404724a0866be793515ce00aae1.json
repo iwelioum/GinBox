@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n        INSERT INTO playback_entries (profile_id, content_id, content_type, season, episode, position_ms, duration_ms, progress_pct, watched, updated_at, episode_title, still_path)\n        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ON CONFLICT(profile_id, content_id, season, episode) DO UPDATE SET\n            position_ms = excluded.position_ms,\n            duration_ms = excluded.duration_ms,\n            progress_pct = excluded.progress_pct,\n            watched = excluded.watched,\n            updated_at = excluded.updated_at,\n            episode_title = excluded.episode_title,\n            still_path = excluded.still_path\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 12
+    },
+    "nullable": []
+  },
+  "hash": "bc482f34da45e9b5a46e5717ad34e47299b5b404724a0866be793515ce00aae1"
+}

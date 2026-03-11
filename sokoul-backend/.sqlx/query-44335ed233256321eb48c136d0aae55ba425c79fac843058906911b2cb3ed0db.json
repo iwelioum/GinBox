@@ -1,0 +1,92 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT id as \"id!: i64\", profile_id, content_id, content_type, season as \"season: Option<u32>\", episode as \"episode: Option<u32>\", position_ms, duration_ms, progress_pct as \"progress_pct: f32\", watched as \"watched: bool\", updated_at, episode_title, still_path FROM playback_entries WHERE profile_id = ? AND content_id = ? AND season = ? AND episode = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "id!: i64",
+        "ordinal": 0,
+        "type_info": "Int64"
+      },
+      {
+        "name": "profile_id",
+        "ordinal": 1,
+        "type_info": "Int64"
+      },
+      {
+        "name": "content_id",
+        "ordinal": 2,
+        "type_info": "Text"
+      },
+      {
+        "name": "content_type",
+        "ordinal": 3,
+        "type_info": "Text"
+      },
+      {
+        "name": "season: Option<u32>",
+        "ordinal": 4,
+        "type_info": "Int64"
+      },
+      {
+        "name": "episode: Option<u32>",
+        "ordinal": 5,
+        "type_info": "Int64"
+      },
+      {
+        "name": "position_ms",
+        "ordinal": 6,
+        "type_info": "Int64"
+      },
+      {
+        "name": "duration_ms",
+        "ordinal": 7,
+        "type_info": "Int64"
+      },
+      {
+        "name": "progress_pct: f32",
+        "ordinal": 8,
+        "type_info": "Float"
+      },
+      {
+        "name": "watched: bool",
+        "ordinal": 9,
+        "type_info": "Int64"
+      },
+      {
+        "name": "updated_at",
+        "ordinal": 10,
+        "type_info": "Int64"
+      },
+      {
+        "name": "episode_title",
+        "ordinal": 11,
+        "type_info": "Text"
+      },
+      {
+        "name": "still_path",
+        "ordinal": 12,
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": [
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "44335ed233256321eb48c136d0aae55ba425c79fac843058906911b2cb3ed0db"
+}
