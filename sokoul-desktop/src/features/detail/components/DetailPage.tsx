@@ -1,7 +1,7 @@
-// DetailPage.tsx — Cinematic detail page orchestrator
-// Lazy-loads all sections with ScrollReveal + section rhythm (dense/visual alternation)
+// DetailPage.tsx
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -11,20 +11,21 @@ import { useDetailData } from '../hooks/useDetailData';
 import { useDetailPlayback } from '../hooks/useDetailPlayback';
 import { ScrollReveal } from '@/shared/components/ui';
 import { Button } from '@/shared/components/ui/Button';
+import { buildTmdbImageUrl } from '@/shared/utils/image';
 
 import { DetailSkeleton } from './sections/DetailSkeleton';
 import { HeroExperience } from './sections/HeroExperience';
 import { WatchProgress } from './sections/WatchProgress';
 import { ComingSoonSection } from './sections/ComingSoonSection';
 
-const UniverseStats = React.lazy(() => import('./sections/UniverseStats').then(m => ({ default: m.UniverseStats })));
-const TrailerExperience = React.lazy(() => import('./sections/TrailerExperience').then(m => ({ default: m.TrailerExperience })));
-const StoryWorld = React.lazy(() => import('./sections/StoryWorld').then(m => ({ default: m.StoryWorld })));
-const EpisodeExplorer = React.lazy(() => import('./sections/EpisodeExplorer').then(m => ({ default: m.EpisodeExplorer })));
-const CharacterUniverse = React.lazy(() => import('./sections/CharacterUniverse').then(m => ({ default: m.CharacterUniverse })));
+const UniverseStats      = React.lazy(() => import('./sections/UniverseStats').then(m => ({ default: m.UniverseStats })));
+const TrailerExperience  = React.lazy(() => import('./sections/TrailerExperience').then(m => ({ default: m.TrailerExperience })));
+const StoryWorld         = React.lazy(() => import('./sections/StoryWorld').then(m => ({ default: m.StoryWorld })));
+const EpisodeExplorer    = React.lazy(() => import('./sections/EpisodeExplorer').then(m => ({ default: m.EpisodeExplorer })));
+const CharacterUniverse  = React.lazy(() => import('./sections/CharacterUniverse').then(m => ({ default: m.CharacterUniverse })));
 const CollectionUniverse = React.lazy(() => import('./sections/CollectionUniverse').then(m => ({ default: m.CollectionUniverse })));
-const GalleryExperience = React.lazy(() => import('./sections/GalleryExperience').then(m => ({ default: m.GalleryExperience })));
-const ProductionDetails = React.lazy(() => import('./sections/ProductionDetails').then(m => ({ default: m.ProductionDetails })));
+const GalleryExperience  = React.lazy(() => import('./sections/GalleryExperience').then(m => ({ default: m.GalleryExperience })));
+const ProductionDetails  = React.lazy(() => import('./sections/ProductionDetails').then(m => ({ default: m.ProductionDetails })));
 const RecommendationEngine = React.lazy(() => import('./sections/RecommendationEngine').then(m => ({ default: m.RecommendationEngine })));
 
 const SectionSkeleton = () => (
@@ -34,11 +35,52 @@ const SectionSkeleton = () => (
   </div>
 );
 
+// ─── Hook: applique le backdrop sur <html> ─────────────────────────────────
+// <html> est le containing block racine — hors de toute couche GPU framer-motion.
+// background-attachment: fixed fonctionne toujours à ce niveau.
+// body.style.backgroundColor = transparent pour que l'image passe à travers.
+function usePageBackdrop(src: string | undefined) {
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    if (!src) return;
+
+    html.style.backgroundImage    = `url(${src})`;
+    html.style.backgroundSize     = 'cover';
+    html.style.backgroundPosition = 'center top';
+    html.style.backgroundRepeat   = 'no-repeat';
+    html.style.backgroundAttachment = 'fixed';
+    body.style.backgroundColor    = 'transparent';
+
+    return () => {
+      html.style.backgroundImage     = '';
+      html.style.backgroundSize      = '';
+      html.style.backgroundPosition  = '';
+      html.style.backgroundRepeat    = '';
+      html.style.backgroundAttachment = '';
+      body.style.backgroundColor     = '';
+    };
+  }, [src]);
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────
+
 const DetailPage: React.FC = () => {
-  const { t } = useTranslation();
-  const data = useDetailData();
+  const { t }    = useTranslation();
+  const data     = useDetailData();
   const playback = useDetailPlayback(data);
   const navigate = useNavigate();
+
+  // Meilleure image dispo : scène HD > poster
+  const backdropSrc = data.item
+    ? (buildTmdbImageUrl(data.item.backdrop_path, 'original')
+      ?? buildTmdbImageUrl((data.item as { poster_path?: string }).poster_path, 'w780')
+      ?? undefined)
+    : undefined;
+
+  // Doit être appelé avant tout return conditionnel (Rules of Hooks)
+  usePageBackdrop(backdropSrc);
 
   if (!data.isValidType) return <Navigate to="/" replace />;
   if (data.metaLoading || data.creditsLoading) return <DetailSkeleton />;
@@ -53,8 +95,9 @@ const DetailPage: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-[var(--color-bg-base)]">
-      {/* Back button — fixed context nav */}
+    <div className="relative min-h-screen">
+
+      {/* Bouton retour */}
       <motion.button
         initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
@@ -73,7 +116,7 @@ const DetailPage: React.FC = () => {
         {data.type === 'movie' ? t('detail.backToMovies') : t('detail.backToSeries')}
       </motion.button>
 
-      {/* Section 1 — Hero (visual) */}
+      {/* Hero */}
       <HeroExperience
         data={data}
         onPlay={playback.handlePlay}
@@ -82,7 +125,7 @@ const DetailPage: React.FC = () => {
         isFavorite={data.isFavorite}
       />
 
-      {/* Play error toast */}
+      {/* Toast erreur lecture */}
       <AnimatePresence>
         {playback.playError && (
           <motion.div
@@ -108,19 +151,16 @@ const DetailPage: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Section 2 — Watch Progress (dense, conditional) */}
+      {/* Progression (séries) */}
       {data.isSeries && (
         <WatchProgress data={data} onResume={playback.handlePlay} />
       )}
 
-      {/* Lazy-loaded sections */}
+      {/* Sections lazy */}
       <React.Suspense fallback={<SectionSkeleton />}>
-        {/* Section 3 — Universe Stats (dense) */}
-        <ScrollReveal>
-          <UniverseStats data={data} />
-        </ScrollReveal>
 
-        {/* Section 4 — Trailer Experience (visual) */}
+        <ScrollReveal><UniverseStats data={data} /></ScrollReveal>
+
         <ScrollReveal>
           <TrailerExperience
             videos={data.videos}
@@ -128,75 +168,58 @@ const DetailPage: React.FC = () => {
           />
         </ScrollReveal>
 
-        {/* Section 5 — Story World (dense) */}
-        <ScrollReveal>
-          <StoryWorld data={data} />
-        </ScrollReveal>
+        <ScrollReveal><StoryWorld data={data} /></ScrollReveal>
 
-        {/* Section 6 — Episode Explorer (visual, series only) */}
         {data.isSeries && data.seasons.length > 0 && (
           <ScrollReveal>
             <EpisodeExplorer data={data} onWatchEpisode={playback.handleWatchEpisode} />
           </ScrollReveal>
         )}
 
-        {/* Section 7 — Character Universe (visual) */}
         <ScrollReveal>
           <CharacterUniverse credits={data.credits} isLoading={data.creditsLoading} />
         </ScrollReveal>
 
-        {/* Section 8 — Collection Universe (visual) */}
         {data.collection && (
           <ScrollReveal>
             <CollectionUniverse collection={data.collection} currentId={data.id} />
           </ScrollReveal>
         )}
 
-        {/* Section 9 — Soundtrack (dense, coming soon) */}
         <ScrollReveal>
-          <ComingSoonSection title="Soundtrack" icon="🎵" description="Soundtrack data integration coming in a future update." />
+          <ComingSoonSection title="Soundtrack" icon="🎵" description="Intégration des données soundtrack prochainement." />
         </ScrollReveal>
 
-        {/* Section 10 — Awards (dense, coming soon) */}
         <ScrollReveal>
-          <ComingSoonSection title="Awards & Legacy" icon="🏆" description="Awards and accolades data coming soon." />
+          <ComingSoonSection title="Awards & Legacy" icon="🏆" description="Palmarès et récompenses bientôt disponibles." />
         </ScrollReveal>
 
-        {/* Section 11 — Behind the Scenes (visual, coming soon) */}
         <ScrollReveal>
-          <ComingSoonSection title="Behind the Scenes" icon="🎬" description="Behind the scenes content coming soon." />
+          <ComingSoonSection title="Behind the Scenes" icon="🎬" description="Contenu making-of bientôt disponible." />
         </ScrollReveal>
 
-        {/* Section 12 — Gallery Experience (visual) */}
         {data.images && (
-          <ScrollReveal>
-            <GalleryExperience images={data.images} />
-          </ScrollReveal>
+          <ScrollReveal><GalleryExperience images={data.images} /></ScrollReveal>
         )}
 
-        {/* Section 13 — Cultural Impact (dense, coming soon) */}
         <ScrollReveal>
-          <ComingSoonSection title="Cultural Impact" icon="🌍" description="Cultural impact scores and memorable quotes coming soon." />
+          <ComingSoonSection title="Cultural Impact" icon="🌍" description="Scores d'impact culturel bientôt disponibles." />
         </ScrollReveal>
 
-        {/* Section 14 — Trivia (visual, coming soon) */}
         <ScrollReveal>
-          <ComingSoonSection title="Trivia & Facts" icon="💡" description="Fun facts and trivia coming in a future update." />
+          <ComingSoonSection title="Trivia & Facts" icon="💡" description="Anecdotes et curiosités bientôt disponibles." />
         </ScrollReveal>
 
-        {/* Section 15 — Production Details (dense) */}
-        <ScrollReveal>
-          <ProductionDetails data={data} />
-        </ScrollReveal>
+        <ScrollReveal><ProductionDetails data={data} /></ScrollReveal>
 
-        {/* Section 16 — Recommendations (visual) */}
         <ScrollReveal>
           <RecommendationEngine similar={data.similar} contentType={data.type} />
         </ScrollReveal>
+
       </React.Suspense>
 
-      {/* Bottom spacing */}
       <div className="h-24" />
+
     </div>
   );
 };

@@ -178,7 +178,7 @@ pub struct CastMember {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub character: Option<String>,
     /// Full URL Fanart.tv or TMDB p/w185
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "profile_path", skip_serializing_if = "Option::is_none")]
     pub profile_path: Option<String>,
     pub order: u32,
 }
