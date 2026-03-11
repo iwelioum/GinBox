@@ -133,11 +133,11 @@ export default function SourcesPage() {
       ) : metaError ? (
         <QueryErrorState error={metaErr as Error} refetch={metaRefetch} className="flex-1" />
       ) : fetchError ? (
-        <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
-          <AlertTriangle size={40} className="text-red-400" />
-          <p className="text-[22px] font-[700] m-0 text-red-400">{t('sources.loadingError')}</p>
-          <p className="text-[14px] text-white/50 m-0 max-w-[400px] break-words">{fetchError}</p>
-          <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-[6px] text-[14px] font-[600] transition-colors mt-[8px]">
+        <div className="flex flex-col items-center justify-center flex-1 gap-4 text-center px-8">
+          <AlertTriangle size={40} className="text-[var(--color-danger)]" />
+          <p className="text-xl font-bold text-[var(--color-danger)]">{t('sources.loadingError')}</p>
+          <p className="text-sm text-[var(--color-text-muted)] max-w-[400px] break-words">{fetchError}</p>
+          <button onClick={handleRetry} className="flex items-center gap-2 px-5 py-2.5 bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-[var(--radius-button)] text-sm font-semibold transition-colors mt-2">
             <RefreshCw size={16} /> {t('common.retry')}
           </button>
         </div>
@@ -150,11 +150,11 @@ export default function SourcesPage() {
           className="flex-1"
         />
       ) : (
-        <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div className="flex flex-1 overflow-hidden">
           <SourcesSidebar sortBy={sortBy} setSortBy={setSortBy} activeFilters={activeFilters}
             setActiveFilters={setActiveFilters} toggleFilter={toggleFilter}
             cachedAt={cachedAt} isStale={isStale} onForceRefresh={handleForceRefresh} />
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent" style={{ padding: '20px 28px' }}>
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent py-5 px-7">
             {sortedAndFiltered.length === 0 ? (
               <EmptyState
                 icon={<Filter />}
@@ -164,17 +164,17 @@ export default function SourcesPage() {
                 className="h-[50vh]"
               />
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', margin: 0 }}>
+              <div className="flex flex-col gap-7">
+                <p className="text-[11px] text-white/25 m-0">
                   {activeFilters.size > 0
                     ? t('sources.sourceCountFiltered', { count: sortedAndFiltered.length })
                     : t('sources.sourceCountAvailable', { count: sortedAndFiltered.length })}
                 </p>
                 {isStale && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[13px]">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm">
                     <AlertTriangle size={14} />
                     <span>{t('sources.staleBadge')}</span>
-                    <button onClick={handleForceRefresh} className="ml-auto px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-[13px] font-semibold transition-colors">
+                    <button onClick={handleForceRefresh} className="ml-auto px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-sm font-semibold transition-colors">
                       <RefreshCw size={12} className="inline mr-1" />{t('sources.refresh')}
                     </button>
                   </div>
@@ -190,10 +190,10 @@ export default function SourcesPage() {
         </div>
       )}
       {launchError && (
-        <div className="absolute bottom-[24px] left-1/2 -translate-x-1/2 bg-red-900/90 text-dp-text px-[20px] py-[14px] rounded-[4px] border border-red-500 flex items-center gap-[12px] shadow-2xl z-50">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-red-900/90 text-[var(--color-text-primary)] px-5 py-3.5 rounded-[var(--radius-card)] border border-[var(--color-danger)] flex items-center gap-3 shadow-2xl z-50">
           <AlertTriangle size={18} />
-          <span className="text-[14px] font-[600]">{launchError}</span>
-          <button onClick={() => setLaunchError(null)} className="ml-[8px] px-[10px] py-[4px] bg-dp-text/20 hover:bg-dp-text/30 rounded-[4px] text-[13px] font-[700]">✕</button>
+          <span className="text-sm font-semibold">{launchError}</span>
+          <button onClick={() => setLaunchError(null)} className="ml-2 px-2.5 py-1 bg-white/20 hover:bg-white/30 rounded-[var(--radius-sm)] text-[13px] font-bold transition-colors">✕</button>
         </div>
       )}
       <ResumeModal

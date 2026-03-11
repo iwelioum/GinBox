@@ -48,7 +48,7 @@ export default function SettingsPage() {
       const resp = await apiClient.get('/debrid/status');
       setRdStatus(resp.data);
     } catch {
-      setRdStatus({ error: 'Connection failed' });
+      setRdStatus({ error: t('settings.connectionFailed') });
     } finally {
       setRdLoading(false);
     }

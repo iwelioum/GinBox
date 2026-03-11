@@ -23,13 +23,22 @@ function ToastItem({ toast }: { toast: ToastData }) {
   return (
     <motion.div
       layout
+      role="alert"
+      aria-live="polite"
       initial={{ opacity: 0, y: 24, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       transition={{ type: 'spring', damping: 22, stiffness: 300 }}
-      className={`${typeStyles[toast.type]} px-4 py-3 rounded-lg text-white text-sm shadow-lg backdrop-blur-sm max-w-xs pointer-events-auto`}
+      className={`${typeStyles[toast.type]} px-4 py-3 rounded-lg text-white text-sm shadow-lg backdrop-blur-sm max-w-xs pointer-events-auto flex items-center gap-2`}
     >
-      {toast.message}
+      <span className="flex-1">{toast.message}</span>
+      <button
+        onClick={() => removeToast(toast.id)}
+        className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors text-white/60 hover:text-white"
+        aria-label="Dismiss"
+      >
+        ×
+      </button>
     </motion.div>
   );
 }

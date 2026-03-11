@@ -410,7 +410,8 @@
     "reset": "Reset",
     "saved": "Settings saved",
     "cacheCleared": "Cache cleared successfully",
-    "preferencesReset": "Preferences reset to defaults"
+    "preferencesReset": "Preferences reset to defaults",
+    "connectionFailed": "Connection failed"
   },
   "debug": {
     "diagnostic": "DIAGNOSTIC",

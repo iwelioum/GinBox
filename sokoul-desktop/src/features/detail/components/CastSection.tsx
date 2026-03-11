@@ -16,8 +16,9 @@ const CastCard: React.FC<CastCardProps> = ({ person }) => {
   const photoUrl = person.profile_path || null;
 
   return (
-    <div
-      className="flex-shrink-0 flex flex-col items-center gap-3 w-16 group cursor-pointer"
+    <button
+      type="button"
+      className="flex-shrink-0 flex flex-col items-center gap-3 w-16 group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-lg"
       onClick={() =>
         navigate(`/actor/${person.id}`, {
           state: { name: person.name, profilePath: photoUrl },
@@ -58,7 +59,7 @@ const CastCard: React.FC<CastCardProps> = ({ person }) => {
           </span>
         )}
       </div>
-    </div>
+    </button>
   );
 };
 

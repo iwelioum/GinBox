@@ -37,7 +37,8 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
         type="button"
         onClick={() => setModalOpen(true)}
         className="relative w-full max-w-[900px] aspect-video rounded-2xl overflow-hidden
-                   group cursor-pointer block shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+                   group cursor-pointer block shadow-[0_20px_60px_rgba(0,0,0,0.6)]
+                   focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none"
       >
         <img
           src={thumbUrl}
@@ -70,6 +71,12 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
         <div
           className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
           onClick={() => setModalOpen(false)}
+          onKeyDown={(e) => { if (e.key === 'Escape') setModalOpen(false); }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('detail.trailer')}
+          tabIndex={-1}
+          ref={(el) => el?.focus()}
         >
           <div
             className="relative w-full max-w-4xl aspect-video mx-4"
@@ -88,7 +95,8 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
             onClick={() => setModalOpen(false)}
             className="absolute top-4 right-4 bg-black/60 text-white border-none
                        w-9 h-9 rounded-full cursor-pointer hover:bg-black/85
-                       flex items-center justify-center text-base"
+                       flex items-center justify-center text-base focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none"
+            aria-label={t('common.close')}
           >✕</button>
         </div>
       )}

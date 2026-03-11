@@ -91,12 +91,12 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
             key={i}
             type="button"
             onClick={() => setLightboxIdx(i)}
-            className="flex-shrink-0 relative overflow-hidden rounded-lg group cursor-zoom-in"
+            className="flex-shrink-0 relative overflow-hidden rounded-lg group cursor-zoom-in focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none"
             style={{ width: thumbW, aspectRatio }}
           >
             <img
               src={url}
-              alt=""
+              alt={`${t(`detail.${activeTab}`)} ${i + 1}`}
               loading="lazy"
               className="w-full h-full object-cover
                          transition-transform duration-500 group-hover:scale-105"
