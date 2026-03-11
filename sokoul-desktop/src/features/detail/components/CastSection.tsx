@@ -52,7 +52,7 @@ const CastCard: React.FC<CastCardProps> = ({ person }) => {
           {person.name}
         </span>
         {person.character && (
-          <span className="text-[10px] text-[var(--color-text-muted)] leading-tight
+          <span className="text-xs text-[var(--color-text-muted)] leading-tight
                            block w-full truncate">
             {person.character}
           </span>

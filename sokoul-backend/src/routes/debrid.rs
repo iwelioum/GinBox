@@ -15,10 +15,21 @@ use axum::{
 use serde::Deserialize;
 use serde_json::json;
 use std::sync::Arc;
+use std::time::Duration;
 use crate::AppState;
 use crate::errors::AppError;
 use crate::models::Stream;
 use crate::services::realdebrid;
+
+const DEBRID_TIMEOUT: Duration = Duration::from_secs(60);
+
+async fn with_timeout<T>(
+    fut: impl std::future::Future<Output = Result<T, AppError>>,
+) -> Result<T, AppError> {
+    tokio::time::timeout(DEBRID_TIMEOUT, fut)
+        .await
+        .map_err(|_| AppError::ExternalApiError("Debrid operation timed out after 60 seconds".into()))?
+}
 
 pub fn router() -> Router<Arc<AppState>> {
     Router::new()
@@ -41,7 +52,7 @@ pub async fn post_debrid(
         parsed_meta: crate::parser::parse_stream_title(""),
         behavior_hints: None,
     };
-    let result = realdebrid::get_direct_link(&stream_stub, &state).await?;
+    let result = with_timeout(realdebrid::get_direct_link(&stream_stub, &state)).await?;
     Ok(Json(json!({ "url": result.url, "is_cached": result.is_cached })))
 }
 
@@ -77,7 +88,7 @@ pub async fn post_unrestrict(
             parsed_meta: crate::parser::parse_stream_title(""),
             behavior_hints: None,
         };
-        let result = realdebrid::get_direct_link(&stream_stub, &state).await?;
+        let result = with_timeout(realdebrid::get_direct_link(&stream_stub, &state)).await?;
         return Ok(Json(json!({ "stream_url": result.url, "is_cached": result.is_cached })));
     }
 
@@ -105,7 +116,7 @@ pub async fn post_unrestrict(
                         parsed_meta: crate::parser::parse_stream_title(""),
                         behavior_hints: None,
                     };
-                    let result = realdebrid::get_direct_link(&stream_stub, &state).await?;
+                    let result = with_timeout(realdebrid::get_direct_link(&stream_stub, &state)).await?;
                     return Ok(Json(json!({ "stream_url": result.url, "is_cached": result.is_cached })));
                 }
             }
@@ -121,14 +132,14 @@ pub async fn post_unrestrict(
 
             // Treat as binary .torrent file
             tracing::info!("Sending binary torrent file to Real-Debrid ({} bytes)...", bytes.len());
-            let result = realdebrid::get_direct_link_from_file(bytes.to_vec(), &state).await?;
+            let result = with_timeout(realdebrid::get_direct_link_from_file(bytes.to_vec(), &state)).await?;
             return Ok(Json(json!({ "stream_url": result.url, "is_cached": result.is_cached })));
         }
 
         // Already Real-Debrid or rdeb.io link
         if magnet_raw.contains("real-debrid.com") || magnet_raw.contains("rdeb.io") {
             tracing::info!("Direct Real-Debrid link detected, immediate unrestrict.");
-            let result = realdebrid::unrestrict_link(magnet_raw, &state).await?;
+            let result = with_timeout(realdebrid::unrestrict_link(magnet_raw, &state)).await?;
             return Ok(Json(json!({ "stream_url": result.download, "is_cached": true })));
         }
         

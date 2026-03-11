@@ -97,7 +97,7 @@ export function EditorialCard({
 
       {showProgress && playbackEntry?.season != null && playbackEntry?.episode != null && (
         <div className="absolute bottom-5 left-0 right-0 px-3">
-          <p className="text-[11px] font-semibold text-white/80 truncate">
+          <p className="text-[13px] font-semibold text-white/80 truncate">
             S{String(playbackEntry.season).padStart(2, '0')}E{String(playbackEntry.episode).padStart(2, '0')}
             {playbackEntry.episodeTitle ? ` — ${playbackEntry.episodeTitle}` : ''}
           </p>

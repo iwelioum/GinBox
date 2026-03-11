@@ -8,6 +8,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { endpoints } from '@/shared/api/client';
+import { extractErrorMessage } from '@/shared/utils/error';
 import type { ContentType, Source } from '../../../shared/types/index';
 import type { PlayerInfo } from './usePlayerInfo';
 
@@ -113,8 +114,7 @@ export function useSwitchSource({
         setSwitchError('No sources found after refresh.');
       }
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string } }; message?: string };
-      setSwitchError(axiosErr?.response?.data?.error ?? axiosErr?.message ?? 'Unable to refresh sources');
+      setSwitchError(extractErrorMessage(err, 'Unable to refresh sources'));
     } finally {
       setRefreshingSources(false);
     }
@@ -137,8 +137,7 @@ export function useSwitchSource({
       await window.mpv?.command({ command: ['set_property', 'pause', false] });
       setCurrentSource(source);
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { error?: string } }; message?: string };
-      setSwitchError(axiosErr?.response?.data?.error ?? axiosErr?.message ?? 'Unable to load this source');
+      setSwitchError(extractErrorMessage(err, 'Unable to load this source'));
     } finally {
       setSwitchingSource(false);
     }

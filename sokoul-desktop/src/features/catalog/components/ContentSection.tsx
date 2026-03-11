@@ -73,7 +73,7 @@ export function ContentSection({
             )}
           </div>
         </div>
-        <span className="text-[11px] text-white/30 font-mono">
+        <span className="text-[13px] text-white/30 font-mono">
           {t('catalog.titlesCount', { count: items.length })}
         </span>
       </div>

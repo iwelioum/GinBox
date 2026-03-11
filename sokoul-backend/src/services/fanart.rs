@@ -48,11 +48,8 @@ pub async fn fetch_all_fanart_data(
     http_client: &reqwest::Client,
 ) -> Result<Value, AppError> {
     let fanart_type = if is_movie { "movies" } else { "tv" };
-    let url = format!(
-        "https://webservice.fanart.tv/v3/{fanart_type}/{fanart_id}?api_key={api_key}"
-    );
-
-    let resp = http_client.get(&url).send().await?;
+    let url = format!("https://webservice.fanart.tv/v3/{fanart_type}/{fanart_id}");
+    let resp = http_client.get(&url).query(&[("api_key", api_key)]).send().await?;
 
     if resp.status().is_success() {
         let data: Value = resp.json().await?;
@@ -126,11 +123,8 @@ pub async fn fetch_and_cache_logo(
     db: &SqlitePool,
 ) -> Result<Option<String>, AppError> {
     let fanart_type = if is_movie { "movies" } else { "tv" };
-    let url = format!(
-        "https://webservice.fanart.tv/v3/{fanart_type}/{tmdb_id}?api_key={api_key}"
-    );
-
-    let resp = http_client.get(&url).send().await?;
+    let url = format!("https://webservice.fanart.tv/v3/{fanart_type}/{tmdb_id}");
+    let resp = http_client.get(&url).query(&[("api_key", api_key)]).send().await?;
 
     let logo_url = if resp.status().is_success() {
         let data: FanartApiResponse = resp.json().await.unwrap_or_default();
@@ -170,11 +164,8 @@ pub async fn fetch_images(
     http_client: &reqwest::Client,
 ) -> Result<Value, AppError> {
     let fanart_type = if is_movie { "movies" } else { "tv" };
-    let url = format!(
-        "https://webservice.fanart.tv/v3/{fanart_type}/{tmdb_id}?api_key={api_key}"
-    );
-
-    let resp = http_client.get(&url).send().await?;
+    let url = format!("https://webservice.fanart.tv/v3/{fanart_type}/{tmdb_id}");
+    let resp = http_client.get(&url).query(&[("api_key", api_key)]).send().await?;
 
     if !resp.status().is_success() {
         return Ok(json!({

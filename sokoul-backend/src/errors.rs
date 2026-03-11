@@ -59,14 +59,17 @@ impl IntoResponse for AppError {
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg.clone()),
             AppError::ApiError(msg) => (StatusCode::BAD_GATEWAY, "API_ERROR", msg.clone()),
             AppError::HttpError(err) => {
-                tracing::error!("HTTP client error: {err}");
+                // Log status only — full error may contain API keys in URL
+                tracing::error!("HTTP request failed: status={:?}", err.status());
                 (StatusCode::BAD_GATEWAY, "HTTP_ERROR", "An external service request failed".to_string())
             },
         };
 
         let body = Json(json!({
-            "error": error_code,
-            "message": error_message,
+            "error": {
+                "code": error_code,
+                "message": error_message,
+            }
         }));
 
         (status, body).into_response()

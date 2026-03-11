@@ -48,7 +48,7 @@ export const TrailerSection: React.FC<TrailerSectionProps> = ({ videos, theme: _
         {/* Dark overlay + "Trailer" text at bottom left */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent
                         group-hover:from-black/50 transition-all duration-300" />
-        <span className="absolute bottom-4 left-5 text-white/60 text-[11px] font-semibold
+        <span className="absolute bottom-4 left-5 text-white/60 text-[13px] font-semibold
                          uppercase tracking-[0.15em]">
           {t('detail.officialTrailer')}
         </span>
