@@ -11,6 +11,7 @@ import { ResumeModal } from '@/shared/components/modals/ResumeModal';
 import type { CatalogMeta, ContentType, Source } from '@/shared/types/index';
 import { useLogStore } from '@/stores/logStore';
 import { useProfileStore } from '@/stores/profileStore';
+import { usePlaybackStore } from '@/shared/stores/playbackStore';
 import { useToast } from '@/shared/hooks/useToast';
 import { extractErrorMessage } from '@/shared/utils/error';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
@@ -38,6 +39,7 @@ export default function SourcesPage() {
   const { activeProfile } = useProfileStore();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const setNavigation = usePlaybackStore((s) => s.setNavigation);
   const { data: meta, isError: metaError, error: metaErr, refetch: metaRefetch } = useQuery<CatalogMeta>({
     queryKey: ['catalogMeta', type, id],
     queryFn: () => endpoints.catalog.getMeta(type!, id!).then(r => r.data),
@@ -71,9 +73,8 @@ export default function SourcesPage() {
   const goToPlayer = (streamUrl: string, startAt = 0) => {
     const epTitle = selectedEpisode
       ? (meta?.episodes?.find(v => v.season === selectedSeason && v.episode === selectedEpisode)?.title ?? '') : '';
-    navigate(buildPlayerUrl(streamUrl, startAt), {
-      replace: true, state: { episodes: meta?.episodes ?? [], episodeTitle: epTitle },
-    });
+    setNavigation({ episodes: meta?.episodes ?? [], episodeTitle: epTitle });
+    navigate(buildPlayerUrl(streamUrl, startAt), { replace: true });
   };
 
   async function handlePlay(source: Source) {

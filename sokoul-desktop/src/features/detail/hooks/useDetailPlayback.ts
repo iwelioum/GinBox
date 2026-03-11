@@ -9,6 +9,7 @@ import { pickBestSource } from '@/shared/utils/parsing';
 import { extractErrorMessage } from '@/shared/utils/error';
 import { endpoints } from '@/shared/api/client';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
+import { usePlaybackStore } from '@/shared/stores/playbackStore';
 import type { Source } from '@/shared/types/index';
 import type { UseDetailDataResult } from './useDetailData';
 
@@ -18,6 +19,7 @@ export function useDetailPlayback(d: UseDetailDataResult) {
   const addToList = useAddToList();
   const removeFromList = useRemoveFromList();
   const { toast } = useToast();
+  const setNavigation = usePlaybackStore((s) => s.setNavigation);
   const [isPlayLoading, setIsPlayLoading] = React.useState(false);
   const [playError, setPlayError] = React.useState<string | null>(null);
 
@@ -63,20 +65,19 @@ export function useDetailPlayback(d: UseDetailDataResult) {
         (episodeTitle ? `&episodeTitle=${encodeURIComponent(episodeTitle)}` : '') +
         startAt +
         (d.detailPath ? `&returnTo=${encodeURIComponent(d.detailPath)}` : '');
-      navigate(url, {
-        replace: true,
-        state: {
-          sources, current: best, mediaId: d.id, mediaType: 'series',
-          season, episode, resumeAt: resumeMs,
-          episodeTitle,
-          selectedSeason: season, selectedEpisode: episode,
-          episodes: d.episodeVideos.map(e => ({
-            season: e.season, episode: e.episode,
-            title: e.title, still_path: e.still_path,
-          })),
-          fromDetail: true, returnTo: d.detailPath,
-        },
+      setNavigation({
+        sources, current: best, mediaId: d.id, mediaType: 'series',
+        season, episode, resumeAt: resumeMs,
+        episodeTitle,
+        selectedSeason: season, selectedEpisode: episode,
+        episodes: d.episodeVideos.map(e => ({
+          ...e,
+          season: e.season, episode: e.episode,
+          title: e.title, still_path: e.still_path,
+        })),
+        fromDetail: true, returnTo: d.detailPath ?? '',
       });
+      navigate(url, { replace: true });
     } catch (err: unknown) {
       setPlayError(extractErrorMessage(err, 'Error launching playback'));
     } finally {
@@ -112,13 +113,11 @@ export function useDetailPlayback(d: UseDetailDataResult) {
         `&contentType=${encodeURIComponent(d.sourceType)}` +
         `&contentId=${encodeURIComponent(d.id)}` +
         (d.detailPath ? `&returnTo=${encodeURIComponent(d.detailPath)}` : '');
-      navigate(url, {
-        replace: true,
-        state: {
-          sources, current: best, mediaId: d.id,
-          mediaType: d.sourceType, fromDetail: true, returnTo: d.detailPath,
-        },
+      setNavigation({
+        sources, current: best, mediaId: d.id,
+        mediaType: d.sourceType ?? '', fromDetail: true, returnTo: d.detailPath ?? '',
       });
+      navigate(url, { replace: true });
     } catch (err: unknown) {
       setPlayError(extractErrorMessage(err, 'Error launching playback'));
     } finally {

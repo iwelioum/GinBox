@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useMpv } from '../hooks/useMpv';
 import { usePlayerBroadcast } from '../hooks/usePlayerBroadcast';
 import { useProgressSave } from '../hooks/useProgressSave';
@@ -23,31 +23,17 @@ import {
 } from './EpisodeOverlay';
 import { useProfileStore } from '@/stores/profileStore';
 import { usePreferencesStore } from '@/stores/preferencesStore';
+import { usePlaybackStore } from '@/shared/stores/playbackStore';
 import type { Source, EpisodeVideo } from '../../../shared/types/index';
 import '@/styles/player.tokens.css';
 
-interface PlayerNavigationState {
-  sources?:         Source[];
-  current?:         Source;
-  mediaId?:         string;
-  mediaType?:       string;
-  season?:          number;
-  episode?:         number;
-  selectedSeason?:  number;
-  selectedEpisode?: number;
-  resumeAt?:        number;
-  episodeTitle?:    string;
-  episodes?:        EpisodeVideo[];
-}
-
 export default function PlayerPage() {
-  const location       = useLocation();
   const [searchParams] = useSearchParams();
 
-  const navigationState = (location.state as PlayerNavigationState | null) ?? null;
-  const launchSources  = Array.isArray(navigationState?.sources)  ? navigationState.sources  : [];
-  const launchCurrent  = navigationState?.current ?? null;
-  const launchEpisodes = Array.isArray(navigationState?.episodes) ? navigationState.episodes : [];
+  const playbackNav = usePlaybackStore();
+  const launchSources  = playbackNav.sources.length > 0 ? playbackNav.sources : [];
+  const launchCurrent  = playbackNav.current ?? null;
+  const launchEpisodes = playbackNav.episodes.length > 0 ? playbackNav.episodes : [];
 
   const url         = searchParams.get('url')         ?? '';
   const title       = searchParams.get('title')       ?? '';
@@ -65,18 +51,18 @@ export default function PlayerPage() {
 
   const startAtRaw     = Number(searchParams.get('startAt') ?? '0');
   const queryStartAt   = Number.isFinite(startAtRaw) && startAtRaw > 0 ? startAtRaw : 0;
-  const resumeAtRaw    = Number(navigationState?.resumeAt ?? 0);
+  const resumeAtRaw    = Number(playbackNav.resumeAt ?? 0);
   const stateResumeAt  = Number.isFinite(resumeAtRaw) && resumeAtRaw > 0 ? resumeAtRaw / 1000 : 0;
   const startAt        = queryStartAt > 0 ? queryStartAt : stateResumeAt;
 
-  const initialSeason  = navigationState?.season  ?? querySeason  ?? null;
-  const initialEpisode = navigationState?.episode ?? queryEpisode ?? null;
+  const initialSeason  = playbackNav.season  ?? querySeason  ?? null;
+  const initialEpisode = playbackNav.episode ?? queryEpisode ?? null;
 
   const [activeSources,      setActiveSources]      = useState<Source[]>(launchSources);
   const [activeCurrent,      setActiveCurrent]      = useState<Source | null>(launchCurrent);
   const [activeSeason,       setActiveSeason]       = useState<number | null>(initialSeason);
   const [activeEpisode,      setActiveEpisode]      = useState<number | null>(initialEpisode);
-  const [activeEpisodeTitle, setActiveEpisodeTitle]  = useState(navigationState?.episodeTitle ?? '');
+  const [activeEpisodeTitle, setActiveEpisodeTitle]  = useState(playbackNav.episodeTitle ?? '');
   const [activeStillPath,    setActiveStillPath]     = useState(
     () => launchEpisodes.find(e => e.season === initialSeason && e.episode === initialEpisode)?.still_path ?? '',
   );
