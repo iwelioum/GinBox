@@ -121,7 +121,7 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
                     disabled={isPlayLoading}
                     className="flex-shrink-0 bg-[var(--color-accent)] text-white text-xs font-semibold
                                px-4 py-2 rounded-[var(--radius-card)] hover:bg-[var(--color-accent-hover)]
-                               transition-all duration-200 disabled:opacity-70 disabled:cursor-default"
+                               transition-colors duration-200 disabled:opacity-70 disabled:cursor-default"
                   >
                     {previewCanResume ? t('detail.resumeButton') : t('detail.playButton')}
                   </button>
@@ -158,7 +158,7 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
                   onSelectEpisode(first);
                 }}
                 className={`flex-shrink-0 px-4 py-2 rounded-[var(--radius-card)] text-sm font-medium 
-                           transition-all duration-200 ${
+                           transition-colors duration-200 ${
                   selectedSeason === s
                     ? 'bg-[var(--color-accent)] text-white'
                     : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-overlay)]'

@@ -113,7 +113,7 @@ export function useDetailData() {
       setSelectedEpisode(lastProgressEpisode.episode ?? 1);
       return;
     }
-    setSelectedSeason(s => (seasons.includes(s) ? s : seasons[0]));
+    setSelectedSeason(s => (seasons.includes(s) ? s : (seasons[0] ?? 1)));
     if (episodesOfSeason.length > 0) {
       setSelectedEpisode(e => (episodesOfSeason.some(v => v.episode === e) ? e : (episodesOfSeason[0].episode ?? 1)));
     }

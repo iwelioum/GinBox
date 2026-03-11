@@ -65,7 +65,7 @@ export function BrowseFiltersBar({
                 <button
                   key={tab.value}
                   onClick={() => onTabClick(tab.value)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none
                     ${isActive
                       ? 'bg-accent text-white'
                       : 'text-text-secondary hover:text-text-primary hover:bg-white/5'
@@ -84,7 +84,7 @@ export function BrowseFiltersBar({
         {/* Filter toggle */}
         <button
           onClick={onOpenDrawer}
-          className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all border
+          className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none border
             ${activeFiltersCount > 0
               ? 'bg-accent text-white border-accent'
               : 'border-[var(--color-border)] text-text-secondary hover:text-text-primary hover:bg-white/5'

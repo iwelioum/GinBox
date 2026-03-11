@@ -26,7 +26,7 @@ export function Tabs({ tabs, activeKey, onChange, className }: TabsProps) {
             type="button"
             onClick={() => onChange(tab.key)}
             className={cn(
-              'rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200',
+              'rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none',
               isActive
                 ? 'bg-[var(--color-accent)] text-white shadow-sm'
                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-white/5',

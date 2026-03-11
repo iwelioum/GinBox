@@ -26,14 +26,14 @@ const CastCard: React.FC<CastCardProps> = ({ person }) => {
     >
       {/* Circular photo */}
       <div className="w-16 h-16 rounded-full overflow-hidden ring-2 ring-[var(--color-border)] 
-                      transition-all duration-300 group-hover:ring-[var(--color-accent)]">
+                      transition-[ring-color] duration-300 group-hover:ring-[var(--color-accent)]">
         {photoUrl ? (
           <img
             src={photoUrl}
             alt={person.name}
             loading="lazy"
             className="w-full h-full object-cover filter grayscale group-hover:grayscale-0
-                       transition-all duration-300"
+                       transition-[filter] duration-300"
           />
         ) : (
           <div className="w-full h-full bg-[var(--color-bg-elevated)] flex items-center justify-center

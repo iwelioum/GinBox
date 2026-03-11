@@ -172,7 +172,11 @@ export default function OverlayPage() {
           refreshingSources={refreshingSources}
           switchError={switchError}
           isCurrent={isCurrent}
-          onSwitchSource={(s) => { void handleSwitchSource(s).then(closeSourcePanel); }}
+          onSwitchSource={(s) => {
+            void handleSwitchSource(s)
+              .then(closeSourcePanel)
+              .catch(() => { closeSourcePanel(); });
+          }}
           onRefreshSources={() => { void handleRefreshSources(); }}
           onClose={closeSourcePanel}
         />
@@ -212,15 +216,15 @@ export default function OverlayPage() {
         {showAudio && (
           <AudioPanel
             tracks={audioTracks}
-            onSelect={id => { selectAudioTrack(id); setShowAudio(false); }}
+            onSelect={async (id) => { try { await selectAudioTrack(id); } catch {} setShowAudio(false); }}
             onClose={() => setShowAudio(false)}
           />
         )}
         {showSubs && (
           <SubtitlesPanel
             tracks={subTracks}
-            onSelect={id => { selectSubTrack(id); setShowSubs(false); }}
-            onDisable={() => { disableSubs(); setShowSubs(false); }}
+            onSelect={async (id) => { try { await selectSubTrack(id); } catch {} setShowSubs(false); }}
+            onDisable={async () => { try { await disableSubs(); } catch {} setShowSubs(false); }}
             onClose={() => setShowSubs(false)}
           />
         )}

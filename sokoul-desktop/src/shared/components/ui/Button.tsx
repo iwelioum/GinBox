@@ -15,7 +15,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', leftIcon, children, size = 'default', ...props }, ref) => {
     const baseClasses =
-      'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-fast focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-offset-1 focus:ring-offset-[var(--color-bg-base)] disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]';
+      'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-[color,background-color,border-color,transform,opacity] duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--color-bg-base)] disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97]';
 
     const variantClasses: Record<ButtonVariant, string> = {
       primary: 'bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)]',

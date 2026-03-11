@@ -44,7 +44,12 @@ export function useDynamicAccentColor(posterUrl: string | null) {
 
     return () => {
       cancelled = true;
-      document.documentElement.removeAttribute('style');
+      const root = document.documentElement;
+      root.style.removeProperty('--accent');
+      root.style.removeProperty('--accent-muted');
+      root.style.removeProperty('--accent-dark');
+      root.style.removeProperty('--accent-light');
+      root.style.removeProperty('--accent-rgb');
     };
   }, [posterUrl]);
 }

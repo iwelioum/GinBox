@@ -243,7 +243,7 @@ async fn do_fresh_fetch(
             let episode_regex = Regex::new(
                 &format!(r"(?i)S0?{}E0?{}", target_season, target_episode)
             )
-            .expect("valid episode regex");
+            .map_err(|e| AppError::ParseError(format!("episode regex: {e}")))?;
 
             all_sources.retain(|source| {
                 let is_pack = pack_regex.is_match(&source.title);
@@ -507,17 +507,16 @@ fn post_process_sources(sources: &mut Vec<Source>) {
 // ── Helpers de pertinence titre ───────────────────────────────────────────────
 
 fn extract_expected_title(query: &str) -> String {
+    static TITLE_CLEANUP: OnceLock<[Regex; 4]> = OnceLock::new();
+    let regexes = TITLE_CLEANUP.get_or_init(|| [
+        Regex::new(r"(?i)\s+S\d{1,2}E\d{1,2}\s*$").expect("re1"),
+        Regex::new(r"(?i)\s+S\d{1,2}\s*$").expect("re2"),
+        Regex::new(r"(?i)\s+SAISON\s+\d{1,2}\s*$").expect("re3"),
+        Regex::new(r"\s+\d{4}\s*$").expect("re4"),
+    ]);
+
     let mut cleaned = query.trim().to_string();
-
-    let patterns = [
-        r"(?i)\s+S\d{1,2}E\d{1,2}\s*$",
-        r"(?i)\s+S\d{1,2}\s*$",
-        r"(?i)\s+SAISON\s+\d{1,2}\s*$",
-        r"\s+\d{4}\s*$",
-    ];
-
-    for pattern in patterns {
-        let regex = Regex::new(pattern).expect("valid expected-title regex");
+    for regex in regexes {
         cleaned = regex.replace(&cleaned, "").to_string();
     }
 
