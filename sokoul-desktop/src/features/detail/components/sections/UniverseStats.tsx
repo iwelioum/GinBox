@@ -76,10 +76,10 @@ export function UniverseStats({ data }: { data: UseDetailDataResult }) {
       >
         {stats.map((stat) => (
           <motion.div key={stat.label} variants={staggerItem}>
-            <GlassPanel className="px-6 py-6 min-w-[140px] flex-shrink-0 text-center">
-              <span className="text-2xl mb-2 block">{stat.icon}</span>
+            <GlassPanel className="px-6 py-6 min-w-[160px] flex-shrink-0 text-center card-glow cursor-default group">
+              <span className="text-2xl mb-3 block group-hover:scale-110 transition-transform duration-200">{stat.icon}</span>
               <CountUp target={stat.value} suffix={stat.suffix} />
-              <p className="text-sm text-[var(--color-text-muted)] mt-1">{stat.label}</p>
+              <p className="text-sm text-[var(--color-text-muted)] mt-2 font-medium">{stat.label}</p>
             </GlassPanel>
           </motion.div>
         ))}

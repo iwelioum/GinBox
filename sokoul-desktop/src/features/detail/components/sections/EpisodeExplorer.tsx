@@ -50,20 +50,26 @@ export function EpisodeExplorer({ data, onWatchEpisode }: EpisodeExplorerProps) 
       <div className="relative z-10">
         <SectionHeader title="Episodes" subtitle={`${episodesOfSeason.length} episodes in season ${selectedSeason}`} />
 
-        {/* Spotlight card */}
+        {/* Spotlight card — cinematic featured episode */}
         {spotlightEp && (
-          <GlassPanel className="flex flex-col lg:flex-row overflow-hidden mb-8">
-            <div className="lg:w-2/5 aspect-video overflow-hidden">
+          <GlassPanel className="flex flex-col lg:flex-row overflow-hidden mb-8 card-elevated group">
+            <div className="lg:w-2/5 aspect-video overflow-hidden relative">
               {spotlightEp.still_path ? (
                 <img
                   src={buildTmdbImageUrl(spotlightEp.still_path, 'w780') ?? undefined}
                   alt={spotlightEp.title || ''}
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="w-full h-full object-cover hover:scale-[1.02] transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
                 />
               ) : (
                 <div className="w-full h-full shimmer" />
               )}
+              {/* Play overlay */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="w-16 h-16 rounded-full bg-[var(--color-accent)]/80 backdrop-blur-sm flex items-center justify-center shadow-[var(--depth-accent-glow)]">
+                  <span className="text-2xl text-white ml-1">▶</span>
+                </div>
+              </div>
             </div>
             <div className="lg:w-3/5 p-8 flex flex-col justify-center">
               <p className="text-sm font-medium text-[var(--color-accent)] mb-2">Now Spotlighting</p>

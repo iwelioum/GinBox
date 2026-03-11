@@ -67,7 +67,7 @@ function PosterCard({ item, contentType, onClick }: { item: CatalogMeta; content
       className="group flex-shrink-0 w-[160px] text-left focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-xl"
       aria-label={title}
     >
-      <div className="aspect-[2/3] rounded-xl overflow-hidden relative mb-2 shadow-[var(--depth-base)] group-hover:shadow-[var(--depth-elevated)] transition-shadow duration-200">
+      <div className="aspect-[2/3] rounded-xl overflow-hidden relative mb-2 card-elevated">
         {posterPath ? (
           <>
             <img
@@ -75,7 +75,7 @@ function PosterCard({ item, contentType, onClick }: { item: CatalogMeta; content
               alt={title}
               sizes="160px"
               onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-cover transition-transform duration-200 group-hover:scale-[1.05] ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.06] ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
             {!imgLoaded && <div className="absolute inset-0 shimmer" />}
           </>
@@ -89,6 +89,9 @@ function PosterCard({ item, contentType, onClick }: { item: CatalogMeta; content
             ⭐ {rating.toFixed(1)}
           </div>
         )}
+
+        {/* Hover accent glow */}
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-[var(--color-accent)]/0 group-hover:bg-[var(--color-accent)]/20 blur-2xl rounded-full pointer-events-none transition-all duration-300" />
       </div>
 
       <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{title}</p>

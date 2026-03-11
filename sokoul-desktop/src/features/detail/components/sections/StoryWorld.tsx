@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { SectionHeader } from '@/shared/components/ui';
+import { SectionHeader, GlassPanel } from '@/shared/components/ui';
 import type { UseDetailDataResult } from '../../hooks/useDetailData';
 
 export function StoryWorld({ data }: { data: UseDetailDataResult }) {
@@ -20,9 +20,9 @@ export function StoryWorld({ data }: { data: UseDetailDataResult }) {
     <section className="relative px-16 py-16">
       <div className="section-atmosphere" />
       <div className="relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-          {/* Synopsis */}
-          <div className="lg:col-span-3">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Synopsis panel */}
+          <GlassPanel className="lg:col-span-3 p-8 card-glow" as="article">
             <SectionHeader title="Story" />
             {synopsis && (
               <>
@@ -31,7 +31,7 @@ export function StoryWorld({ data }: { data: UseDetailDataResult }) {
                     key={synopsisExpanded ? 'full' : 'short'}
                     initial={prefersReducedMotion ? false : { opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className={`text-sm text-[var(--color-text-secondary)] leading-relaxed ${synopsisExpanded ? '' : 'line-clamp-4'}`}
+                    className={`text-sm text-[var(--color-text-secondary)] leading-7 ${synopsisExpanded ? '' : 'line-clamp-4'}`}
                   >
                     {synopsis}
                   </motion.p>
@@ -39,7 +39,7 @@ export function StoryWorld({ data }: { data: UseDetailDataResult }) {
                 {synopsis.length > 200 && (
                   <button
                     onClick={() => setSynopsisExpanded(v => !v)}
-                    className="text-sm text-[var(--color-accent)] mt-3 hover:underline transition-colors"
+                    className="text-sm text-[var(--color-accent)] mt-4 hover:underline transition-colors font-medium"
                   >
                     {synopsisExpanded ? 'Show less ↑' : 'Read more ↓'}
                   </button>
@@ -53,51 +53,37 @@ export function StoryWorld({ data }: { data: UseDetailDataResult }) {
                 {genres.map(g => (
                   <span
                     key={g}
-                    className="px-3 py-1 rounded-full border border-[var(--color-border)] text-sm bg-[var(--color-bg-overlay)] text-[var(--color-text-secondary)]"
+                    className="px-3 py-1.5 rounded-full border border-[var(--color-border)] text-sm bg-[var(--color-bg-overlay)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)]/40 hover:text-[var(--color-text-primary)] transition-colors duration-200 cursor-default"
                   >
                     {g}
                   </span>
                 ))}
               </div>
             )}
-          </div>
+          </GlassPanel>
 
-          {/* Quick info */}
-          <div className="lg:col-span-2">
+          {/* Quick metadata panel */}
+          <GlassPanel className="lg:col-span-2 p-8 card-glow" as="aside">
             <SectionHeader title="Details" />
-            <dl className="space-y-3">
-              {item?.director && (
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm text-[var(--color-text-muted)] w-24">Director</dt>
-                  <dd className="text-sm font-medium text-[var(--color-text-primary)]">{item.director}</dd>
-                </div>
-              )}
-              {item?.studio && (
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm text-[var(--color-text-muted)] w-24">Studio</dt>
-                  <dd className="text-sm font-medium text-[var(--color-text-primary)]">{item.studio}</dd>
-                </div>
-              )}
-              {item?.status && (
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm text-[var(--color-text-muted)] w-24">Status</dt>
-                  <dd className="text-sm font-medium text-[var(--color-text-primary)]">{item.status}</dd>
-                </div>
-              )}
-              {item?.original_language && (
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm text-[var(--color-text-muted)] w-24">Language</dt>
-                  <dd className="text-sm font-medium text-[var(--color-text-primary)]">{item.original_language.toUpperCase()}</dd>
-                </div>
-              )}
-              {item?.runtime && (
-                <div className="flex items-center gap-2">
-                  <dt className="text-sm text-[var(--color-text-muted)] w-24">Runtime</dt>
-                  <dd className="text-sm font-medium text-[var(--color-text-primary)]">{item.runtime} min</dd>
-                </div>
-              )}
+            <dl className="space-y-4">
+              {[
+                item?.director && { label: 'Director', value: item.director },
+                item?.studio && { label: 'Studio', value: item.studio },
+                item?.status && { label: 'Status', value: item.status },
+                item?.original_language && { label: 'Language', value: item.original_language.toUpperCase() },
+                item?.runtime && { label: 'Runtime', value: `${item.runtime} min` },
+                item?.origin_country?.length && { label: 'Country', value: item.origin_country.join(', ') },
+              ].filter(Boolean).map((field) => {
+                const f = field as { label: string; value: string };
+                return (
+                  <div key={f.label} className="flex items-baseline gap-3 group">
+                    <dt className="text-sm text-[var(--color-text-muted)] w-20 flex-shrink-0 group-hover:text-[var(--color-text-secondary)] transition-colors">{f.label}</dt>
+                    <dd className="text-sm font-medium text-[var(--color-text-primary)]">{f.value}</dd>
+                  </div>
+                );
+              })}
             </dl>
-          </div>
+          </GlassPanel>
         </div>
       </div>
     </section>

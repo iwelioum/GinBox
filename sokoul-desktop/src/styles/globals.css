@@ -147,6 +147,36 @@ button:active, [role="button"]:active {
   z-index: 1;
 }
 
+.hero-light {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 25% 40%, rgba(80,120,255,0.35), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(120,80,255,0.25), transparent 40%);
+  filter: blur(120px);
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Card glow on hover — reusable utility */
+.card-glow {
+  transition: box-shadow 300ms ease, transform 300ms ease;
+}
+.card-glow:hover {
+  box-shadow: 0 10px 40px rgba(108,99,255,0.2), 0 0 0 1px rgba(255,255,255,0.08);
+  transform: translateY(-2px);
+}
+
+/* Elevated card — depth effect */
+.card-elevated {
+  box-shadow: var(--depth-base);
+  transition: box-shadow 300ms ease, transform 300ms ease;
+}
+.card-elevated:hover {
+  box-shadow: var(--depth-elevated);
+  transform: translateY(-4px);
+}
+
 .section-atmosphere {
   position: absolute; inset: 0;
   background:

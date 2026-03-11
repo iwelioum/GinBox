@@ -103,7 +103,7 @@ export function GalleryExperience({ images }: GalleryExperienceProps) {
                 src={buildTmdbImageUrl(path, 'w500') ?? undefined}
                 alt=""
                 sizes="33vw"
-                className="w-full h-auto object-cover transition-transform duration-200 group-hover:scale-[1.03]"
+                className="w-full h-auto object-cover transition-all duration-300 group-hover:scale-[1.05] group-hover:brightness-110"
                 loading="lazy"
               />
             </motion.button>

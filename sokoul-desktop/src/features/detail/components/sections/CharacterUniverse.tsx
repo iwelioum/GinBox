@@ -83,7 +83,7 @@ function CastCard({ member, prefersReducedMotion }: { member: CastMember; prefer
 
   return (
     <motion.div variants={fadeUp} className="group">
-      <div className="aspect-[2/3] rounded-xl overflow-hidden relative">
+      <div className="aspect-[2/3] rounded-xl overflow-hidden relative card-elevated">
         {member.profile_path ? (
           <>
             <img
@@ -91,7 +91,7 @@ function CastCard({ member, prefersReducedMotion }: { member: CastMember; prefer
               alt={member.name}
               sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
               onLoad={() => setImgLoaded(true)}
-              className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.04] ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+              className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-[1.06] ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
             {!imgLoaded && <div className="absolute inset-0 shimmer" />}
           </>
@@ -101,15 +101,22 @@ function CastCard({ member, prefersReducedMotion }: { member: CastMember; prefer
           </div>
         )}
 
-        {/* Hover overlay */}
-        {member.character && !prefersReducedMotion && (
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-250 flex items-end p-3">
-            <p className="text-sm text-[var(--color-accent)] line-clamp-2">as {member.character}</p>
-          </div>
-        )}
+        {/* Hover overlay with character info */}
+        <div className={`
+          absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent
+          flex flex-col justify-end p-4 transition-opacity duration-250
+          ${prefersReducedMotion ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}
+        `}>
+          {member.character && (
+            <p className="text-sm text-[var(--color-accent)] font-medium line-clamp-2">as {member.character}</p>
+          )}
+        </div>
+
+        {/* Accent glow on hover */}
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-[var(--color-accent)]/0 group-hover:bg-[var(--color-accent)]/20 blur-2xl rounded-full pointer-events-none transition-all duration-300" />
       </div>
 
-      <p className="text-sm font-medium text-[var(--color-text-primary)] mt-2 truncate">{member.name}</p>
+      <p className="text-sm font-semibold text-[var(--color-text-primary)] mt-3 truncate">{member.name}</p>
       <p className="text-sm text-[var(--color-text-muted)] truncate">{member.character || 'Unknown role'}</p>
     </motion.div>
   );

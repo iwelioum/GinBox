@@ -29,16 +29,16 @@ export function TrailerExperience({ videos, synopsis }: TrailerExperienceProps) 
       <div className="relative z-10">
         <SectionHeader title="Trailers" subtitle={`${trailers.length} video${trailers.length > 1 ? 's' : ''} available`} />
 
-        {/* Main player */}
+        {/* Main player — cinematic wrapper */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentTrailer?.key}
-            initial={prefersReducedMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <GlassPanel className="overflow-hidden rounded-2xl">
+            <GlassPanel className="overflow-hidden rounded-2xl shadow-[var(--depth-elevated)] relative group">
               <div className="aspect-video">
                 <iframe
                   src={`https://www.youtube-nocookie.com/embed/${currentTrailer?.key}?rel=0&modestbranding=1`}
@@ -48,6 +48,8 @@ export function TrailerExperience({ videos, synopsis }: TrailerExperienceProps) 
                   className="w-full h-full border-0"
                 />
               </div>
+              {/* Cinematic glow beneath the player */}
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-[var(--color-accent)]/15 blur-3xl rounded-full pointer-events-none" />
             </GlassPanel>
           </motion.div>
         </AnimatePresence>
