@@ -40,12 +40,9 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     : raw.toLocaleString('en-US');
   return (
     <span
-      style={{
-        display: 'inline-block',
-        opacity:   active ? 1 : 0,
-        transform: active ? 'translateY(0)' : 'translateY(8px)',
-        transition: 'opacity 0.4s, transform 0.4s',
-      }}
+      className={`inline-block transition-[opacity,transform] duration-[400ms] ${
+        active ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+      }`}
     >
       {prefix}{formatted}{suffix}
     </span>

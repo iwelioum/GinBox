@@ -10,7 +10,6 @@ import { endpoints }              from '@/shared/api/client';
 import type { CollectionItem }    from '../../../shared/types/index';
 import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
 import { getGenreStyleByKey }     from '@/shared/config/genreTypography';
-import { Spinner }                from '@/shared/components/ui/Spinner';
 import { EmptyState }             from '@/shared/components/ui/EmptyState';
 import { QueryErrorState }        from '@/shared/components/ui/QueryErrorState';
 import { Skeleton }               from '@/shared/components/ui/Skeleton';
@@ -107,8 +106,7 @@ export default function CollectionsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen px-8 pt-24"
-           style={{ backgroundColor: 'var(--bg-abyss)' }}>
+      <div className="min-h-screen px-8 pt-24 bg-[var(--bg-abyss)]">
         <Skeleton variant="text" width="200px" height="28px" className="mb-2" />
         <Skeleton variant="text" width="140px" height="16px" className="mb-8" />
         <div className="grid grid-cols-2 gap-4">
@@ -122,25 +120,22 @@ export default function CollectionsPage() {
 
   if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center"
-           style={{ backgroundColor: 'var(--bg-abyss)' }}>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-abyss)]">
         <QueryErrorState error={error as Error} refetch={refetch} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pb-20"
-         style={{ backgroundColor: 'var(--bg-abyss)' }}>
+    <div className="min-h-screen pb-20 bg-[var(--bg-abyss)]">
 
       <div className="px-8 pt-24 pb-8">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold mb-1"
-                style={{ color: 'var(--text-main)' }}>
+            <h1 className="text-3xl font-bold mb-1 text-[var(--text-main)]">
               {t('collections.heading')}
             </h1>
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-sm text-[var(--text-muted)]">
               {t('collections.franchiseCount', { count: allCollections.length })}
             </p>
           </div>
@@ -172,6 +167,7 @@ export default function CollectionsPage() {
               className={`
                 flex-shrink-0 px-4 py-1.5 rounded-full text-xs
                 font-medium transition-colors duration-200
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]
                 ${activeCategory === cat.key
                   ? 'bg-white text-black'
                   : 'bg-white/[0.07] text-white/55 border border-white/[0.08] hover:bg-white/[0.12] hover:text-white/80'}
@@ -202,9 +198,13 @@ export default function CollectionsPage() {
         )}
       </div>
 
-      <div ref={loaderRef} className="py-8 flex justify-center">
+      <div ref={loaderRef} className="py-8 flex justify-center gap-4">
         {isFetchingNextPage && (
-          <Spinner size={24} />
+          <div className="grid grid-cols-2 gap-4 w-full px-8">
+            {Array.from({ length: 2 }, (_, i) => (
+              <Skeleton key={i} width="100%" height="0" className="aspect-[21/9] rounded-2xl" />
+            ))}
+          </div>
         )}
       </div>
     </div>

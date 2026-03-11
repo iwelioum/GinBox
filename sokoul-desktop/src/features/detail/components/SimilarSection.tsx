@@ -31,8 +31,7 @@ export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _t
         {t('detail.similar')}
       </h2>
       <div
-        className="flex gap-3 overflow-x-auto pb-4 scroll-smooth"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
+        className="flex gap-3 overflow-x-auto pb-4 scroll-smooth scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
       >
         {displayed.map(sim => {
           const imgRaw = sim.backdrop_path || sim.background || sim.poster_path || sim.poster;
@@ -48,7 +47,7 @@ export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _t
               key={sim.id}
               type="button"
               onClick={() => navigate(`/detail/${type}/${sim.id}`)}
-              className="flex-shrink-0 w-[200px] group text-left cursor-pointer"
+              className="flex-shrink-0 w-[200px] group text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-lg"
             >
               <div className="relative w-full aspect-video rounded-lg overflow-hidden mb-2">
                 {imgUrl ? (
