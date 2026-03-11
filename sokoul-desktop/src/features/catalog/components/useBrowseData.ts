@@ -5,6 +5,7 @@ import { useQueries, useQuery } from '@tanstack/react-query';
 import { endpoints }            from '@/shared/api/client';
 import type { CatalogMeta, ContentType, UserProgressEntry, PlaybackEntry, Profile } from '@/shared/types';
 import { useProfileStore }      from '@/stores/profileStore';
+import { useKidsFilter }        from '@/shared/hooks/useKidsFilter';
 import {
   classifyContentKind,
   expandGenres,
@@ -52,6 +53,7 @@ export function useBrowseData(
 ): BrowseData {
   const activeProfile = useProfileStore((s) => s.activeProfile);
   const profileId     = activeProfile?.id ?? null;
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
 
   const resolveItemType = React.useCallback(
     (item: Pick<CatalogMeta, 'type' | 'media_type'>): ContentType =>
@@ -117,8 +119,9 @@ export function useBrowseData(
     const all: CatalogMeta[] = [];
     for (const r of results) { if (r.data) all.push(...r.data); }
     const seen = new Set<string>();
-    return all.filter((item) => item.id && !seen.has(item.id) && seen.add(item.id));
-  }, [results]);
+    const deduped = all.filter((item) => item.id && !seen.has(item.id) && seen.add(item.id));
+    return filterForKids(deduped);
+  }, [results, filterForKids]);
 
   /* ─── Enrichment ─── */
   const enrichedItems = React.useMemo<EnrichedItem[]>(() => {

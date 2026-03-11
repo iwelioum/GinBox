@@ -5,6 +5,7 @@ import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useProfileStore } from '@/stores/profileStore';
+import { useKidsFilter } from '@/shared/hooks/useKidsFilter';
 import { endpoints } from '@/shared/api/client';
 import type { CatalogMeta, PlaybackEntry, ListItem, UserList } from '@/shared/types';
 
@@ -20,6 +21,7 @@ export function useHomePersonalized(
 ): PersonalizedRails {
   const { t } = useTranslation();
   const profileId = useProfileStore((s) => s.activeProfile?.id ?? null);
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
 
   // Fetch playback history for "Continue Watching" rail
   const { data: playbackHistory } = useQuery({
@@ -111,5 +113,12 @@ export function useHomePersonalized(
     };
   }, [recentlyWatchedMeta, t]);
 
-  return { continueWatchingItems, recentlyAddedItems, becauseYouWatched };
+  return {
+    continueWatchingItems: filterForKids(continueWatchingItems),
+    recentlyAddedItems: filterForKids(recentlyAddedItems),
+    becauseYouWatched: {
+      ...becauseYouWatched,
+      items: filterForKids(becauseYouWatched.items),
+    },
+  };
 }

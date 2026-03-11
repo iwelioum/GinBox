@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Source } from '@/shared/types/index';
 import { Play, Download } from 'lucide-react';
@@ -29,7 +30,7 @@ interface SourceRowProps {
 
 export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
   const { t } = useTranslation();
-  const meta = parseTorrentName(source.title);
+  const meta = useMemo(() => parseTorrentName(source.title), [source.title]);
 
   return (
     <div className="flex items-center justify-between gap-[12px] w-full px-[16px] py-[14px] rounded-[10px] border border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-150 group">

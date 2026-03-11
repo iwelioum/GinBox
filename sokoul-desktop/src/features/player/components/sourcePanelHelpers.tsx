@@ -1,6 +1,7 @@
 // sourcePanelHelpers.tsx — Presentational helpers for SourcePanel.
 // Extracted to keep SourcePanel.tsx under 300 lines (AGENTS.md Rule 4).
 
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Source } from '@/shared/types/index';
 import { parseTorrentName } from '@/shared/utils/parsing';
@@ -86,9 +87,10 @@ export function SourceCard({
   onSelect: () => void;
 }) {
   const { t } = useTranslation();
-  const parsed      = parseTorrentName(source.title);
-  const releaseType = detectReleaseType(source.title);
-  const codecLabel  = getCodecLabel(parsed.codec);
+
+  const parsed      = useMemo(() => parseTorrentName(source.title), [source.title]);
+  const releaseType = useMemo(() => detectReleaseType(source.title), [source.title]);
+  const codecLabel  = useMemo(() => getCodecLabel(parsed.codec), [parsed.codec]);
   const isDDL       = source.source === 'wastream';
 
   const hasAnyMeta =

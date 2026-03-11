@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Zap, Download } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -16,8 +16,8 @@ export function InlineSourceRow({
 }) {
   const [hovered, setHovered] = useState(false);
   const { t } = useTranslation();
-  const meta  = parseTorrentName(source.title);
-  const label = cleanTitle(source.title, meta);
+  const meta  = useMemo(() => parseTorrentName(source.title), [source.title]);
+  const label = useMemo(() => cleanTitle(source.title, meta), [source.title, meta]);
   const ok    = source.playable;
 
   return (
@@ -75,8 +75,8 @@ export function InlineSourceRow({
 export function BestSourceCard({
   source, onPlay, launching,
 }: { source: Source; onPlay: () => void; launching: boolean }) {
-  const m = parseTorrentName(source.title);
-  const tLabel = cleanTitle(source.title, m);
+  const m = useMemo(() => parseTorrentName(source.title), [source.title]);
+  const tLabel = useMemo(() => cleanTitle(source.title, m), [source.title, m]);
   const { t } = useTranslation();
   return (
     <div className="p-3.5 px-4 rounded-[var(--radius-lg)] border border-[var(--color-white-12)]

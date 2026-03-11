@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useCatalogStore }  from '../store/catalog.store';
 import { useCatalogLoader } from '../hooks/useCatalogLoader';
 import { useHomePersonalized } from '../hooks/useHomePersonalized';
+import { useKidsFilter }    from '@/shared/hooks/useKidsFilter';
 import { HeroBanner }       from './HeroBanner';
 import { BrandRow }         from './BrandRow';
 import { ContentRail }      from './ContentRail';
@@ -49,6 +50,7 @@ export default function HomePage({ mode }: HomePageProps) {
   const { t } = useTranslation();
   const { catalog, loading, error, sections } = useCatalogStore();
   const { load } = useCatalogLoader();
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
 
   const { continueWatchingItems, recentlyAddedItems, becauseYouWatched } =
     useHomePersonalized(catalog, sections);
@@ -110,11 +112,11 @@ export default function HomePage({ mode }: HomePageProps) {
 
       const deduplicated = filtered.filter(item => !seen.has(item.id));
       deduplicated.forEach(item => seen.add(item.id));
-      result[rail.key] = shuffle(deduplicated);
+      result[rail.key] = shuffle(filterForKids(deduplicated));
     }
 
     return result;
-  }, [catalog, sections, mode]);
+  }, [catalog, sections, mode, filterForKids]);
 
   const getItems = (key: string): CatalogMeta[] => railItems[key] ?? [];
 

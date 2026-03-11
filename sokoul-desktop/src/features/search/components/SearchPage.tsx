@@ -9,7 +9,9 @@ import { Search as SearchIcon, Clock, X, TrendingUp } from 'lucide-react';
 import { endpoints } from '@/shared/api/client';
 import { ContentCard } from '@/features/catalog/components/ContentCard';
 import { Spinner } from '../../../shared/components/ui/Spinner';
+import { EmptyState } from '../../../shared/components/ui/EmptyState';
 import { useSearchHistory } from '@/shared/hooks/useSearchHistory';
+import { useKidsFilter } from '@/shared/hooks/useKidsFilter';
 import { useCatalogStore } from '@/features/catalog/store/catalog.store';
 import type { CatalogMeta } from '../../../shared/types/index';
 
@@ -24,14 +26,15 @@ export default function SearchPage() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const { history, addEntry, removeEntry, clearHistory } = useSearchHistory();
   const { sections } = useCatalogStore();
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
 
   const popularSuggestions = useMemo((): CatalogMeta[] => {
     const trending: CatalogMeta[] = sections['trending'] ?? [];
-    return trending
+    return filterForKids(trending)
       .filter((item: CatalogMeta) => (item.vote_average ?? 0) >= 6)
       .sort((a: CatalogMeta, b: CatalogMeta) => (b.vote_average ?? 0) - (a.vote_average ?? 0))
       .slice(0, 10);
-  }, [sections]);
+  }, [sections, filterForKids]);
 
   // Debounce 300ms
   useEffect(() => {
@@ -64,17 +67,18 @@ export default function SearchPage() {
   }, [debouncedQuery, allMetas.length, addEntry]);
 
   const filteredResults: CatalogMeta[] = (() => {
+    const safe = filterForKids(allMetas);
     if (activeTab === 'movies') {
-      return allMetas.filter(
+      return safe.filter(
         (item) => (item.type || item.media_type) === 'movie',
       );
     }
     if (activeTab === 'series') {
-      return allMetas.filter(
+      return safe.filter(
         (item) => (item.type || item.media_type) !== 'movie',
       );
     }
-    return allMetas;
+    return safe;
   })();
 
   const tabs: { id: FilterTab; label: string }[] = [
@@ -225,9 +229,12 @@ export default function SearchPage() {
 
       {/* No results for this query */}
       {!isLoading && debouncedQuery && allMetas.length === 0 && (
-        <div className="text-center text-white/50 mt-16">
-          <p>{t('search.noResults', { query: debouncedQuery })}</p>
-        </div>
+        <EmptyState
+          icon={<SearchIcon />}
+          title={t('search.noResults', { query: debouncedQuery })}
+          description={t('search.tryAnotherQuery', { defaultValue: 'Try a different search term or check for typos.' })}
+          className="mt-16"
+        />
       )}
 
       {/* Results */}
@@ -259,9 +266,12 @@ export default function SearchPage() {
 
       {/* Filtered tab has no results but the raw query does */}
       {!isLoading && debouncedQuery && allMetas.length > 0 && filteredResults.length === 0 && (
-        <div className="text-center text-white/50 mt-16">
-          <p>{t('search.noResults', { query: debouncedQuery })}</p>
-        </div>
+        <EmptyState
+          icon={<SearchIcon />}
+          title={t('search.noResults', { query: debouncedQuery })}
+          description={t('search.tryOtherFilter', { defaultValue: 'Try switching the filter to see all results.' })}
+          className="mt-16"
+        />
       )}
     </div>
   );

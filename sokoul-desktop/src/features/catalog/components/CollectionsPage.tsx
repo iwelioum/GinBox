@@ -10,6 +10,8 @@ import { endpoints }              from '@/shared/api/client';
 import type { CollectionItem }    from '../../../shared/types/index';
 import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
 import { getGenreStyleByKey }     from '@/shared/config/genreTypography';
+import { Spinner }                from '@/shared/components/ui/Spinner';
+import { EmptyState }             from '@/shared/components/ui/EmptyState';
 
 const CATEGORIES = [
   { key: 'all',     labelKey: 'collections.categoryAll' },
@@ -103,8 +105,7 @@ export default function CollectionsPage() {
       <div className="min-h-screen flex items-center justify-center"
            style={{ backgroundColor: 'var(--bg-abyss)' }}>
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-white/20
-                          border-t-white/80 rounded-full animate-spin" />
+          <Spinner size={32} />
           <span className="text-white/40 text-sm">
             {t('collections.loading')}
           </span>
@@ -169,9 +170,10 @@ export default function CollectionsPage() {
 
       <div className="px-8">
         {filtered.length === 0 ? (
-          <div className="py-16 text-center text-white/30 text-sm">
-            {search ? t('collections.noSagaFoundFor', { search }) : t('collections.noSagaFound')}
-          </div>
+          <EmptyState
+            icon={<Film />}
+            title={search ? t('collections.noSagaFoundFor', { search }) : t('collections.noSagaFound')}
+          />
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {filtered.map(collection => (
@@ -187,8 +189,7 @@ export default function CollectionsPage() {
 
       <div ref={loaderRef} className="py-8 flex justify-center">
         {isFetchingNextPage && (
-          <div className="w-6 h-6 border-2 border-white/15
-                          border-t-white/50 rounded-full animate-spin" />
+          <Spinner size={24} />
         )}
       </div>
     </div>

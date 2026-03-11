@@ -7,6 +7,8 @@ import { motion }                                     from 'framer-motion'
 import { useLists, useListItems, useRemoveFromList }  from '../../../shared/hooks/useLists'
 import { ContentCard }                                from './ContentCard'
 import { Skeleton }                                   from '@/shared/components/ui'
+import { EmptyState }                                 from '@/shared/components/ui/EmptyState'
+import { Heart, List }                                from 'lucide-react'
 import type { UserList, ListItem, CatalogMeta }       from '../../../shared/types/index'
 
 export default function MyListsPage() {
@@ -45,26 +47,12 @@ export default function MyListsPage() {
 
       {/* Empty state when no lists exist at all */}
       {lists.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-32 text-center">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mb-6 text-3xl"
-            style={{ backgroundColor: 'var(--color-accent)', opacity: 0.85 }}
-          >
-            ♥
-          </div>
-          <p
-            className="text-[1.2rem] font-semibold mb-2"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            {t('lists.noLists')}
-          </p>
-          <p
-            className="text-[0.9rem] max-w-xs"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            {t('lists.addFromDetail')}
-          </p>
-        </div>
+        <EmptyState
+          icon={<Heart />}
+          title={t('lists.noLists')}
+          description={t('lists.addFromDetail')}
+          className="py-32"
+        />
       ) : (
         <>
           {/* List selector — pill tabs */}
@@ -98,20 +86,11 @@ export default function MyListsPage() {
               <Skeleton variant="card" />
             </div>
           ) : items.length === 0 ? (
-            <div className="p-16 text-center">
-              <p
-                className="text-[1.1rem]"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {activeList ? t('lists.listEmpty', { name: activeList.name }) : t('lists.noLists')}
-              </p>
-              <p
-                className="text-[0.85rem] mt-2"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
-                {t('lists.addFromDetail')}
-              </p>
-            </div>
+            <EmptyState
+              icon={<List />}
+              title={activeList ? t('lists.listEmpty', { name: activeList.name }) : t('lists.noLists')}
+              description={t('lists.addFromDetail')}
+            />
           ) : (
             <motion.div
               layout

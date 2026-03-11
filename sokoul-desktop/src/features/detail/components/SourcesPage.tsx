@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useParams, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, AlertTriangle, RefreshCw, Bug } from 'lucide-react';
+import { ChevronLeft, AlertTriangle, RefreshCw, Bug, Zap, Filter } from 'lucide-react';
 import { client, endpoints } from '@/shared/api/client';
 import { Spinner } from '@/shared/components/ui/Spinner';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
 import { ResumeModal } from '@/shared/components/modals/ResumeModal';
 import type { CatalogMeta, ContentType, Source } from '@/shared/types/index';
 import { useLogStore } from '@/stores/logStore';
@@ -137,13 +138,13 @@ export default function SourcesPage() {
           </button>
         </div>
       ) : sources.length === 0 ? (
-        <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
-          <p className="text-[22px] font-[700] m-0 text-white/50">{t('sources.noStreamsFound')}</p>
-          <p className="text-[14px] text-white/30 m-0 max-w-[320px]">{t('sources.notAvailableVia')}</p>
-          <button onClick={handleForceRefresh} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-            <RefreshCw size={16} /> {t('sources.restartSearch')}
-          </button>
-        </div>
+        <EmptyState
+          icon={<Zap />}
+          title={t('sources.noStreamsFound')}
+          description={t('sources.notAvailableVia')}
+          action={{ label: t('sources.restartSearch'), onClick: handleForceRefresh }}
+          className="flex-1"
+        />
       ) : (
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
           <SourcesSidebar sortBy={sortBy} setSortBy={setSortBy} activeFilters={activeFilters}
@@ -151,13 +152,13 @@ export default function SourcesPage() {
             cachedAt={cachedAt} isStale={isStale} onForceRefresh={handleForceRefresh} />
           <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent" style={{ padding: '20px 28px' }}>
             {sortedAndFiltered.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-[50vh] gap-[14px] text-center">
-                <p className="text-[22px] font-[700] m-0 text-white/50">{t('sources.noFilterResults')}</p>
-                <p className="text-[14px] text-white/30 m-0 max-w-[320px]">{t('sources.modifyFilters')}</p>
-                <button onClick={() => setActiveFilters(new Set())} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
-                  {t('sources.viewAllSources')}
-                </button>
-              </div>
+              <EmptyState
+                icon={<Filter />}
+                title={t('sources.noFilterResults')}
+                description={t('sources.modifyFilters')}
+                action={{ label: t('sources.viewAllSources'), onClick: () => setActiveFilters(new Set()) }}
+                className="h-[50vh]"
+              />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', margin: 0 }}>
