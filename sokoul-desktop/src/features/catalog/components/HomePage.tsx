@@ -2,183 +2,20 @@
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { useCatalogStore }  from '../store/catalog.store';
 import { useCatalogLoader } from '../hooks/useCatalogLoader';
 import { HeroBanner }       from './HeroBanner';
 import { BrandRow }         from './BrandRow';
 import { ContentRail }      from './ContentRail';
 import { Skeleton }         from '@/shared/components/ui';
-import type { CatalogMeta } from '@/shared/types';
-
-// -- Rail title display (deterministic alternation) --------------------------
-//
-// Each rail shows either its genre name OR its tagline, never both.
-// Even-indexed visible rails → genre name ("Action")
-// Odd-indexed visible rails  → tagline ("No brakes. No mercy.")
-// Titles are stable — no animation, no cycling, no timer.
-
-// Fisher-Yates shuffle for randomizing items within a rail
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-// -- Rail rhythm (deterministic variant cycle) --------------------------------
-//
-// Position pattern across the page (from VISUAL_IDENTITY_PROMPT):
-//   1 → landscape | 2 → landscape | 3 → POSTER | 4 → landscape
-//   5 → landscape | 6 → landscape | 7 → POSTER | 8+ → repeat from 2
-
-/**
- * Returns the card variant for a given visible rail position.
- * Poster rails appear at every 4th position starting at 3 (3, 7, 11, 15…).
- */
-function getPositionVariant(position: number): 'landscape' | 'poster' {
-  if (position < 3) return 'landscape';
-  return (position - 3) % 4 === 0 ? 'poster' : 'landscape';
-}
-
-// -- Rail configuration (25 distinct sections) --------------------------------
-
-interface RailConfig {
-  key:         string;
-  titleKey:    string;
-  taglineKey?: string;
-  accentColor?: string;
-  genreIds?:   number[] | null;
-}
-
-const RAILS: RailConfig[] = [
-  {
-    key: 'trending',      accentColor: '#0063e5', genreIds: null,
-    titleKey:   'home.recommendedForYou',
-    taglineKey: 'home.recommendedTagline',
-  },
-  {
-    key: 'top10',         accentColor: '#0063e5', genreIds: null,
-    titleKey:   'home.newOnSokoul',
-    taglineKey: 'home.newOnSokoulTagline',
-  },
-  {
-    key: 'action',        accentColor: '#e63946', genreIds: [28],
-    titleKey:   'home.action',
-    taglineKey: 'home.actionTagline',
-  },
-  {
-    key: 'scifi',         accentColor: '#4361ee', genreIds: [878],
-    titleKey:   'home.scienceFiction',
-    taglineKey: 'home.scienceFictionTagline',
-  },
-  {
-    key: 'thriller',      accentColor: '#c0392b', genreIds: [53],
-    titleKey:   'home.thriller',
-    taglineKey: 'home.thrillerTagline',
-  },
-  {
-    key: 'horror',        accentColor: '#8b0000', genreIds: [27],
-    titleKey:   'home.horror',
-    taglineKey: 'home.horrorTagline',
-  },
-  {
-    key: 'series',        accentColor: '#0063e5', genreIds: null,
-    titleKey:   'home.tvShows',
-    taglineKey: 'home.tvShowsTagline',
-  },
-  {
-    key: 'adventure',     accentColor: '#f39c12', genreIds: [12],
-    titleKey:   'home.adventure',
-    taglineKey: 'home.adventureTagline',
-  },
-  {
-    key: 'comedy',        accentColor: '#f4d03f', genreIds: [35],
-    titleKey:   'home.comedy',
-    taglineKey: 'home.comedyTagline',
-  },
-  {
-    key: 'drama',         accentColor: '#8e44ad', genreIds: [18],
-    titleKey:   'home.drama',
-    taglineKey: 'home.dramaTagline',
-  },
-  {
-    key: 'kdrama',        accentColor: '#c0392b', genreIds: null,
-    titleKey:   'home.kDrama',
-    taglineKey: 'home.kDramaTagline',
-  },
-  {
-    key: 'fantasy',       accentColor: '#8e44ad', genreIds: [14],
-    titleKey:   'home.fantasy',
-    taglineKey: 'home.fantasyTagline',
-  },
-  {
-    key: 'crime',         accentColor: '#2c3e50', genreIds: [80],
-    titleKey:   'home.crime',
-    taglineKey: 'home.crimeTagline',
-  },
-  {
-    key: 'anime',         accentColor: '#e74c3c', genreIds: [16],
-    titleKey:   'home.anime',
-    taglineKey: 'home.animeTagline',
-  },
-  {
-    key: 'series-action', accentColor: '#e63946', genreIds: [10759],
-    titleKey:   'home.actionAdventureSeries',
-    taglineKey: 'home.actionAdventureSeriesTagline',
-  },
-  {
-    key: 'documentary',   accentColor: '#2ecc71', genreIds: [99],
-    titleKey:   'home.documentary',
-    taglineKey: 'home.documentaryTagline',
-  },
-  {
-    key: 'romance',       accentColor: '#e91e8c', genreIds: [10749],
-    titleKey:   'home.romance',
-    taglineKey: 'home.romanceTagline',
-  },
-  {
-    key: 'animation',     accentColor: '#ff9f43', genreIds: [16],
-    titleKey:   'home.animation',
-    taglineKey: 'home.animationTagline',
-  },
-  {
-    key: 'mystery',       accentColor: '#6c3483', genreIds: [9648],
-    titleKey:   'home.mystery',
-    taglineKey: 'home.mysteryTagline',
-  },
-  {
-    key: 'war',           accentColor: '#7f8c8d', genreIds: [10752],
-    titleKey:   'home.war',
-    taglineKey: 'home.warTagline',
-  },
-  {
-    key: 'history',       accentColor: '#1a5276', genreIds: [36],
-    titleKey:   'home.history',
-    taglineKey: 'home.historyTagline',
-  },
-  {
-    key: 'international', accentColor: '#27ae60', genreIds: null,
-    titleKey:   'home.fromAroundTheWorld',
-    taglineKey: 'home.fromAroundTheWorldTagline',
-  },
-  {
-    key: 'western',       accentColor: '#a04000', genreIds: [37],
-    titleKey:   'home.western',
-    taglineKey: 'home.westernTagline',
-  },
-  {
-    key: 'family',        accentColor: '#e84393', genreIds: [10751],
-    titleKey:   'home.family',
-    taglineKey: 'home.familyTagline',
-  },
-  {
-    key: 'music',         accentColor: '#1db954', genreIds: [10402],
-    titleKey:   'home.music',
-    taglineKey: 'home.musicTagline',
-  },
-];
+import { useProfileStore }  from '@/stores/profileStore';
+import { endpoints }        from '@/shared/api/client';
+import type { CatalogMeta, PlaybackEntry } from '@/shared/types';
+import {
+  RAILS, SERIES_ONLY_RAIL_KEYS, MIN_RAIL_ITEMS,
+  shuffle, getPositionVariant,
+} from './homeRailsConfig';
 
 // -- Loading / Error states --------------------------------------------------
 
@@ -204,17 +41,6 @@ function ErrorState(): React.ReactElement {
   );
 }
 
-// -- Rail classification for mode-based filtering ----------------------------
-//
-// 'series-only' rails are fetched exclusively from the series endpoint.
-// 'movie-only'  rails are fetched exclusively from the movie endpoint.
-// 'mixed'       rails contain both types (trending, top10, international).
-
-const SERIES_ONLY_RAIL_KEYS = new Set(['series', 'series-action', 'anime', 'kdrama']);
-
-// Minimum visible items in a rail after type-filtering before the rail is hidden.
-const MIN_RAIL_ITEMS = 2;
-
 interface HomePageProps {
   mode?: 'movie' | 'series';
 }
@@ -225,6 +51,36 @@ export default function HomePage({ mode }: HomePageProps) {
   const { t } = useTranslation();
   const { catalog, loading, error, sections } = useCatalogStore();
   const { load } = useCatalogLoader();
+  const profileId = useProfileStore((s) => s.activeProfile?.id ?? null);
+
+  // Fetch playback history for "Continue Watching" rail
+  const { data: playbackHistory } = useQuery({
+    queryKey: ['playback-history', profileId],
+    queryFn: () => endpoints.playback.history(profileId!, 30).then(r => r.data),
+    enabled: profileId !== null,
+    staleTime: 30_000,
+  });
+
+  // Build "Continue Watching" items by matching history with catalog
+  const continueWatchingItems = React.useMemo(() => {
+    if (!playbackHistory || !catalog) return [];
+    const allItems = Object.values(sections).flat();
+    const itemMap = new Map<string, CatalogMeta>();
+    for (const item of allItems) {
+      const key = String(item.id);
+      if (!itemMap.has(key)) itemMap.set(key, item);
+    }
+
+    return playbackHistory
+      .filter((e: PlaybackEntry) => e.progressPct > 5 && e.progressPct < 95 && !e.watched)
+      .sort((a: PlaybackEntry, b: PlaybackEntry) => b.updatedAt - a.updatedAt)
+      .map((e: PlaybackEntry) => {
+        const id = e.contentId.includes(':') ? e.contentId.split(':').pop()! : e.contentId;
+        return itemMap.get(id);
+      })
+      .filter((item): item is CatalogMeta => item !== undefined)
+      .slice(0, 20);
+  }, [playbackHistory, catalog, sections]);
 
   React.useEffect(() => {
     if (mode === 'movie') {
@@ -359,6 +215,33 @@ export default function HomePage({ mode }: HomePageProps) {
         {heroItems.length > 0 && <HeroBanner items={heroItems.slice(0, 5)} />}
 
         {!mode && <BrandRow />}
+
+        {/* Continue Watching rail — only shown when there are items */}
+        {continueWatchingItems.length > 0 && (
+          <ContentRail
+            title={t('home.continueWatching')}
+            items={continueWatchingItems}
+            cardVariant="landscape"
+          />
+        )}
+
+        {/* Top Rated rail — items with vote_average > 7.5, sorted by rating */}
+        {(() => {
+          const allItems = Object.values(sections).flat();
+          const topRated = allItems
+            .filter(item => (item.vote_average ?? 0) >= 7.5)
+            .sort((a, b) => (b.vote_average ?? 0) - (a.vote_average ?? 0))
+            .slice(0, 20);
+          if (topRated.length < 4) return null;
+          return (
+            <ContentRail
+              title={t('home.topRated')}
+              items={topRated}
+              cardVariant="poster"
+              accentColor="#f1c40f"
+            />
+          );
+        })()}
 
         {loading && <LoadingState />}
 

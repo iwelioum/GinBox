@@ -14,7 +14,7 @@ import { useProfileStore } from '@/stores/profileStore';
 import { getLogo, type FanartResponse } from '@/shared/utils/fanart';
 import { useLists, useListItems } from '@/shared/hooks/useLists';
 import { endpoints } from '@/shared/api/client';
-import type { ContentType, PlaybackEntry } from '@/shared/types/index';
+import type { ContentType, PlaybackEntry, EpisodeVideo } from '@/shared/types/index';
 
 const VALID_TYPES = new Set<string>(['movie', 'series', 'tv']);
 const PLAYBACK_HISTORY_LIMIT = 200;
@@ -35,12 +35,16 @@ export function useDetailData() {
   const { data: similar } = useSimilarQuery(type!, id!);
   const { data: collection } = useCollectionQuery(item?.belongs_to_collection?.id);
 
-  const episodeVideos = React.useMemo(() =>
-    (item?.episodes ?? [])
+  const episodeVideos = React.useMemo(() => {
+    // Backend serialises TV episodes into the `videos` field (Meta.videos: Vec<Video>).
+    // `item.episodes` is a frontend-only alias that may never be populated from the API.
+    const raw = item?.episodes
+      ?? (item?.videos as unknown as EpisodeVideo[] | undefined)
+      ?? [];
+    return (raw ?? [])
       .filter(v => (v.season ?? 0) > 0 && (v.episode ?? 0) > 0)
-      .sort((a, b) => ((a.season ?? 0) - (b.season ?? 0)) || ((a.episode ?? 0) - (b.episode ?? 0))),
-    [item?.episodes],
-  );
+      .sort((a, b) => ((a.season ?? 0) - (b.season ?? 0)) || ((a.episode ?? 0) - (b.episode ?? 0)));
+  }, [item?.episodes, item?.videos]);
 
   const seasons = React.useMemo(
     () => [...new Set(episodeVideos.map(v => v.season as number))].sort((a, b) => a - b),
@@ -61,12 +65,12 @@ export function useDetailData() {
 
   // Playback history — limit reduced from 1200 to avoid over-fetching
   const { data: playbackHistory = [], isFetched: historyFetched } = useQuery<PlaybackEntry[]>({
-    queryKey: ['playback-history', activeProfile?.id, id],
+    queryKey: ['playback-history', activeProfile?.id, id, sourceType],
     queryFn: async () => {
       if (!activeProfile?.id || !id) return [];
       const { data } = await endpoints.playback.history(activeProfile.id, PLAYBACK_HISTORY_LIMIT);
       return data.filter(
-        e => e.contentId === id && (e.contentType === 'series' || e.contentType === 'tv'),
+        e => e.contentId === id && (['series', 'tv'] as string[]).includes(e.contentType),
       );
     },
     enabled: isSeries && !!activeProfile?.id && !!id, staleTime: 30_000,
@@ -100,26 +104,51 @@ export function useDetailData() {
     return latest;
   }, [playbackHistory]);
 
-  // Bug fix: use full `lastProgressEpisode` object as dependency, not individual properties
-  React.useEffect(() => {
-    if (!isSeries || !historyFetched || !lastProgressEpisode) return;
-    if ((lastProgressEpisode.season ?? 0) <= 0 || (lastProgressEpisode.episode ?? 0) <= 0) return;
-    setSelectedSeason(lastProgressEpisode.season ?? 1);
-    setSelectedEpisode(lastProgressEpisode.episode ?? 1);
-  }, [isSeries, historyFetched, lastProgressEpisode]);
-
+  // Unified effect: history resume takes priority, then season/episode validation
   React.useEffect(() => {
     if (!isSeries || seasons.length === 0) return;
-    setSelectedSeason(c => (seasons.includes(c) ? c : seasons[0]));
-  }, [isSeries, seasons]);
+    if (historyFetched && lastProgressEpisode &&
+        (lastProgressEpisode.season ?? 0) > 0 && (lastProgressEpisode.episode ?? 0) > 0) {
+      setSelectedSeason(lastProgressEpisode.season ?? 1);
+      setSelectedEpisode(lastProgressEpisode.episode ?? 1);
+      return;
+    }
+    setSelectedSeason(s => (seasons.includes(s) ? s : seasons[0]));
+    if (episodesOfSeason.length > 0) {
+      setSelectedEpisode(e => (episodesOfSeason.some(v => v.episode === e) ? e : (episodesOfSeason[0].episode ?? 1)));
+    }
+  }, [isSeries, historyFetched, lastProgressEpisode, seasons, episodesOfSeason]);
 
-  React.useEffect(() => {
-    if (!isSeries || episodesOfSeason.length === 0) return;
-    setSelectedEpisode(c => {
-      if (episodesOfSeason.some(v => v.episode === c)) return c;
-      return episodesOfSeason[0].episode ?? 1;
-    });
-  }, [isSeries, episodesOfSeason]);
+  const goToNextEpisode = React.useCallback(() => {
+    const idx = episodesOfSeason.findIndex(v => v.episode === selectedEpisode);
+    if (idx !== -1 && idx < episodesOfSeason.length - 1) {
+      setSelectedEpisode(episodesOfSeason[idx + 1].episode ?? selectedEpisode + 1);
+    } else {
+      const seasonIdx = seasons.indexOf(selectedSeason);
+      if (seasonIdx < seasons.length - 1) {
+        const nextSeason = seasons[seasonIdx + 1];
+        setSelectedSeason(nextSeason);
+        setSelectedEpisode(episodeVideos.find(v => v.season === nextSeason)?.episode ?? 1);
+      }
+    }
+  }, [episodesOfSeason, episodeVideos, seasons, selectedEpisode, selectedSeason]);
+
+  const goToPrevEpisode = React.useCallback(() => {
+    const idx = episodesOfSeason.findIndex(v => v.episode === selectedEpisode);
+    if (idx > 0) {
+      setSelectedEpisode(episodesOfSeason[idx - 1].episode ?? selectedEpisode - 1);
+    } else {
+      const seasonIdx = seasons.indexOf(selectedSeason);
+      if (seasonIdx > 0) {
+        const prevSeason = seasons[seasonIdx - 1];
+        setSelectedSeason(prevSeason);
+        const prevEps = episodeVideos
+          .filter(v => v.season === prevSeason)
+          .sort((a, b) => (a.episode ?? 0) - (b.episode ?? 0));
+        setSelectedEpisode(prevEps[prevEps.length - 1]?.episode ?? 1);
+      }
+    }
+  }, [episodesOfSeason, episodeVideos, seasons, selectedEpisode, selectedSeason]);
 
   const { data: fanart } = useQuery<FanartResponse | null>({
     queryKey: ['fanart', type, id],
@@ -158,7 +187,7 @@ export function useDetailData() {
     selectedSeason, setSelectedSeason, selectedEpisode, setSelectedEpisode,
     getEpisodeProgress, selectedEpisodeProgress,
     theme, logoUrl, isFavorite, favoritesList,
-    detailPath, sourceNavState, getEpisodeTitle,
+    detailPath, sourceNavState, getEpisodeTitle, goToNextEpisode, goToPrevEpisode,
   };
 }
 
