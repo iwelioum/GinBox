@@ -114,6 +114,7 @@
     "topRated": "Les mieux notés",
     "topRatedSub": "Qualité critique et acclamation du public",
     "recentlyAdded": "Récemment ajouté à Ma Liste",
+    "becauseYouWatched": "Parce que vous avez regardé {{title}}",
     "recentReleases": "Sorties récentes",
     "recentReleasesSub": "Focus {{startYear}}–{{endYear}}",
     "newInYear": "Nouveau en {{year}}",

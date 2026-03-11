@@ -42,6 +42,7 @@ function IconBtn({
     <button
       onClick={onClick}
       title={title}
+      aria-label={title}
       className={`
         text-white/70 hover:text-white hover:scale-110 
         transition-all duration-150 ease-out

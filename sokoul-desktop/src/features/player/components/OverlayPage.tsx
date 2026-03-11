@@ -26,7 +26,7 @@ export default function OverlayPage() {
   }, []);
 
   const {
-    play, pause, seekTo, setVolume,
+    play, pause, seekTo, setVolume, setSpeed,
     loadTracks, selectAudioTrack, selectSubTrack, disableSubs,
     audioTracks, subTracks,
     position, duration, isPlaying, isActive,
@@ -47,6 +47,8 @@ export default function OverlayPage() {
   const [showAudio, setShowAudio] = useState(false);
   const [showSubs, setShowSubs] = useState(false);
   const [sourcePanelOpen, setSourcePanelOpen] = useState(false);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
+  const [currentSpeed, setCurrentSpeed] = useState(1);
 
   /** Tell Electron whether to capture mouse events on this overlay */
   useEffect(() => {
@@ -59,6 +61,7 @@ export default function OverlayPage() {
       setShowAudio(false);
       setShowSubs(false);
       setSourcePanelOpen(false);
+      setShowSpeedMenu(false);
     }
   }, [isActive]);
 
@@ -91,6 +94,19 @@ export default function OverlayPage() {
     if (!showSubs) loadTracks();
     setShowSubs(p => !p);
     setShowAudio(false);
+    setShowSpeedMenu(false);
+  };
+
+  const handleToggleSpeed = () => {
+    setShowSpeedMenu(p => !p);
+    setShowAudio(false);
+    setShowSubs(false);
+  };
+
+  const handleSpeedChange = (rate: number) => {
+    setCurrentSpeed(rate);
+    void setSpeed(rate);
+    setShowSpeedMenu(false);
   };
 
   const handleSourcePanelOpen = () => {
@@ -221,8 +237,25 @@ export default function OverlayPage() {
           onMuteToggle={handleMuteToggle}
           onSubtitles={handleToggleSubs}
           onAudio={handleToggleAudio}
-          onSettings={() => { /* TODO */ }}
+          onSettings={handleToggleSpeed}
         />
+        {showSpeedMenu && (
+          <div className="absolute bottom-20 right-4 bg-black/90 backdrop-blur-xl border border-white/15 rounded-xl p-2 flex flex-col gap-0.5 z-50 min-w-[120px]">
+            {[0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => (
+              <button
+                key={rate}
+                onClick={() => handleSpeedChange(rate)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium text-left transition-colors ${
+                  currentSpeed === rate
+                    ? 'bg-accent/20 text-accent'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                {rate === 1 ? 'Normal' : `${rate}×`}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

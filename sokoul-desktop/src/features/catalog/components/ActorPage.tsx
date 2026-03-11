@@ -6,12 +6,13 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Film } from 'lucide-react';
 import { endpoints } from '@/shared/api/client';
 import { useAmbientColor } from '../../../shared/hooks/useAmbientColor';
 import { ContentRail } from './ContentRail';
 import { Spinner } from '../../../shared/components/ui/Spinner';
 import { Button } from '../../../shared/components/ui/Button';
+import { EmptyState } from '../../../shared/components/ui/EmptyState';
 import type { CatalogMeta } from '../../../shared/types/index';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
@@ -133,9 +134,11 @@ const ActorPage: React.FC = () => {
       <div className="bg-[#040714] pb-16">
 
         {allMeta.length === 0 && (
-          <div className="text-center text-white/40 py-24">
-            {t('actor.noTitlesFound')}
-          </div>
+          <EmptyState
+            icon={<Film />}
+            title={t('actor.noTitlesFound')}
+            description={t('actor.noTitlesDesc', { defaultValue: 'No movies or series found in the catalog for this person.' })}
+          />
         )}
 
         {/* Movies */}

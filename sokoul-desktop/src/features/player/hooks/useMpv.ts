@@ -161,9 +161,13 @@ export function useMpv() {
     setTimeout(loadTracks, 150);
   }
 
+  async function setSpeed(rate: number): Promise<void> {
+    await window.mpv?.command({ command: ['set_property', 'speed', rate] });
+  }
+
   return {
     launch, kill, waitUntilReady,
-    play, pause, seekTo, setVolume,
+    play, pause, seekTo, setVolume, setSpeed,
     cycleSubtitle, cycleAudio,
     loadTracks, selectAudioTrack, selectSubTrack, disableSubs,
     audioTracks, subTracks,

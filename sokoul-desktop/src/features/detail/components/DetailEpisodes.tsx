@@ -5,6 +5,8 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDuration } from '@/shared/utils/time';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
+import { EmptyState } from '@/shared/components/ui/EmptyState';
+import { Film, Tv, Clapperboard } from 'lucide-react';
 import type { EpisodeVideo, PlaybackEntry } from '@/shared/types/index';
 
 interface DetailEpisodesProps {
@@ -201,6 +203,13 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
 
           {/* Episode list */}
           <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-[var(--color-border)]">
+            {episodesOfSeason.length === 0 && (
+              <EmptyState
+                icon={<Tv />}
+                title={t('detail.noEpisodes', { defaultValue: 'No episodes available' })}
+                description={t('detail.noEpisodesDesc', { defaultValue: 'This season doesn\'t have any episodes yet.' })}
+              />
+            )}
             {episodesOfSeason.map(ep => {
               const stillUrl = getImageUrl(ep.still_path, 'w300');
               const isSelected = selectedEpisode === ep.episode;
@@ -293,16 +302,20 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
 
       {/* Similar Tab Content */}
       {activeTab === 'similar' && (
-        <div className="text-[var(--color-text-secondary)] text-center py-12">
-          Similar content coming soon...
-        </div>
+        <EmptyState
+          icon={<Film />}
+          title={t('detail.similarComingSoon', { defaultValue: 'Similar content' })}
+          description={t('detail.similarComingSoonDesc', { defaultValue: 'Recommendations based on this title are coming soon.' })}
+        />
       )}
 
       {/* Extras Tab Content */}
       {activeTab === 'extras' && (
-        <div className="text-[var(--color-text-secondary)] text-center py-12">
-          Extras coming soon...
-        </div>
+        <EmptyState
+          icon={<Clapperboard />}
+          title={t('detail.extrasComingSoon', { defaultValue: 'Extras' })}
+          description={t('detail.extrasComingSoonDesc', { defaultValue: 'Behind-the-scenes content, deleted scenes and more coming soon.' })}
+        />
       )}
     </section>
   );
