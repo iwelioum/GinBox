@@ -190,11 +190,8 @@ async fn fetch_external_ids(tmdb_id: i64, is_movie: bool, state: &AppState) -> E
     let none = ExternalIds { imdb_id: None, tvdb_id: None };
     if state.tmdb_key.is_empty() { return none; }
     let kind = if is_movie { "movie" } else { "tv" };
-    let url = format!(
-        "https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids?api_key={}",
-        state.tmdb_key
-    );
-    let Ok(resp) = state.http_client.get(&url).send().await else { return none; };
+    let url = format!("https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids");
+    let Ok(resp) = state.http_client.get(&url).query(&[("api_key", &state.tmdb_key)]).send().await else { return none; };
     let Ok(json): Result<Value, _> = resp.json().await else { return none; };
     ExternalIds {
         imdb_id: json["imdb_id"].as_str().filter(|s| !s.is_empty()).map(String::from),
@@ -208,11 +205,8 @@ async fn fetch_fanart(fanart_id: Option<i64>, is_movie: bool, state: &AppState) 
     let Some(id) = fanart_id else { return Value::Null; };
     if state.fanart_key.is_empty() { return Value::Null; }
     let ft = if is_movie { "movies" } else { "tv" };
-    let url = format!(
-        "https://webservice.fanart.tv/v3/{ft}/{id}?api_key={}",
-        state.fanart_key
-    );
-    let Ok(resp) = state.http_client.get(&url).send().await else { return Value::Null; };
+    let url = format!("https://webservice.fanart.tv/v3/{ft}/{id}");
+    let Ok(resp) = state.http_client.get(&url).query(&[("api_key", &state.fanart_key)]).send().await else { return Value::Null; };
     if !resp.status().is_success() { return Value::Null; }
     resp.json::<Value>().await.unwrap_or(Value::Null)
 }
@@ -222,11 +216,8 @@ async fn fetch_fanart(fanart_id: Option<i64>, is_movie: bool, state: &AppState) 
 async fn fetch_tmdb_images(tmdb_id: i64, is_movie: bool, state: &AppState) -> Value {
     if state.tmdb_key.is_empty() { return Value::Null; }
     let kind = if is_movie { "movie" } else { "tv" };
-    let url = format!(
-        "https://api.themoviedb.org/3/{kind}/{tmdb_id}/images?api_key={}",
-        state.tmdb_key
-    );
-    let Ok(resp) = state.http_client.get(&url).send().await else { return Value::Null; };
+    let url = format!("https://api.themoviedb.org/3/{kind}/{tmdb_id}/images");
+    let Ok(resp) = state.http_client.get(&url).query(&[("api_key", &state.tmdb_key)]).send().await else { return Value::Null; };
     if !resp.status().is_success() { return Value::Null; }
     resp.json::<Value>().await.unwrap_or(Value::Null)
 }
@@ -283,11 +274,9 @@ fn build_top_posters_url(tmdb_id: i64, is_movie: bool, api_key: &str) -> Option<
 async fn fetch_cinematerial(imdb_id: Option<&str>, state: &AppState) -> Option<String> {
     let id = imdb_id?;
     if state.cinematerial_key.is_empty() { return None; }
-    let url = format!(
-        "https://api.cinematerial.com/?imdbid={id}&apikey={}",
-        state.cinematerial_key
-    );
-    let resp = state.http_client.get(&url).send().await.ok()?;
+    let resp = state.http_client.get("https://api.cinematerial.com/")
+        .query(&[("imdbid", id), ("apikey", state.cinematerial_key.as_str())])
+        .send().await.ok()?;
     if !resp.status().is_success() { return None; }
     let json: Value = resp.json().await.ok()?;
     // CineMaterial returns an array of poster objects; first item has an "img" URL.

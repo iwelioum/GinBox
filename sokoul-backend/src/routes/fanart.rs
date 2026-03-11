@@ -52,11 +52,11 @@ pub async fn get_fanart_handler(
         tmdb_id
     } else {
         let ext_url = format!(
-            "https://api.themoviedb.org/3/tv/{tmdb_id}/external_ids?api_key={}",
-            state.tmdb_key
+            "https://api.themoviedb.org/3/tv/{tmdb_id}/external_ids"
         );
         let ext: Value = state.http_client
             .get(&ext_url)
+            .query(&[("api_key", state.tmdb_key.as_str())])
             .send().await
             .map_err(|e| AppError::NetworkError(e.to_string()))?
             .json().await
@@ -100,10 +100,11 @@ pub async fn get_logo_handler(
     // Resolve IMDB ID (cache key) via TMDB
     let kind = if is_movie { "movie" } else { "tv" };
     let ext_url = format!(
-        "https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids?api_key={}",
-        state.tmdb_key
+        "https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids"
     );
-    let ext_json: Value = state.http_client.get(&ext_url).send().await
+    let ext_json: Value = state.http_client.get(&ext_url)
+        .query(&[("api_key", state.tmdb_key.as_str())])
+        .send().await
         .map_err(|e| AppError::NetworkError(e.to_string()))?
         .json().await
         .map_err(|e| AppError::ParseError(e.to_string()))?;

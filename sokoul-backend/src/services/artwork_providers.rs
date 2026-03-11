@@ -148,10 +148,8 @@ async fn p_external_ids(
     let none = ExternalIds { imdb_id: None, tvdb_id: None };
     if api_key.is_empty() { return none; }
     let kind = if is_movie { "movie" } else { "tv" };
-    let url = format!(
-        "https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids?api_key={api_key}"
-    );
-    let Ok(resp) = client.get(&url).send().await else { return none; };
+    let url = format!("https://api.themoviedb.org/3/{kind}/{tmdb_id}/external_ids");
+    let Ok(resp) = client.get(&url).query(&[("api_key", api_key)]).send().await else { return none; };
     let Ok(json): Result<Value, _> = resp.json().await else { return none; };
     ExternalIds {
         imdb_id: json["imdb_id"].as_str().map(String::from),
@@ -223,10 +221,10 @@ async fn p_simkl(
 ) -> Option<String> {
     if client_id.is_empty() { return None; }
     let media = if is_movie { "movie" } else { "show" };
-    let url = format!(
-        "https://api.simkl.com/search/id?client_id={client_id}&tmdb={tmdb_id}&type={media}"
-    );
-    let Ok(resp) = client.get(&url).send().await else { return None; };
+    let tmdb_str = tmdb_id.to_string();
+    let Ok(resp) = client.get("https://api.simkl.com/search/id")
+        .query(&[("client_id", client_id), ("tmdb", tmdb_str.as_str()), ("type", media)])
+        .send().await else { return None; };
     let Ok(json): Result<Value, _> = resp.json().await else { return None; };
     let hash = json.as_array()?.first()?["poster"].as_str()?.to_string();
     if hash.is_empty() { return None; }
@@ -245,19 +243,15 @@ async fn p_watchmode(
     let field = if is_movie { "tmdb_movie_id" } else { "tmdb_tv_id" };
 
     // 1. Search to get the Watchmode ID
-    let search_url = format!(
-        "https://api.watchmode.com/v1/search/\
-         ?apiKey={api_key}&search_field={field}&search_value={tmdb_id}"
-    );
-    let Ok(resp) = client.get(&search_url).send().await else { return None; };
+    let Ok(resp) = client.get("https://api.watchmode.com/v1/search/")
+        .query(&[("apiKey", api_key), ("search_field", field), ("search_value", &tmdb_id.to_string())])
+        .send().await else { return None; };
     let Ok(json): Result<Value, _> = resp.json().await else { return None; };
     let wm_id = json["title_results"].as_array()?.first()?["id"].as_i64()?;
 
     // 2. Details → poster URL
-    let details_url = format!(
-        "https://api.watchmode.com/v1/title/{wm_id}/details/?apiKey={api_key}"
-    );
-    let Ok(det_resp) = client.get(&details_url).send().await else { return None; };
+    let details_url = format!("https://api.watchmode.com/v1/title/{wm_id}/details/");
+    let Ok(det_resp) = client.get(&details_url).query(&[("apiKey", api_key)]).send().await else { return None; };
     let Ok(det): Result<Value, _> = det_resp.json().await else { return None; };
     let poster = det["poster"].as_str()?.to_string();
     if poster.is_empty() { return None; }
@@ -272,8 +266,9 @@ async fn p_omdb(
 ) -> Option<String> {
     let id = imdb_id?;
     if api_key.is_empty() { return None; }
-    let url = format!("https://www.omdbapi.com/?apikey={api_key}&i={id}");
-    let Ok(resp) = client.get(&url).send().await else { return None; };
+    let Ok(resp) = client.get("https://www.omdbapi.com/")
+        .query(&[("apikey", api_key), ("i", id)])
+        .send().await else { return None; };
     let Ok(json): Result<Value, _> = resp.json().await else { return None; };
     let poster = json["Poster"].as_str()?;
     if poster == "N/A" || poster.is_empty() { return None; }

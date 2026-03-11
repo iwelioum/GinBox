@@ -737,11 +737,12 @@ pub async fn fetch_tmdb_images(
     };
 
     let url = format!(
-        "https://api.themoviedb.org/3/{kind}/{id}/images?api_key={}&include_image_language=en,null",
-        state.tmdb_key
+        "https://api.themoviedb.org/3/{kind}/{id}/images"
     );
 
-    let resp = state.http_client.get(&url).send().await.map_err(|e| AppError::NetworkError(e.to_string()))?;
+    let resp = state.http_client.get(&url)
+        .query(&[("api_key", &state.tmdb_key), ("include_image_language", &"en,null".to_string())])
+        .send().await.map_err(|e| AppError::NetworkError(e.to_string()))?;
 
     if !resp.status().is_success() {
         return Ok(serde_json::json!({
