@@ -342,3 +342,13 @@ Before marking any task complete, agents must verify:
 - "Error handling must use toast() from useToast — never console.error for user-facing errors"
 - "Fanart queries have `staleTime: Infinity` — this is correct, fanart data never changes"
 - "Type-only re-exports (e.g. `BadgeProps`) should not be in barrel index.ts unless consumed externally"
+
+## Session 5 — Error Handling & Kids Filter
+- "Every React Query must destructure `isError` + `error` + `refetch` — use `QueryErrorState` component for error UI"
+- "QueryErrorState has two variants: full (page-level) and compact (inline/card-level). Use `compact={true}` for sections inside pages"
+- "Non-critical queries (fanart, trakt stats, HoverCard meta) can absorb errors silently — just destructure `isError` for future use"
+- "useBrowseData returns `isError` + `refetch` — aggregates error state from multiple `useQueries` results"
+- "Kids filter entry points (7 total): HomePage, useHomePersonalized, useBrowseData, SearchPage, ActorPage, CollectionDetailPage, SimilarSection"
+- "Replace custom Spinner divs with Skeleton variant grids for page-level loading — use `animate-pulse` pattern from DetailSkeleton"
+- "CollectionsPage uses `useInfiniteQuery` — error is typed `unknown`, must cast to `Error`"
+- "i18n error keys live in `error.queryFailed` and `error.retry` — reuse them, don't create new ones"
