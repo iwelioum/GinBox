@@ -20,14 +20,14 @@ export function PrevEpisodeCard({ episode, switchingEpisode, onSwitch }: PrevEpi
       <button
         onClick={onSwitch}
         disabled={switchingEpisode}
-        className={`rounded-lg border-none px-3.5 py-2 text-[13px] font-bold text-black ${
+        className={`rounded-lg border-none px-3.5 py-2 text-sm font-bold text-black ${
           switchingEpisode ? 'cursor-default bg-white/35 opacity-75' : 'cursor-pointer bg-white'
         }`}
       >
         {switchingEpisode ? t('player.loadingEpisode') : t('player.previousButton')}
       </button>
       <div className="flex flex-col gap-0.5">
-        <span className="text-[10px] uppercase tracking-wider text-white/45">
+        <span className="text-xs uppercase tracking-wider text-white/45">
           {t('player.previousEpisode')}
         </span>
         <span className="text-sm font-semibold text-white">
@@ -58,7 +58,7 @@ export function NextEpisodeCard({
   return (
     <div className="absolute right-6 bottom-[84px] z-20 flex items-center gap-3 rounded-xl border border-white/[0.14] bg-black/[0.72] p-3.5 backdrop-blur-md">
       <div className="flex flex-col gap-0.5">
-        <span className="text-[10px] uppercase tracking-wider text-white/45">
+        <span className="text-xs uppercase tracking-wider text-white/45">
           {autoplayCountdown !== null ? t('player.playingIn', { count: autoplayCountdown }) : t('player.nextEpisode')}
         </span>
         <span className="text-sm font-semibold text-white">
@@ -69,7 +69,7 @@ export function NextEpisodeCard({
       {autoplayCountdown !== null && !switchingEpisode && (
         <button
           onClick={onCancelAutoplay}
-          className="cursor-pointer rounded-lg border border-white/30 bg-transparent px-3.5 py-2 text-[13px] font-semibold text-white"
+          className="cursor-pointer rounded-lg border border-white/30 bg-transparent px-3.5 py-2 text-sm font-semibold text-white"
         >
           {t('common.cancel')}
         </button>
@@ -77,7 +77,7 @@ export function NextEpisodeCard({
       <button
         onClick={onSwitch}
         disabled={switchingEpisode}
-        className={`rounded-lg border-none px-3.5 py-2 text-[13px] font-bold text-black ${
+        className={`rounded-lg border-none px-3.5 py-2 text-sm font-bold text-black ${
           switchingEpisode ? 'cursor-default bg-white/35 opacity-75' : 'cursor-pointer bg-white'
         }`}
       >

@@ -64,12 +64,12 @@ interface StatEntry {
 
 const StatCard: React.FC<{ stat: StatEntry; active: boolean }> = ({ stat, active }) => (
   <div className="flex flex-col gap-2 p-4 rounded-xl bg-white/5 border border-white/10">
-    <span className="text-[10px] text-white/30 uppercase tracking-wide">
+    <span className="text-xs text-white/30 uppercase tracking-wide">
       {stat.label}
     </span>
     <span
       className="text-2xl font-extrabold"
-      style={{ color: stat.color ?? 'var(--accent, #0072D2)' }}
+      style={{ color: stat.color ?? 'var(--color-accent)' }}
     >
       <AnimatedNumber
         value={stat.value}
@@ -85,7 +85,7 @@ const StatCard: React.FC<{ stat: StatEntry; active: boolean }> = ({ stat, active
         className="h-full rounded-full"
         style={{
           width: active ? `${Math.max(2, stat.percent)}%` : '0%',
-          background: stat.color ?? 'var(--accent, #0072D2)',
+          background: stat.color ?? 'var(--color-accent)',
           transition: 'width 1.5s cubic-bezier(0, 0, 0.2, 1)',
         }}
       />
@@ -109,14 +109,14 @@ const ReviewCard: React.FC<{ review: TraktCommentData }> = ({ review }) => {
   return (
     <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-[13px] font-semibold text-white">{review.author}</span>
-        <span className="text-[11px] text-white/40">{date}</span>
+        <span className="text-sm font-semibold text-white">{review.author}</span>
+        <span className="text-[13px] text-white/40">{date}</span>
       </div>
-      <p className="text-[13px] text-white/65 leading-relaxed line-clamp-4">
+      <p className="text-sm text-white/65 leading-relaxed line-clamp-4">
         {review.comment}
       </p>
       {review.likes > 0 && (
-        <span className="text-[11px] text-white/35">♥ {review.likes}</span>
+        <span className="text-[13px] text-white/35">♥ {review.likes}</span>
       )}
     </div>
   );
@@ -172,7 +172,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
 
   if (tmdbRating != null && tmdbRating > 0)
     stats.push({ label: t('detail.tmdbRating'), value: tmdbRating, decimals: 1, suffix: '/10',
-      percent: toPercent(tmdbRating, 10), color: '#f5c518' });
+      percent: toPercent(tmdbRating, 10), color: 'var(--color-warning)' });
 
   if (tmdbVotes != null && tmdbVotes > 0)
     stats.push({ label: t('detail.tmdbVotes'), value: tmdbVotes,
@@ -180,10 +180,10 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
 
   if (trakt && trakt.votes > 0) {
     stats.push({ label: t('detail.traktRating'), value: trakt.rating, decimals: 1, suffix: '/10',
-      percent: toPercent(trakt.rating, 10), color: '#ed1c24' });
+      percent: toPercent(trakt.rating, 10), color: 'var(--color-danger)' });
     if (trakt.pctLiked > 0)
       stats.push({ label: t('detail.liked'), value: trakt.pctLiked, suffix: '%',
-        percent: trakt.pctLiked, color: '#22c55e' });
+        percent: trakt.pctLiked, color: 'var(--color-success)' });
   }
 
   if (type === 'movie' && budget != null && budget > 0)
@@ -212,7 +212,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
 
       {trakt?.comments && trakt.comments.length > 0 && (
         <div>
-          <h3 className="text-[11px] font-semibold text-white/30 uppercase tracking-widest mb-4">
+          <h3 className="text-[13px] font-semibold text-white/30 uppercase tracking-widest mb-4">
             {t('detail.traktReviews')}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

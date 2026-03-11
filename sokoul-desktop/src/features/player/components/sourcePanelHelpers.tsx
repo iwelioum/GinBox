@@ -128,7 +128,7 @@ export function SourceCard({
       ].join(' ')}
     >
       {/* Title */}
-      <p className="text-[11px] text-white/60 line-clamp-2 leading-relaxed mb-2">
+      <p className="text-[13px] text-white/60 line-clamp-2 leading-relaxed mb-2">
         {displayTitle}
       </p>
 
@@ -137,29 +137,29 @@ export function SourceCard({
         {source.cached_rd && (
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-[10px] text-green-300 font-medium">RD</span>
+            <span className="text-xs text-green-300 font-medium">RD</span>
           </span>
         )}
         {releaseType && (
-          <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${RELEASE_CLASS[releaseType]}`}>
+          <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${RELEASE_CLASS[releaseType]}`}>
             {releaseType}
           </span>
         )}
         {codecLabel && (
-          <span className="text-[10px] bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
+          <span className="text-xs bg-zinc-700/50 text-zinc-400 px-1.5 py-0.5 rounded">
             {codecLabel}
           </span>
         )}
         {parsed.hdr === 'DV' && (
-          <span className="text-[10px] bg-violet-500/20 text-violet-400 px-1.5 py-0.5 rounded">DV</span>
+          <span className="text-xs bg-violet-500/20 text-violet-400 px-1.5 py-0.5 rounded">DV</span>
         )}
         {(parsed.hdr === 'HDR10+' || parsed.hdr === 'HDR') && (
-          <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
+          <span className="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded">
             {parsed.hdr}
           </span>
         )}
         {isDDL && (
-          <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded">
+          <span className="text-xs bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded">
             DDL
           </span>
         )}
@@ -169,26 +169,26 @@ export function SourceCard({
       <div className="flex flex-wrap items-center gap-1 mb-1.5">
         {parsed.isMultiSuspect ? (
           <>
-            <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded" title={t('player.audioFrench')}>FR</span>
-            <span className="text-[10px] bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded" title={t('player.audioEnglish')}>EN</span>
+            <span className="text-xs bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded" title={t('player.audioFrench')}>FR</span>
+            <span className="text-xs bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded" title={t('player.audioEnglish')}>EN</span>
           </>
         ) : parsed.hasFrenchAudio ? (
-          <span className="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded" title={t('player.audioFrench')}>FR</span>
+          <span className="text-xs bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded" title={t('player.audioFrench')}>FR</span>
         ) : parsed.hasSubFr ? (
           <span className="inline-flex items-center gap-0.5" title={t('player.voWithFrenchSubs')}>
-            <span className="text-[10px] bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded">EN</span>
-            <span className="text-white/30 text-[9px] mx-0.5">/</span>
-            <span className="text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+            <span className="text-xs bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded">EN</span>
+            <span className="text-white/30 text-[11px] mx-0.5">/</span>
+            <span className="text-xs bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded flex items-center gap-0.5">
               FR <SubIcon />
             </span>
           </span>
         ) : (
-          <span className="text-[10px] bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded">EN</span>
+          <span className="text-xs bg-slate-500/20 text-slate-400 px-1.5 py-0.5 rounded">EN</span>
         )}
       </div>
 
       {/* Row 3 — seeders + size */}
-      <div className="flex items-center gap-3 text-[10px] text-white/30">
+      <div className="flex items-center gap-3 text-xs text-white/30">
         {!isDDL && (
           <span className="flex items-center gap-1">
             <span>📶</span>

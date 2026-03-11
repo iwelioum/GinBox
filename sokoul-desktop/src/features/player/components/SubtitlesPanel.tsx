@@ -34,13 +34,13 @@ function TrackRow({
       className={[
         'flex items-center gap-2.5 px-4 py-2.5 cursor-pointer text-sm',
         'transition-colors duration-[var(--transition-fast)]',
-        active ? 'text-[#F5F5F5] font-semibold bg-white/[0.07]' : 'text-[#F5F5F5]/60 font-normal bg-transparent',
+        active ? 'text-[var(--color-text-primary)] font-semibold bg-white/[0.07]' : 'text-[var(--color-text-primary)]/60 font-normal bg-transparent',
         active ? 'hover:bg-white/10' : 'hover:bg-[var(--color-white-4)]',
       ].join(' ')}
     >
       <span className={[
-        'w-1.5 h-1.5 rounded-full shrink-0 border border-[#F5F5F5]/40',
-        active ? 'bg-[#F5F5F5]' : 'bg-transparent',
+        'w-1.5 h-1.5 rounded-full shrink-0 border border-[var(--color-text-primary)]/40',
+        active ? 'bg-[var(--color-text-primary)]' : 'bg-transparent',
       ].join(' ')} />
       {label}
     </div>
@@ -52,11 +52,11 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
   const noneActive = tracks.length === 0 || tracks.every(t => !t.selected);
 
   return (
-    <div className="absolute right-4 bottom-full mb-2 w-[260px] bg-[#0d0d0d]
+    <div className="absolute right-4 bottom-full mb-2 w-[260px] bg-[var(--color-bg-elevated)]
                     border border-[rgba(202,202,202,0.2)] rounded-[var(--radius-sm)]
                     py-3 z-50 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
       {/* Title */}
-      <p className="text-[#F5F5F5]/50 text-[11px] tracking-[1.42px] px-4 pb-2 uppercase m-0">
+      <p className="text-[var(--color-text-primary)]/50 text-[13px] tracking-[1.42px] px-4 pb-2 uppercase m-0">
         {t('player.subtitlesTitle')}
       </p>
 
@@ -84,7 +84,7 @@ export function SubtitlesPanel({ tracks, onSelect, onDisable, onClose }: Subtitl
 
       {/* No tracks available */}
       {tracks.length === 0 && (
-        <p className="text-[#F5F5F5]/[0.35] text-[13px] px-4 pt-1 m-0">
+        <p className="text-[var(--color-text-primary)]/[0.35] text-sm px-4 pt-1 m-0">
           {t('player.noTracksAvailable')}
         </p>
       )}

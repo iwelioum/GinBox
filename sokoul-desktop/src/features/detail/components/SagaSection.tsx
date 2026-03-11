@@ -58,7 +58,7 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
               <div
                 className="w-[90px] h-[135px] rounded-lg overflow-hidden relative"
                 style={{
-                  outline: isCurrent ? '2px solid var(--accent, #0072D2)' : '2px solid transparent',
+                  outline: isCurrent ? '2px solid var(--color-accent)' : '2px solid transparent',
                   outlineOffset: '2px',
                   boxShadow: isCurrent ? '0 0 16px rgba(var(--accent-rgb,0,114,210),0.4)' : 'none',
                   transition: 'box-shadow 0.3s',
@@ -72,7 +72,7 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 ) : (
-                  <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/20 text-[10px]">
+                  <div className="w-full h-full bg-white/10 flex items-center justify-center text-white/20 text-xs">
                     ?
                   </div>
                 )}
@@ -80,17 +80,17 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
                 {/* Current film badge */}
                 {isCurrent && (
                   <div
-                    className="absolute top-1.5 right-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white"
-                    style={{ background: 'var(--accent, #0072D2)' }}
+                    className="absolute top-1.5 right-1.5 text-[11px] font-bold px-1.5 py-0.5 rounded-full text-white"
+                    style={{ background: 'var(--color-accent)' }}
                   >
                     {t('detail.here')}
                   </div>
                 )}
               </div>
-              <p className="text-white/70 text-[10px] text-center leading-tight line-clamp-2 w-full">
+              <p className="text-white/70 text-xs text-center leading-tight line-clamp-2 w-full">
                 {part.title}
               </p>
-              {year && <p className="text-white/35 text-[9px]">{year}</p>}
+              {year && <p className="text-white/35 text-[11px]">{year}</p>}
             </button>
           );
         })}

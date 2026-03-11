@@ -24,7 +24,7 @@ export function SourcesSidebar({
                       overflow-y-auto flex flex-col gap-5 scrollbar-hide">
       {/* Sort by */}
       <div>
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/[0.28]
+        <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-white/[0.28]
                       mb-2 ml-0.5">
           {t('sources.sortBy')}
         </p>
@@ -58,7 +58,7 @@ export function SourcesSidebar({
         return (
           <div key={group.label}>
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.12em] text-white/[0.28] m-0">
+              <p className="text-xs font-extrabold uppercase tracking-[0.12em] text-white/[0.28] m-0">
                 {t(group.label)}
               </p>
               {groupActive && (
@@ -69,7 +69,7 @@ export function SourcesSidebar({
                     return next;
                   })}
                   aria-label={t('sources.clearGroupFilter')}
-                  className="bg-transparent border-none cursor-pointer text-white/25 text-[9px] px-[3px] py-px"
+                  className="bg-transparent border-none cursor-pointer text-white/25 text-[11px] px-[3px] py-px"
                 >✕</button>
               )}
             </div>
@@ -82,7 +82,7 @@ export function SourcesSidebar({
                     aria-pressed={on}
                     className={[
                       'px-2 py-[3px] rounded-[5px] cursor-pointer',
-                      'text-[10px] font-bold tracking-[0.05em] uppercase whitespace-nowrap',
+                      'text-xs font-bold tracking-[0.05em] uppercase whitespace-nowrap',
                       'transition-all duration-[120ms] ease-linear',
                       on
                         ? 'border border-[var(--color-white-30)] bg-[var(--color-border-medium)] text-white/[0.92]'
@@ -105,7 +105,7 @@ export function SourcesSidebar({
         {activeFilters.size > 0 && (
           <button
             onClick={() => setActiveFilters(new Set())}
-            className="bg-transparent border-none cursor-pointer text-[11px] text-white/[0.35]
+            className="bg-transparent border-none cursor-pointer text-[13px] text-white/[0.35]
                        underline text-left p-0"
           >
             {t('sources.clearAllFilters')}
@@ -113,7 +113,7 @@ export function SourcesSidebar({
         )}
         {cachedAt && (
           <p className={[
-            'text-[10px] m-0 leading-[1.4]',
+            'text-xs m-0 leading-[1.4]',
             isStale ? 'text-amber-400' : 'text-white/[0.22]',
           ].join(' ')}>
             {isStale ? t('sources.outdatedResults') : t('sources.updatedAt', { time: formatCacheAge(cachedAt) })}
@@ -124,7 +124,7 @@ export function SourcesSidebar({
           aria-label={t('sources.refreshSources')}
           className="flex items-center gap-1.5 px-2.5 py-[7px] rounded-[7px]
                      border border-[var(--color-border-medium)] bg-[var(--color-white-4)]
-                     text-white/[0.55] text-[11px] font-semibold cursor-pointer
+                     text-white/[0.55] text-[13px] font-semibold cursor-pointer
                      transition-all duration-[120ms] ease-linear"
         >
           <RefreshCw size={12} /> {t('common.refresh')}

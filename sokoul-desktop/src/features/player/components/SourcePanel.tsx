@@ -79,7 +79,7 @@ export function SourcePanel({
           <button
             onClick={onRefreshSources}
             disabled={refreshingSources || switchingSource}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] text-white/75 border border-white/15 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] text-white/75 border border-white/15 bg-white/5 hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RefreshCw className={`w-3 h-3 ${refreshingSources ? 'animate-spin' : ''}`} />
             {refreshingSources ? t('player.refreshing') : t('player.refreshButton')}
@@ -92,7 +92,7 @@ export function SourcePanel({
 
       {/* Error banner */}
       {switchError && (
-        <div className="px-4 py-3 text-[12px] text-red-300 border-b border-red-400/20 bg-red-900/20">
+        <div className="px-4 py-3 text-[13px] text-red-300 border-b border-red-400/20 bg-red-900/20">
           {switchError}
         </div>
       )}
@@ -108,7 +108,7 @@ export function SourcePanel({
               key={tab.key}
               onClick={() => setProviderFilter(tab.key)}
               className={[
-                'flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium whitespace-nowrap transition-colors',
+                'flex items-center gap-1 px-2.5 py-1 rounded-md text-[13px] font-medium whitespace-nowrap transition-colors',
                 active
                   ? 'bg-white/15 text-white'
                   : 'text-white/40 hover:text-white/70 hover:bg-white/5',
@@ -116,7 +116,7 @@ export function SourcePanel({
             >
               {tab.icon && <span>{tab.icon}</span>}
               {tab.label}
-              <span className="text-[10px] opacity-60">({count})</span>
+              <span className="text-xs opacity-60">({count})</span>
             </button>
           );
         })}
@@ -140,7 +140,7 @@ export function SourcePanel({
                 onClick={() => toggleGroup(quality)}
                 className="sticky top-0 w-full px-4 py-2 bg-black/70 backdrop-blur-sm border-b border-white/[0.06] flex items-center gap-2 hover:bg-white/[0.04] transition-colors"
               >
-                <span className="flex-1 text-left flex items-center gap-2 text-[11px] font-bold text-white/60 uppercase tracking-wider">
+                <span className="flex-1 text-left flex items-center gap-2 text-[13px] font-bold text-white/60 uppercase tracking-wider">
                   {groupLabel(quality)}
                   <span className="text-white/25 font-normal">·</span>
                   <span className="text-white/35 font-normal">{qualitySources.length}</span>
@@ -148,7 +148,7 @@ export function SourcePanel({
                     <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
                   )}
                 </span>
-                <span className="text-white/30 text-[10px]">{isOpen ? '▼' : '▶'}</span>
+                <span className="text-white/30 text-xs">{isOpen ? '▼' : '▶'}</span>
               </button>
 
               {/* Accordion body — CSS grid rows animation, no arbitrary max-h */}

@@ -36,7 +36,7 @@ export function InlineSourceRow({
     >
       <div className="flex-1 min-w-0 flex items-center gap-2 flex-wrap">
         <span className={[
-          'text-[13px] text-white/[0.92] truncate transition-[font-weight] duration-100',
+          'text-sm text-white/[0.92] truncate transition-[font-weight] duration-100',
           hovered && ok ? 'font-semibold' : 'font-medium',
         ].join(' ')}>
           {label}
@@ -50,7 +50,7 @@ export function InlineSourceRow({
             <span className="text-xs font-semibold text-white/[0.55] whitespace-nowrap">
               {t('sources.sizeDisplay', { size: source.size_gb.toFixed(1) })}
             </span>
-            <span className="text-[var(--color-white-20)] text-[10px]">·</span>
+            <span className="text-[var(--color-white-20)] text-xs">·</span>
           </>
         )}
         <span className="flex items-center gap-[3px] text-xs font-semibold text-white/45 whitespace-nowrap">
@@ -82,10 +82,10 @@ export function BestSourceCard({
     <div className="p-3.5 px-4 rounded-[var(--radius-lg)] border border-[var(--color-white-12)]
                     bg-white/5 flex items-center justify-between gap-4">
       <div className="flex flex-col gap-1.5 min-w-0">
-        <span className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-white/30">
+        <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-white/30">
           {t('sources.bestAvailableSource')}
         </span>
-        <span className="text-[13px] font-medium text-white/[0.88] truncate">
+        <span className="text-sm font-medium text-white/[0.88] truncate">
           {tLabel}
         </span>
         <SourceBadges meta={m} source={source} />
@@ -94,7 +94,7 @@ export function BestSourceCard({
         onClick={onPlay} disabled={launching}
         className={[
           'shrink-0 px-5 py-[9px] rounded-[var(--radius-card)] bg-white text-black',
-          'border-none text-[13px] font-bold transition-opacity duration-[var(--transition-fast)]',
+          'border-none text-sm font-bold transition-opacity duration-[var(--transition-fast)]',
           launching ? 'cursor-wait opacity-70' : 'cursor-pointer opacity-100',
         ].join(' ')}
       >
@@ -116,10 +116,10 @@ export function QualitySection({
     <div>
       <div className="flex items-center gap-2 pb-2 mb-1 border-b border-[var(--color-border)]">
         <Icon size={12} style={{ color }} className="shrink-0" />
-        <span className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-white/40">
+        <span className="text-[13px] font-extrabold uppercase tracking-[0.12em] text-white/40">
           {t(label)}
         </span>
-        <span className="text-[10px] font-bold text-white/[0.22]">
+        <span className="text-xs font-bold text-white/[0.22]">
           ({sources.length})
         </span>
       </div>

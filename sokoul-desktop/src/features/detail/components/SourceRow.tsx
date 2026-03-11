@@ -15,7 +15,7 @@ function ProviderBadge({ provider }: { provider: string }) {
   return (
     <span
       style={{ background: c.bg, color: c.color }}
-      className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide whitespace-nowrap"
+      className="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide whitespace-nowrap"
     >
       {c.icon} {c.label}
     </span>
@@ -46,11 +46,11 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
 
       {/* Metadata */}
       <div className="hidden sm:flex items-center gap-[16px] shrink-0">
-        <span className="text-[13px] text-white/50 w-[60px] text-right font-mono">
+        <span className="text-sm text-white/50 w-[60px] text-right font-mono">
           {source.size_gb.toFixed(1)} GB
         </span>
         
-        <span className="text-[13px] text-white/50 w-[50px] text-right flex items-center justify-end gap-[4px]">
+        <span className="text-sm text-white/50 w-[50px] text-right flex items-center justify-end gap-[4px]">
           {source.seeders}S
         </span>
         
@@ -60,7 +60,7 @@ export function SourceRow({ source, onPlay, onDownload }: SourceRowProps) {
       {/* Actions */}
       <div className="flex items-center gap-[8px] shrink-0">
         <button
-          className="w-[36px] h-[36px] flex items-center justify-center rounded-full bg-white/10 hover:bg-[#0063e5] hover:text-white text-white/70 transition-colors"
+          className="w-[36px] h-[36px] flex items-center justify-center rounded-full bg-white/10 hover:bg-[var(--color-accent)] hover:text-white text-white/70 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onPlay();

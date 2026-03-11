@@ -114,7 +114,7 @@ export default function SourcesPage() {
     <div className="fixed inset-0 bg-dp-bg text-dp-text flex flex-col z-50">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-[14px] px-[28px] py-[20px] border-b border-dp-text/5 shrink-0 bg-dp-nav">
         <div className="flex items-center gap-[14px]">
-          <button onClick={handleBack} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-white/15 bg-white/5 text-[#f9f9f9cc] text-[13px] font-[600] cursor-pointer whitespace-nowrap transition-colors hover:bg-white/10 hover:text-white">
+          <button onClick={handleBack} className="flex items-center gap-[6px] px-[14px] py-[8px] rounded-[8px] border border-white/15 bg-white/5 text-[var(--color-text-primary)]/80 text-sm font-[600] cursor-pointer whitespace-nowrap transition-colors hover:bg-white/10 hover:text-white">
             <ChevronLeft size={16} /> {t('sources.back')}
           </button>
           <h1 className="flex-1 text-[20px] font-[700] m-0 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -137,7 +137,7 @@ export default function SourcesPage() {
           <AlertTriangle size={40} className="text-red-400" />
           <p className="text-[22px] font-[700] m-0 text-red-400">{t('sources.loadingError')}</p>
           <p className="text-[14px] text-white/50 m-0 max-w-[400px] break-words">{fetchError}</p>
-          <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[#0063e5] hover:bg-[#0483ee] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
+          <button onClick={handleRetry} className="flex items-center gap-[8px] px-[20px] py-[10px] bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-white rounded-[6px] text-[14px] font-[600] transition-all mt-[8px]">
             <RefreshCw size={16} /> {t('common.retry')}
           </button>
         </div>
@@ -171,10 +171,10 @@ export default function SourcesPage() {
                     : t('sources.sourceCountAvailable', { count: sortedAndFiltered.length })}
                 </p>
                 {isStale && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[12px]">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[13px]">
                     <AlertTriangle size={14} />
                     <span>{t('sources.staleBadge')}</span>
-                    <button onClick={handleForceRefresh} className="ml-auto px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-[11px] font-semibold transition-colors">
+                    <button onClick={handleForceRefresh} className="ml-auto px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-[13px] font-semibold transition-colors">
                       <RefreshCw size={12} className="inline mr-1" />{t('sources.refresh')}
                     </button>
                   </div>
@@ -193,7 +193,7 @@ export default function SourcesPage() {
         <div className="absolute bottom-[24px] left-1/2 -translate-x-1/2 bg-red-900/90 text-dp-text px-[20px] py-[14px] rounded-[4px] border border-red-500 flex items-center gap-[12px] shadow-2xl z-50">
           <AlertTriangle size={18} />
           <span className="text-[14px] font-[600]">{launchError}</span>
-          <button onClick={() => setLaunchError(null)} className="ml-[8px] px-[10px] py-[4px] bg-dp-text/20 hover:bg-dp-text/30 rounded-[4px] text-[12px] font-[700]">✕</button>
+          <button onClick={() => setLaunchError(null)} className="ml-[8px] px-[10px] py-[4px] bg-dp-text/20 hover:bg-dp-text/30 rounded-[4px] text-[13px] font-[700]">✕</button>
         </div>
       )}
       <ResumeModal
