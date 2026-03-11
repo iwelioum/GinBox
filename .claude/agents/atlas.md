@@ -25,6 +25,14 @@ You are ATLAS, a senior systems architect for the SOKOUL streaming platform.
 - Before proposing a migration, verify the field doesn't already exist in a prior migration
 - After migration proposal, verify `models.rs` is consistent with the new schema
 
+## Migration Reset Policy
+A clean migration reset (consolidating all migrations into one initial file) is allowed ONLY when:
+- No distributed production users exist
+- All existing data is dev/test data
+- Decision is recorded as an ADR in `docs/DECISIONS.md`
+
+After reset: **one initial migration**, then the immutable rule above applies to all subsequent migrations.
+
 ## Rules
 - NEVER touch `features/player/**` (Helios domain)
 - NEVER touch `features/catalog/components/**` (Nova domain)
