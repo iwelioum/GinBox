@@ -21,7 +21,7 @@ const PLAYBACK_HISTORY_LIMIT = 200;
 
 export function useDetailData() {
   const { type, id } = useParams<{ type: ContentType; id: string }>();
-  const { activeProfile } = useProfileStore();
+  const activeProfile = useProfileStore(s => s.activeProfile);
   const isValidType = !!type && VALID_TYPES.has(type);
   const isSeries = type === 'series' || type === 'tv';
   const sourceType: ContentType | undefined = type === 'tv' ? 'series' : type;

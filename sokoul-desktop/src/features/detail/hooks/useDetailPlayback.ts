@@ -15,7 +15,13 @@ import type { UseDetailDataResult } from './useDetailData';
 
 export function useDetailPlayback(d: UseDetailDataResult) {
   const navigate = useNavigate();
-  const prefs = usePreferencesStore();
+  const prefs = usePreferencesStore(s => ({
+    preferredLanguage: s.preferredLanguage,
+    minQuality: s.minQuality,
+    preferCachedRD: s.preferCachedRD,
+    autoPlay: s.autoPlay,
+    uiLanguage: s.uiLanguage,
+  }));
   const addToList = useAddToList();
   const removeFromList = useRemoveFromList();
   const { toast } = useToast();

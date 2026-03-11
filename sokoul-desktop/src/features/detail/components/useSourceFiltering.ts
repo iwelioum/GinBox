@@ -22,8 +22,14 @@ interface UseSourceFilteringArgs {
 export function useSourceFiltering({
   id, normalizedType, selectedSeason, selectedEpisode, meta,
 }: UseSourceFilteringArgs) {
-  const { addLog } = useLogStore();
-  const prefs = usePreferencesStore();
+  const addLog = useLogStore(s => s.addLog);
+  const prefs = usePreferencesStore(s => ({
+    preferredLanguage: s.preferredLanguage,
+    minQuality: s.minQuality,
+    preferCachedRD: s.preferCachedRD,
+    autoPlay: s.autoPlay,
+    uiLanguage: s.uiLanguage,
+  }));
 
   const [sources,      setSources]      = useState<Source[]>([]);
   const [loading,      setLoading]      = useState(true);

@@ -55,7 +55,7 @@ interface EpisodeCardProps {
   onWatchEpisode: (season: number, episode: number, resumeAt?: number) => Promise<void>;
 }
 
-export const EpisodeCard: React.FC<EpisodeCardProps> = ({
+export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
   ep, isSelected, selectedSeason, isPlayLoading, progress,
   onSelectEpisode, onWatchEpisode,
 }) => {
@@ -141,4 +141,4 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({
       </div>
     </div>
   );
-};
+});

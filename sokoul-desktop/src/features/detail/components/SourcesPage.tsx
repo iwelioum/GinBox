@@ -35,8 +35,8 @@ export default function SourcesPage() {
   const fallbackPath = type && id ? `/detail/${type}/${id}` : '/';
   const returnPath = typeof navState?.returnTo === 'string' ? navState.returnTo : fallbackPath;
   const shouldReturn = navState?.fromDetail === true;
-  const { addLog } = useLogStore();
-  const { activeProfile } = useProfileStore();
+  const addLog = useLogStore(s => s.addLog);
+  const activeProfile = useProfileStore(s => s.activeProfile);
   const { toast } = useToast();
   const { t } = useTranslation();
   const setNavigation = usePlaybackStore((s) => s.setNavigation);
