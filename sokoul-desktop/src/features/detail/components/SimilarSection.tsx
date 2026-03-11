@@ -65,8 +65,8 @@ export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _t
                 )}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
               </div>
-              <p className="text-white/80 text-[13px] font-medium truncate leading-tight">{title}</p>
-              {year && <p className="text-white/40 text-[11px]">{year}</p>}
+              <p className="text-white/80 text-sm font-medium truncate leading-tight">{title}</p>
+              {year && <p className="text-white/40 text-[13px]">{year}</p>}
             </button>
           );
         })}

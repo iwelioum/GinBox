@@ -107,14 +107,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           }}
         >
           <span
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold tracking-widest uppercase"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] font-bold tracking-widest uppercase"
             style={{ background: `${accent}22`, border: `1px solid ${accent}55`, color: accent }}
           >
             {isSeries ? <Tv2 size={11} /> : <Film size={11} />}
             {isSeries ? t('common.series') : t('common.movie')}
           </span>
           {isSeries && seriesStatus && (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wider uppercase bg-white/10 border border-white/15 text-white/60">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[13px] font-semibold tracking-wider uppercase bg-white/10 border border-white/15 text-white/60">
               {seriesStatus}
             </span>
           )}

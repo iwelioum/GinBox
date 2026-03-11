@@ -49,7 +49,7 @@ export function HeaderOverlay({
         style={{
           background:   'transparent',
           border:       'none',
-          color:        'var(--player-text, #F5F5F5)',
+          color:        'var(--color-text-primary)',
           cursor:       'pointer',
           display:      'flex',
           alignItems:   'center',
@@ -80,7 +80,7 @@ export function HeaderOverlay({
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
           <span
             style={{
-              color:         'var(--player-text, #F5F5F5)',
+              color:         'var(--color-text-primary)',
               fontSize:      15,
               fontWeight:    600,
               letterSpacing: '1.42px',
@@ -121,7 +121,7 @@ export function HeaderOverlay({
             style={{
               background:   'transparent',
               border:       'none',
-              color:        'var(--player-text, #F5F5F5)',
+              color:        'var(--color-text-primary)',
               cursor:       'pointer',
               padding:      '4px 6px',
               display:      'flex',
@@ -140,7 +140,7 @@ export function HeaderOverlay({
             style={{
               background:   'transparent',
               border:       'none',
-              color:        'var(--player-text, #F5F5F5)',
+              color:        'var(--color-text-primary)',
               cursor:       'pointer',
               padding:      '4px 6px',
               display:      'flex',

@@ -55,7 +55,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
         flexDirection:  'column',
         alignItems:     'center',
         justifyContent: 'center',
-        background:     'linear-gradient(to bottom, #0a0a0a, #1a1a2e)',
+        background:     'linear-gradient(to bottom, var(--color-bg-base), var(--color-bg-overlay))',
         transition:     'opacity 0.35s ease',
         opacity:        visible ? 1 : 0,
         pointerEvents:  visible ? 'auto' : 'none',
@@ -94,7 +94,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
 
         <p
           style={{
-            color:         '#F5F5F5',
+            color:         'var(--color-text-primary)',
             fontSize:      16,
             fontWeight:    600,
             margin:        '0 0 20px',
@@ -119,7 +119,7 @@ export const LoadingScreen = ({ title, poster, visible }: LoadingScreenProps) =>
             style={{
               width:        `${percent}%`,
               height:       '100%',
-              background:   '#F5F5F5',
+              background:   'var(--color-text-primary)',
               borderRadius: 2,
               transition:   'width 0.15s ease',
             }}

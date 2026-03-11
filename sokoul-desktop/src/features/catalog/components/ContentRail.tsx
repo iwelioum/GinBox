@@ -37,7 +37,7 @@ const ContentRail: React.FC<ContentRailProps> = ({
   title,
   items,
   cardVariant = 'landscape',
-  accentColor = '#0063e5',
+  accentColor = 'var(--color-accent)',
   seeMoreHref,
   className,
 }) => {
@@ -85,7 +85,7 @@ const ContentRail: React.FC<ContentRailProps> = ({
         {seeMoreHref && (
           <NavLink
             to={seeMoreHref}
-            className="text-[13px] text-[var(--color-text-secondary)]
+            className="text-sm text-[var(--color-text-secondary)]
                        hover:text-[var(--color-text-primary)]
                        tracking-[0.3px] no-underline
                        transition-colors duration-[var(--transition-fast)]"

@@ -91,7 +91,7 @@ const Navbar: React.FC = () => {
                     'before:transition-all before:duration-[250ms]',
                     'before:[transition-timing-function:cubic-bezier(0.25,0.46,0.45,0.94)]',
                     'group-hover/link:before:scale-x-100 group-hover/link:before:opacity-100',
-                    'text-[var(--color-text-primary)] text-[13px] tracking-[1.42px]',
+                    'text-[var(--color-text-primary)] text-sm tracking-[1.42px]',
                     'leading-[1.08] py-0.5 whitespace-nowrap',
                   ].join(' ')}
                 >
@@ -128,7 +128,7 @@ const Navbar: React.FC = () => {
               <button
                 onClick={() => navigate('/profile')}
                 className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
-                           hover:bg-white/10 text-[13px] tracking-[0.5px] px-4 py-2 block
+                           hover:bg-white/10 text-sm tracking-[0.5px] px-4 py-2 block
                            transition-colors duration-[var(--transition-fast)]"
               >
                 {t('navbar.profile')}
@@ -139,7 +139,7 @@ const Navbar: React.FC = () => {
               <button
                 onClick={() => navigate('/settings')}
                 className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
-                           hover:bg-white/10 text-[13px] tracking-[0.5px] px-4 py-2 block
+                           hover:bg-white/10 text-sm tracking-[0.5px] px-4 py-2 block
                            transition-colors duration-[var(--transition-fast)]"
               >
                 {t('common.settings')}
@@ -150,7 +150,7 @@ const Navbar: React.FC = () => {
               <button
                 onClick={() => navigate('/profile-select')}
                 className="w-full text-left bg-transparent border-none cursor-pointer text-dp-text
-                           hover:bg-white/10 text-[13px] tracking-[0.5px] px-4 py-2 block
+                           hover:bg-white/10 text-sm tracking-[0.5px] px-4 py-2 block
                            transition-colors duration-[var(--transition-fast)]"
               >
                 {t('navbar.switchProfile')}

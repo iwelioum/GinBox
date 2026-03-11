@@ -63,14 +63,14 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
                 key={tab.key}
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-3 py-1 rounded-full text-[11px] font-[600]
+                className={`px-3 py-1 rounded-full text-[13px] font-[600]
                             transition-all duration-200 cursor-pointer border ${
                   activeTab === tab.key
-                    ? 'border-[var(--accent,#0072D2)] text-[var(--accent,#0072D2)]'
+                    ? 'border-[var(--color-accent)] text-[var(--color-accent)]'
                     : 'border-white/20 text-white/40 hover:border-white/40'
                 }`}
                 style={activeTab === tab.key ? {
-                  background: 'color-mix(in srgb, var(--accent, #0072D2) 12%, transparent)',
+                  background: 'color-mix(in srgb, var(--color-accent) 12%, transparent)',
                 } : {}}
               >
                 {tab.label}

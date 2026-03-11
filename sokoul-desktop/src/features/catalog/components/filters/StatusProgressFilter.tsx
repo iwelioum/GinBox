@@ -70,7 +70,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
                     <StatusIcon size={13} />
                     {t(labelKey)}
                   </span>
-                  <span className={`text-[10px] mt-0.5 ${active ? 'text-black/50' : 'text-white/30'}`}>
+                  <span className={`text-xs mt-0.5 ${active ? 'text-black/50' : 'text-white/30'}`}>
                     {t(sublabelKey)} · {count}
                   </span>
                 </button>
@@ -121,7 +121,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
               <div className="flex flex-col gap-2 mt-1 max-h-[160px] overflow-y-auto pr-1">
                 {inProgressItems.map((item) => (
                   <div key={item.id} className="flex items-center gap-3">
-                    <span className="text-[11px] text-white/50 truncate flex-1 max-w-[140px]">
+                    <span className="text-[13px] text-white/50 truncate flex-1 max-w-[140px]">
                       {item.title ?? item.name}
                     </span>
                     <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
@@ -130,7 +130,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
                         style={{ width: `${item._userProgress}%` }}
                       />
                     </div>
-                    <span className="text-[10px] text-white/30 w-8 text-right font-mono">
+                    <span className="text-xs text-white/30 w-8 text-right font-mono">
                       {item._userProgress}%
                     </span>
                   </div>

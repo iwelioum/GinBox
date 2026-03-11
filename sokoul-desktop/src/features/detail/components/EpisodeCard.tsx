@@ -106,13 +106,13 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = ({
 
         <div className="flex items-center gap-2 mt-1">
           {progress?.watched && (
-            <span className="text-[10px] text-green-400 bg-green-400/10 px-2 py-1 rounded-full 
+            <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full 
                              border border-green-400/20">
               {t('detail.watched')}
             </span>
           )}
           {canResume && (
-            <span className="text-[10px] text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full 
+            <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full 
                              border border-yellow-400/20">
               {t('detail.resumeAt', { time: formatDuration(progress.positionMs) })}
             </span>
