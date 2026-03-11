@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { endpoints } from '@/shared/api/client'
 import { useProfileStore } from '@/stores/profileStore'
+import { useToast } from '@/shared/hooks/useToast'
 import { TitleBar } from '@/shared/components/layout/TitleBar'
 import { Skeleton } from '@/shared/components/ui'
 import { ProfileCard } from './ProfileCard'
@@ -18,6 +19,7 @@ export default function ProfileSelectPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const qc = useQueryClient()
+  const { toast } = useToast()
   const activeProfile    = useProfileStore((s) => s.activeProfile)
   const setActiveProfile = useProfileStore((s) => s.setActiveProfile)
 
@@ -55,7 +57,7 @@ export default function ProfileSelectPage() {
       }
       qc.invalidateQueries({ queryKey: ['profiles'] })
     } catch (err) {
-      console.error('Failed to delete profile:', err)
+      toast(t('profile.errorDeleting', { defaultValue: 'Failed to delete profile' }), 'error')
     }
   }
 

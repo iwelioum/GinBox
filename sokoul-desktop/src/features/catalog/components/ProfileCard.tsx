@@ -60,6 +60,7 @@ export function ProfileCard({
         <div className="absolute inset-0 bg-[var(--color-bg-overlay)] rounded-2xl flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-[var(--transition-fast)]">
           {onEdit && (
             <button
+              aria-label={t('profile.edit')}
               onClick={(e) => {
                 e.stopPropagation()
                 onEdit(profile)
@@ -71,6 +72,7 @@ export function ProfileCard({
           )}
           {onDelete && (
             <button
+              aria-label={t('profile.delete')}
               onClick={(e) => {
                 e.stopPropagation()
                 onDelete(profile)

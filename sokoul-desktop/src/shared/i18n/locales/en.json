@@ -230,6 +230,7 @@
     "create": "Create",
     "creating": "Creating...",
     "errorCreating": "Error creating profile.",
+    "errorDeleting": "Failed to delete profile.",
     "nameRequired": "Name is required.",
     "nameTooLong": "Name too long (max 32 characters).",
     "manageProfiles": "Manage Profiles",
@@ -238,7 +239,9 @@
     "save": "Save",
     "memberSince": "Member since {{date}}",
     "switchProfile": "Switch Profile",
-    "noActiveProfile": "No active profile"
+    "noActiveProfile": "No active profile",
+    "edit": "Edit profile",
+    "delete": "Delete profile"
   },
   "detail": {
     "seasonEpisode": "Season & episode",
@@ -661,5 +664,16 @@
     "filmsInSaga_other": "{{count}} films in this saga",
     "allFilms": "All films",
     "noMoviesFound": "No movies found in this collection."
+  },
+  "kind": {
+    "movie": "Movie",
+    "series": "Series",
+    "anime": "Anime",
+    "animation": "Animation",
+    "documentary": "Documentary",
+    "miniseries": "Mini-series",
+    "short": "Short film",
+    "reality": "Reality TV",
+    "special": "Special"
   }
 }

@@ -8,16 +8,16 @@ import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 import { endpoints } from '@/shared/api/client';
 import type { VideoItem, ContentType } from '@/shared/types/index';
 
-const KIND_LABELS: Record<string, string> = {
-  movie:       'Movie',
-  tv:          'Series',
-  anime:       'Anime',
-  animation:   'Animation',
-  documentary: 'Documentary',
-  miniseries:  'Mini-series',
-  short:       'Short film',
-  reality:     'Reality TV',
-  special:     'Special',
+const KIND_KEYS: Record<string, string> = {
+  movie:       'kind.movie',
+  tv:          'kind.series',
+  anime:       'kind.anime',
+  animation:   'kind.animation',
+  documentary: 'kind.documentary',
+  miniseries:  'kind.miniseries',
+  short:       'kind.short',
+  reality:     'kind.reality',
+  special:     'kind.special',
 };
 
 interface HoverCardProps {
@@ -132,7 +132,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
           {item._kind && (
             <span className="text-[10px] text-white/50 bg-black/40
                              px-2 py-0.5 rounded-full ">
-              {KIND_LABELS[item._kind] ?? item._kind}
+              {KIND_KEYS[item._kind] ? t(KIND_KEYS[item._kind]) : item._kind}
             </span>
           )}
         </div>
