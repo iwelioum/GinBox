@@ -1,11 +1,12 @@
-// DetailEpisodes.tsx — Netflix 2025 × Infuse × Apple TV episode picker
-// Tabs interface with premium episode cards
+// DetailEpisodes.tsx — Netflix-style episode picker
+// Season selector + episode list, no dead tabs
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
-import { Film, Tv, Clapperboard } from 'lucide-react';
+import { Tv, Play } from 'lucide-react';
 import { EpisodeCard } from './EpisodeCard';
 import type { EpisodeVideo, PlaybackEntry } from '@/shared/types/index';
 
@@ -36,181 +37,155 @@ export const DetailEpisodes: React.FC<DetailEpisodesProps> = ({
   onSelectSeason, onSelectEpisode, onWatchEpisode,
 }) => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = React.useState<'episodes' | 'similar' | 'extras'>('episodes');
 
   const previewProgress = getEpisodeProgress(selectedEpisodeData?.season, selectedEpisodeData?.episode);
   const previewCanResume = !!previewProgress && !previewProgress.watched && (previewProgress.positionMs ?? 0) > 0;
   const previewStill = getImageUrl(selectedEpisodeData?.still_path, 'w780');
+  const episodeCount = episodesOfSeason.length;
 
   return (
-    <section className="space-y-6">
-      {/* Tabs */}
-      <div className="border-b border-[var(--color-border)]">
-        <nav className="flex gap-8">
-          <button
-            onClick={() => setActiveTab('episodes')}
-            className={`pb-4 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'episodes'
-                ? 'text-[var(--color-text-primary)] border-[var(--color-accent)]'
-                : 'text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text-secondary)]'
-            }`}
-          >
-            Episodes
-          </button>
-          <button
-            onClick={() => setActiveTab('similar')}
-            className={`pb-4 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'similar'
-                ? 'text-[var(--color-text-primary)] border-[var(--color-accent)]'
-                : 'text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text-secondary)]'
-            }`}
-          >
-            {t('detail.similar')}
-          </button>
-          <button
-            onClick={() => setActiveTab('extras')}
-            className={`pb-4 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'extras'
-                ? 'text-[var(--color-text-primary)] border-[var(--color-accent)]'
-                : 'text-[var(--color-text-muted)] border-transparent hover:text-[var(--color-text-secondary)]'
-            }`}
-          >
-            Extras
-          </button>
-        </nav>
+    <section className="space-y-5">
+      {/* Header with season selector */}
+      <div className="flex flex-wrap items-center gap-4">
+        <h2 className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-[0.2em]">
+          {t('detail.seasonEpisode')}
+        </h2>
+
+        <div className="flex gap-1.5 overflow-x-auto scrollbar-thin scrollbar-thumb-[var(--color-white-8)]">
+          {seasons.map(s => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => {
+                onSelectSeason(s);
+                const first = episodeVideos.find(v => v.season === s)?.episode ?? 1;
+                onSelectEpisode(first);
+              }}
+              className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium
+                         transition-all duration-200 border
+                         focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none ${
+                selectedSeason === s
+                  ? 'bg-[var(--color-accent)] text-white border-[var(--color-accent)]'
+                  : 'bg-transparent text-[var(--color-text-secondary)] border-[var(--color-border)] hover:border-[var(--color-border-medium)] hover:text-[var(--color-text-primary)]'
+              }`}
+              aria-pressed={selectedSeason === s}
+            >
+              {t('detail.seasonNumber', { number: s })}
+            </button>
+          ))}
+        </div>
+
+        {episodeCount > 0 && (
+          <span className="text-xs text-[var(--color-text-muted)] ml-auto">
+            {episodeCount} {episodeCount === 1 ? 'episode' : 'episodes'}
+          </span>
+        )}
       </div>
 
-      {/* Episodes Tab Content */}
-      {activeTab === 'episodes' && (
-        <div className="space-y-6">
-          {/* Selected episode preview */}
-          {selectedEpisodeData && (
-            <div className="rounded-[var(--radius-card)] overflow-hidden bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
-              <div className="relative w-full aspect-video bg-[var(--color-bg-overlay)]">
-                {previewStill ? (
-                  <img src={previewStill} className="w-full h-full object-cover" alt={selectedEpisodeData.title} />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-sm">
-                    S{String(selectedEpisodeData.season).padStart(2, '0')}E{String(selectedEpisodeData.episode).padStart(2, '0')}
-                  </div>
-                )}
-                {previewProgress && previewProgress.progressPct > 0 && !previewProgress.watched && (
-                  <div className="absolute left-0 right-0 bottom-0 h-1 bg-[var(--color-border)]">
-                    <div className="h-full bg-[var(--color-accent)]" style={{ width: `${Math.min(100, previewProgress.progressPct)}%` }} />
-                  </div>
-                )}
-              </div>
-              <div className="p-4 space-y-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-1 flex-1 min-w-0">
-                    <p className="text-xs text-[var(--color-text-muted)]">
-                      S{String(selectedEpisodeData.season).padStart(2, '0')}E{String(selectedEpisodeData.episode).padStart(2, '0')}
-                      {selectedEpisodeData.runtime ? ` · ${selectedEpisodeData.runtime} ${t('common.min')}` : ''}
-                    </p>
-                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
-                      {selectedEpisodeData.title ?? `Episode ${selectedEpisodeData.episode}`}
-                    </h4>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => void onWatchEpisode(
-                      selectedEpisodeData.season ?? selectedSeason,
-                      selectedEpisodeData.episode ?? 1,
-                      previewCanResume ? previewProgress?.positionMs : undefined,
-                    )}
-                    disabled={isPlayLoading}
-                    className="flex-shrink-0 bg-[var(--color-accent)] text-white text-xs font-semibold
-                               px-4 py-2 rounded-[var(--radius-card)] hover:bg-[var(--color-accent-hover)]
-                               transition-colors duration-200 disabled:opacity-70 disabled:cursor-default"
-                  >
-                    {previewCanResume ? t('detail.resumeButton') : t('detail.playButton')}
-                  </button>
+      {/* Selected episode preview */}
+      <AnimatePresence mode="wait">
+        {selectedEpisodeData && (
+          <motion.div
+            key={`${selectedEpisodeData.season}-${selectedEpisodeData.episode}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="flex gap-5 rounded-xl overflow-hidden bg-[var(--color-bg-elevated)]
+                       border border-[var(--color-border)] group"
+          >
+            {/* Still image */}
+            <div className="relative flex-shrink-0 w-[280px] aspect-video bg-[var(--color-bg-overlay)]">
+              {previewStill ? (
+                <img src={previewStill} className="w-full h-full object-cover" alt={selectedEpisodeData.title} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-[var(--color-text-muted)] text-sm">
+                  S{String(selectedEpisodeData.season).padStart(2, '0')}E{String(selectedEpisodeData.episode).padStart(2, '0')}
                 </div>
-                {selectedEpisodeData.overview && (
-                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                    {selectedEpisodeData.overview}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Season selector */}
-          <div className="flex items-center gap-4">
-            <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">
-              {t('detail.seasonEpisode')}
-            </h3>
-            {selectedEpisodeData && (
-              <span className="text-xs text-[var(--color-text-muted)]">
-                S{String(selectedSeason).padStart(2, '0')}E{String(selectedEpisode).padStart(2, '0')}
-              </span>
-            )}
-          </div>
-
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-[var(--color-border)]">
-            {seasons.map(s => (
+              )}
+              {previewProgress && previewProgress.progressPct > 0 && !previewProgress.watched && (
+                <div className="absolute left-0 right-0 bottom-0 h-1 bg-[var(--color-white-8)]">
+                  <div className="h-full bg-[var(--color-accent)]" style={{ width: `${Math.min(100, previewProgress.progressPct)}%` }} />
+                </div>
+              )}
+              {/* Play overlay */}
               <button
-                key={s}
                 type="button"
-                onClick={() => {
-                  onSelectSeason(s);
-                  const first = episodeVideos.find(v => v.season === s)?.episode ?? 1;
-                  onSelectEpisode(first);
-                }}
-                className={`flex-shrink-0 px-4 py-2 rounded-[var(--radius-card)] text-sm font-medium 
-                           transition-colors duration-200 ${
-                  selectedSeason === s
-                    ? 'bg-[var(--color-accent)] text-white'
-                    : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-overlay)]'
-                }`}
+                onClick={() => void onWatchEpisode(
+                  selectedEpisodeData.season ?? selectedSeason,
+                  selectedEpisodeData.episode ?? 1,
+                  previewCanResume ? previewProgress?.positionMs : undefined,
+                )}
+                disabled={isPlayLoading}
+                className="absolute inset-0 flex items-center justify-center bg-black/0
+                           hover:bg-black/30 transition-colors cursor-pointer
+                           focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--color-accent)]"
+                aria-label={previewCanResume ? t('detail.resumeButton') : t('detail.playButton')}
               >
-                {t('detail.seasonNumber', { number: s })}
+                <div className="w-12 h-12 rounded-full bg-[var(--color-white-15)] backdrop-blur-sm
+                                flex items-center justify-center opacity-0 group-hover:opacity-100
+                                transition-opacity duration-200 border border-[var(--color-white-20)]">
+                  <Play size={20} className="fill-white text-white ml-0.5" />
+                </div>
               </button>
-            ))}
-          </div>
+            </div>
 
-          {/* Episode list */}
-          <div className="space-y-3 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-[var(--color-border)]">
-            {episodesOfSeason.length === 0 && (
-              <EmptyState
-                icon={<Tv />}
-                title={t('detail.noEpisodes', { defaultValue: 'No episodes available' })}
-                description={t('detail.noEpisodesDesc', { defaultValue: 'This season doesn\'t have any episodes yet.' })}
-              />
-            )}
-            {episodesOfSeason.map(ep => (
-              <EpisodeCard
-                key={`${ep.season}-${ep.episode}`}
-                ep={ep}
-                isSelected={selectedEpisode === ep.episode}
-                selectedSeason={selectedSeason}
-                isPlayLoading={isPlayLoading}
-                progress={getEpisodeProgress(ep.season, ep.episode)}
-                onSelectEpisode={onSelectEpisode}
-                onWatchEpisode={onWatchEpisode}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+            {/* Info */}
+            <div className="py-4 pr-4 flex flex-col justify-center gap-2 flex-1 min-w-0">
+              <p className="text-xs text-[var(--color-text-muted)]">
+                S{String(selectedEpisodeData.season).padStart(2, '0')}E{String(selectedEpisodeData.episode).padStart(2, '0')}
+                {selectedEpisodeData.runtime ? ` · ${selectedEpisodeData.runtime} ${t('common.min')}` : ''}
+              </p>
+              <h4 className="text-sm font-semibold text-[var(--color-text-primary)] truncate">
+                {selectedEpisodeData.title ?? `Episode ${selectedEpisodeData.episode}`}
+              </h4>
+              {selectedEpisodeData.overview && (
+                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed line-clamp-3">
+                  {selectedEpisodeData.overview}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={() => void onWatchEpisode(
+                  selectedEpisodeData.season ?? selectedSeason,
+                  selectedEpisodeData.episode ?? 1,
+                  previewCanResume ? previewProgress?.positionMs : undefined,
+                )}
+                disabled={isPlayLoading}
+                className="self-start mt-1 bg-[var(--color-accent)] text-white text-xs font-semibold
+                           px-5 py-2 rounded-full hover:bg-[var(--color-accent-hover)]
+                           transition-colors duration-200 disabled:opacity-70 disabled:cursor-default"
+              >
+                {previewCanResume ? t('detail.resumeButton') : t('detail.playButton')}
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Similar Tab Content */}
-      {activeTab === 'similar' && (
-        <EmptyState
-          icon={<Film />}
-          title={t('detail.similarComingSoon', { defaultValue: 'Similar content' })}
-          description={t('detail.similarComingSoonDesc', { defaultValue: 'Recommendations based on this title are coming soon.' })}
-        />
-      )}
-
-      {/* Extras Tab Content */}
-      {activeTab === 'extras' && (
-        <EmptyState
-          icon={<Clapperboard />}
-          title={t('detail.extrasComingSoon', { defaultValue: 'Extras' })}
-          description={t('detail.extrasComingSoonDesc', { defaultValue: 'Behind-the-scenes content, deleted scenes and more coming soon.' })}
-        />
-      )}
+      {/* Episode list */}
+      <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1
+                      scrollbar-thin scrollbar-thumb-[var(--color-white-8)] scrollbar-track-transparent">
+        {episodesOfSeason.length === 0 && (
+          <EmptyState
+            icon={<Tv />}
+            title={t('detail.noEpisodes', { defaultValue: 'No episodes available' })}
+            description={t('detail.noEpisodesDesc', { defaultValue: 'This season doesn\'t have any episodes yet.' })}
+          />
+        )}
+        {episodesOfSeason.map(ep => (
+          <EpisodeCard
+            key={`${ep.season}-${ep.episode}`}
+            ep={ep}
+            isSelected={selectedEpisode === ep.episode}
+            selectedSeason={selectedSeason}
+            isPlayLoading={isPlayLoading}
+            progress={getEpisodeProgress(ep.season, ep.episode)}
+            onSelectEpisode={onSelectEpisode}
+            onWatchEpisode={onWatchEpisode}
+          />
+        ))}
+      </div>
     </section>
   );
 };

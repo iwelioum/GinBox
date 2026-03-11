@@ -1,5 +1,5 @@
-// EpisodeCard.tsx — Single episode card in the episode list
-// Extracted from DetailEpisodes.tsx to keep it under 300 lines (AGENTS.md Rule 4).
+// EpisodeCard.tsx — Single episode card with progress + play
+// Bigger thumbnails, design token colors, air date display
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,12 +21,13 @@ const Thumbnail: React.FC<{
   const showBar = !!progress && progress.progressPct > 0 && !progress.watched;
 
   return (
-    <div className="relative flex-shrink-0 w-[120px] aspect-video rounded-[var(--radius-card)] 
+    <div className="relative flex-shrink-0 w-[160px] aspect-video rounded-lg
                     overflow-hidden bg-[var(--color-bg-elevated)] flex items-center justify-center">
       {stillUrl ? (
         <img
           src={stillUrl}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-500
+                     group-hover:scale-105"
           alt={`Episode ${episode ?? ''}`}
           loading="lazy"
         />
@@ -34,7 +35,7 @@ const Thumbnail: React.FC<{
         <span className="text-xs text-[var(--color-text-muted)]">E{episode ?? '?'}</span>
       )}
       {showBar && (
-        <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-black/60">
+        <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-[var(--color-white-8)]">
           <div
             className="h-full bg-[var(--color-accent)]"
             style={{ width: `${Math.min(progress.progressPct, 100)}%` }}
@@ -66,14 +67,15 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
   return (
     <div
       onClick={() => onSelectEpisode(ep.episode ?? 1)}
-      className={`group flex items-start gap-4 p-4 rounded-[var(--radius-card)] 
-                 cursor-pointer transition-colors duration-200 ${
+      className={`group flex items-start gap-4 p-3 rounded-xl
+                 cursor-pointer transition-all duration-200 ${
         isSelected
-          ? 'bg-[var(--color-bg-overlay)] ring-1 ring-[var(--color-border)]'
-          : 'bg-[var(--color-bg-elevated)] hover:bg-[var(--color-bg-overlay)]'
+          ? 'bg-[var(--color-bg-overlay)] ring-1 ring-[var(--color-accent)]/30'
+          : 'hover:bg-[var(--color-white-4)]'
       }`}
       role="button"
       tabIndex={0}
+      aria-label={`${ep.title ?? `Episode ${ep.episode}`}${progress?.watched ? ` — ${t('detail.watched')}` : ''}`}
       onKeyDown={e => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -83,10 +85,10 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
     >
       <Thumbnail stillUrl={stillUrl} episode={ep.episode} progress={progress} />
 
-      <div className="flex flex-col gap-2 flex-1 min-w-0">
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0 py-0.5">
         <div className="flex items-center gap-3">
-          <span className="text-xs text-[var(--color-text-muted)] flex-shrink-0">
-            {t('detail.episodeNumber', { number: ep.episode }).replace('{{number}}', ep.episode?.toString() || '1')}
+          <span className="text-xs text-[var(--color-text-muted)] font-medium flex-shrink-0 tabular-nums">
+            {ep.episode}
           </span>
           <span className="text-sm font-medium text-[var(--color-text-primary)] truncate">
             {ep.title ?? `Episode ${ep.episode}`}
@@ -104,16 +106,16 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
           </p>
         )}
 
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2 mt-0.5">
           {progress?.watched && (
-            <span className="text-xs text-green-400 bg-green-400/10 px-2 py-1 rounded-full 
-                             border border-green-400/20">
+            <span className="text-xs text-[var(--color-success)] bg-[var(--color-success)]/10
+                             px-2 py-0.5 rounded-full border border-[var(--color-success)]/20 font-medium">
               {t('detail.watched')}
             </span>
           )}
           {canResume && (
-            <span className="text-xs text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full 
-                             border border-yellow-400/20">
+            <span className="text-xs text-[var(--color-warning)] bg-[var(--color-warning)]/10
+                             px-2 py-0.5 rounded-full border border-[var(--color-warning)]/20 font-medium">
               {t('detail.resumeAt', { time: formatDuration(progress.positionMs) })}
             </span>
           )}
@@ -129,10 +131,10 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
               );
             }}
             disabled={isPlayLoading}
-            className={`ml-auto bg-[var(--color-accent)] text-white text-xs font-semibold 
-                       px-4 py-2 rounded-[var(--radius-card)] hover:bg-[var(--color-accent-hover)] 
+            className={`ml-auto bg-[var(--color-accent)] text-white text-xs font-semibold
+                       px-4 py-1.5 rounded-full hover:bg-[var(--color-accent-hover)]
                        transition-[color,background-color,opacity] duration-200 ${
-              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+              isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 md:opacity-0'
             } ${isPlayLoading ? 'cursor-default opacity-70' : ''}`}
           >
             {canResume ? t('detail.resumeButton') : t('detail.playButton')}

@@ -114,11 +114,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               alt={title}
               src={identity.url}
               className="max-w-[550px] min-w-[160px] w-[32vw] mb-3
-                         drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]"
+                         drop-shadow-[var(--shadow-logo,0_8px_32px_rgba(0,0,0,0.8))]"
             />
           ) : (
             <h1
-              className="mb-3 [text-wrap:balance] drop-shadow-[0_4px_24px_rgba(0,0,0,0.7)]"
+              className="mb-3 [text-wrap:balance] drop-shadow-[var(--shadow-title,0_4px_24px_rgba(0,0,0,0.7))]"
               style={{
                 fontFamily: identity.style.fontFamily,
                 fontSize: identity.style.fontSize,
@@ -154,7 +154,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               }}
             >
               {/* Mini circular gauge */}
-              <svg width="22" height="22" viewBox="0 0 22 22" className="flex-shrink-0">
+              <svg width="22" height="22" viewBox="0 0 22 22" className="flex-shrink-0"
+                   role="img" aria-label={`${ratingStr}/10`}>
                 <circle cx="11" cy="11" r="9" fill="none" stroke="currentColor" strokeOpacity={0.15} strokeWidth="2" />
                 <circle
                   cx="11" cy="11" r="9" fill="none" stroke="currentColor" strokeWidth="2"
@@ -221,7 +222,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <motion.div variants={fadeUp} className="mb-7 max-w-[640px]">
             <p
               className={`text-[var(--color-text-secondary)] text-[var(--text-body)] leading-relaxed
-                         ${!synopsisExpanded ? 'line-clamp-3 synopsis-mask' : ''}`}
+                         ${!synopsisExpanded ? 'line-clamp-2 md:line-clamp-3 lg:line-clamp-4 synopsis-mask' : ''}`}
             >
               {item.overview}
             </p>
@@ -229,6 +230,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <button
                 type="button"
                 onClick={() => setSynopsisExpanded(v => !v)}
+                aria-expanded={synopsisExpanded}
                 className="mt-2 flex items-center gap-1.5 text-[var(--color-text-muted)]
                            hover:text-[var(--color-text-secondary)] text-sm font-medium
                            transition-colors group focus-visible:outline-none

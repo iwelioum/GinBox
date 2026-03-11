@@ -15,7 +15,7 @@ export interface MediaImages {
   seasons: string[];
 }
 
-type MediaTab = 'scenes' | 'posters' | 'logos';
+type MediaTab = 'scenes' | 'posters' | 'logos' | 'banners' | 'seasons';
 
 interface GallerySectionProps {
   images: MediaImages;
@@ -30,15 +30,23 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
   const slides = currentImages.map(url => ({ src: url }));
 
   const allTabs: { key: MediaTab; label: string; count: number }[] = [
-    { key: 'scenes',  label: t('detail.scenes'),  count: images.scenes.length  },
-    { key: 'posters', label: t('detail.posters'), count: images.posters.length },
-    { key: 'logos',   label: t('detail.logos'),    count: images.logos.length   },
+    { key: 'scenes',  label: t('detail.scenes'),  count: images.scenes?.length ?? 0  },
+    { key: 'posters', label: t('detail.posters'), count: images.posters?.length ?? 0 },
+    { key: 'logos',   label: t('detail.logos'),    count: images.logos?.length ?? 0   },
+    { key: 'banners', label: 'Banners',           count: images.banners?.length ?? 0 },
+    { key: 'seasons', label: 'Seasons',           count: images.seasons?.length ?? 0 },
   ];
   const tabs = allTabs.filter(t => t.count > 0);
   if (tabs.length === 0) return null;
 
-  const aspectRatio = activeTab === 'posters' ? '2 / 3' : activeTab === 'logos' ? '16 / 5' : '16 / 9';
-  const thumbW = activeTab === 'posters' ? 120 : activeTab === 'logos' ? 200 : 280;
+  const ASPECT: Record<MediaTab, string> = {
+    scenes: '16 / 9', posters: '2 / 3', logos: '16 / 5', banners: '21 / 9', seasons: '2 / 3',
+  };
+  const WIDTHS: Record<MediaTab, number> = {
+    scenes: 280, posters: 120, logos: 200, banners: 320, seasons: 120,
+  };
+  const aspectRatio = ASPECT[activeTab];
+  const thumbW = WIDTHS[activeTab];
 
   return (
     <section>
@@ -117,7 +125,7 @@ export const GallerySection: React.FC<GallerySectionProps> = ({ images }) => {
         slides={slides}
         index={lightboxIdx}
         on={{ view: ({ index }) => setLightboxIdx(index) }}
-        styles={{ container: { backgroundColor: 'rgba(0,0,0,0.95)' } }}
+        styles={{ container: { backgroundColor: 'var(--color-bg-base)' } }}
       />
     </section>
   );

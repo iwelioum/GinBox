@@ -140,6 +140,8 @@ const DetailPage: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
+              role="alert"
+              aria-live="assertive"
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
                          bg-[var(--color-danger)]/15 backdrop-blur-xl
                          text-[var(--color-text-primary)] px-5 py-3 rounded-xl

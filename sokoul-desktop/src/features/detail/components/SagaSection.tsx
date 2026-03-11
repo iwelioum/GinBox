@@ -1,9 +1,10 @@
 // components/detail/SagaSection.tsx — Collection/franchise timeline
-// Poster cards with current film highlighting · Number badges · Collection overview
+// Framer Motion stagger · Number badges · Current film highlighting
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
 interface CollectionPart {
@@ -24,6 +25,11 @@ interface SagaSectionProps {
   collection: unknown;
   currentId:  number;
 }
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.92 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
+};
 
 export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId }) => {
   const { t } = useTranslation();
@@ -49,8 +55,14 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
         </p>
       )}
 
-      <div className="flex gap-4 overflow-x-auto pb-4 scroll-smooth
-                      scrollbar-thin scrollbar-thumb-[var(--color-white-8)] scrollbar-track-transparent">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ staggerChildren: 0.06 }}
+        className="flex gap-4 overflow-x-auto pb-4 scroll-smooth
+                   scrollbar-thin scrollbar-thumb-[var(--color-white-8)] scrollbar-track-transparent"
+      >
         {sorted.map((part, idx) => {
           const isCurrent = part.id === currentId;
           const posterUrl = part.poster_path
@@ -59,30 +71,33 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
           const year = part.release_date ? new Date(part.release_date).getFullYear() : null;
 
           return (
-            <button
+            <motion.button
               key={part.id}
+              variants={cardVariants}
+              whileHover={!isCurrent ? { y: -4, transition: { duration: 0.2 } } : undefined}
               type="button"
               onClick={() => !isCurrent && navigate(`/detail/movie/${part.id}`)}
               disabled={isCurrent}
-              className={`flex-shrink-0 flex flex-col items-center gap-2 w-24 group cursor-pointer
+              aria-label={`${part.title}${year ? ` (${year})` : ''}${isCurrent ? ' — current' : ''}`}
+              aria-current={isCurrent ? 'true' : undefined}
+              className={`flex-shrink-0 flex flex-col items-center gap-2 w-[7rem] group
                          focus-visible:outline-none focus-visible:ring-2
                          focus-visible:ring-[var(--color-accent)] rounded-lg
-                         transition-opacity duration-200
-                         ${isCurrent ? 'cursor-default' : 'hover:opacity-90'}`}
+                         ${isCurrent ? 'cursor-default' : 'cursor-pointer'}`}
             >
-              <div className={`relative w-24 h-36 rounded-lg overflow-hidden
+              <div className={`relative w-[7rem] h-[10.5rem] rounded-xl overflow-hidden
                               transition-shadow duration-300
                               ${isCurrent
-                                ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--color-bg-base)] shadow-[0_0_16px_rgba(108,99,255,0.3)]'
+                                ? 'ring-2 ring-[var(--color-accent)] ring-offset-2 ring-offset-[var(--color-bg-base)] shadow-[0_0_20px_var(--color-accent-shadow,rgba(108,99,255,0.25))]'
                                 : 'shadow-[var(--shadow-card)] group-hover:shadow-[var(--shadow-card-hover)]'
                               }`}>
                 {posterUrl ? (
                   <img
                     src={posterUrl}
-                    alt={part.title}
+                    alt=""
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-500
-                               group-hover:scale-105"
+                    className={`w-full h-full object-cover transition-transform duration-500
+                               ${isCurrent ? '' : 'group-hover:scale-105'}`}
                   />
                 ) : (
                   <div className="w-full h-full bg-[var(--color-bg-elevated)] flex items-center justify-center
@@ -90,12 +105,11 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
                     ?
                   </div>
                 )}
-
-                {/* Number badge */}
-                <span className={`absolute top-1.5 left-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full
+                <span className={`absolute top-2 left-2 text-[10px] font-bold w-5 h-5
+                                 flex items-center justify-center rounded-full
                                  ${isCurrent
                                    ? 'bg-[var(--color-accent)] text-white'
-                                   : 'bg-black/60 text-[var(--color-text-secondary)]'}`}>
+                                   : 'bg-[var(--color-bg-glass)] backdrop-blur-sm text-[var(--color-text-secondary)] border border-[var(--color-border)]'}`}>
                   {idx + 1}
                 </span>
               </div>
@@ -106,10 +120,10 @@ export const SagaSection: React.FC<SagaSectionProps> = ({ collection, currentId 
               {year && (
                 <p className="text-[var(--color-text-muted)] text-[11px] -mt-1">{year}</p>
               )}
-            </button>
+            </motion.button>
           );
         })}
-      </div>
+      </motion.div>
     </section>
   );
 };

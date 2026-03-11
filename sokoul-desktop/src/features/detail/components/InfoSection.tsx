@@ -1,5 +1,5 @@
 // components/detail/InfoSection.tsx — Rich metadata grid
-// Director, studio, budget, revenue, language, country, status
+// Semantic dl/dt/dd, hover highlight, visual hierarchy
 
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,14 +41,14 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme: _theme })
   const totalEpisodes = item.number_of_episodes;
   const totalSeasons = item.number_of_seasons;
 
-  const items: { label: string; value: string }[] = [];
+  const items: { label: string; value: string; accent?: boolean }[] = [];
 
-  if (director) items.push({ label: t('detail.director'), value: director });
+  if (director) items.push({ label: t('detail.director'), value: director, accent: true });
   if (studio) items.push({ label: t('detail.studio'), value: studio });
   if (language) items.push({ label: t('detail.language'), value: LANGUAGE_NAMES[language] ?? language.toUpperCase() });
   if (country) items.push({ label: t('detail.country'), value: country });
   if (budget && budget > 0) items.push({ label: t('detail.budget'), value: formatCurrency(budget) });
-  if (revenue && revenue > 0) items.push({ label: t('detail.boxOffice'), value: formatCurrency(revenue) });
+  if (revenue && revenue > 0) items.push({ label: t('detail.boxOffice'), value: formatCurrency(revenue), accent: true });
   if (status && isSeries) items.push({ label: 'Status', value: status });
   if (totalSeasons && totalEpisodes && isSeries) {
     items.push({ label: 'Total', value: `${totalSeasons} ${t('detail.seasons', { count: totalSeasons })} · ${totalEpisodes} ep.` });
@@ -58,19 +58,22 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ item, theme: _theme })
 
   return (
     <section>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-8 gap-y-4 py-5
+      <dl className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-4 py-5
                       border-t border-b border-[var(--color-border)]">
-        {items.map(({ label, value }) => (
-          <div key={label} className="space-y-1">
-            <span className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest font-medium">
+        {items.map(({ label, value, accent }) => (
+          <div key={label} className="space-y-1 rounded-lg px-2 py-1.5 -mx-2
+                                      transition-colors duration-200 hover:bg-[var(--color-white-4)]">
+            <dt className="text-xs text-[var(--color-text-muted)] uppercase tracking-widest font-medium">
               {label}
-            </span>
-            <p className="text-sm text-[var(--color-text-secondary)] font-medium leading-tight">
+            </dt>
+            <dd className={`text-sm font-semibold leading-tight ${
+              accent ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'
+            }`}>
               {value}
-            </p>
+            </dd>
           </div>
         ))}
-      </div>
+      </dl>
     </section>
   );
 };
