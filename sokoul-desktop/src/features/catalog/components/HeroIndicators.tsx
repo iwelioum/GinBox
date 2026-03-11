@@ -73,7 +73,7 @@ export const HeroIndicators: React.FC<HeroIndicatorsProps> = ({
                 style={{
                   width: isActive ? 22 : 6, height: 6, borderRadius: 3,
                   border: 'none', cursor: 'pointer', padding: 0, display: 'block',
-                  background: isActive ? '#f9f9f9' : 'rgba(255,255,255,0.30)',
+                  background: isActive ? 'var(--color-text-primary)' : 'rgba(255,255,255,0.30)',
                   transition: 'width 0.3s ease, background 0.2s ease',
                 }}
               />

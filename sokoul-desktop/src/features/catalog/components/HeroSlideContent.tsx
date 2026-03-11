@@ -38,7 +38,7 @@ export const HeroSlideContent: React.FC<HeroSlideContentProps> = ({ item, heroLo
         >
           <span className={[
             'inline-flex items-center gap-1 px-2.5 py-[3px] rounded-[20px]',
-            'text-[10px] font-extrabold tracking-[0.07em] uppercase text-white',
+            'text-xs font-extrabold tracking-[0.07em] uppercase text-white',
             badge === 'new'
               ? 'bg-[rgba(0,99,229,0.82)] border border-[rgba(100,160,255,0.35)]'
               : 'bg-[rgba(220,80,0,0.82)] border border-[rgba(255,130,50,0.35)]',
@@ -68,13 +68,13 @@ export const HeroSlideContent: React.FC<HeroSlideContentProps> = ({ item, heroLo
         )}
         {rating != null && rating > 0 && (
           <>
-            <span className="text-[var(--color-border-strong)] text-[11px]">•</span>
+            <span className="text-[var(--color-border-strong)] text-[13px]">•</span>
             <span className="text-[12.5px] text-green-400 font-bold">{Math.round(rating * 10)}%</span>
           </>
         )}
         {duration && (
           <>
-            <span className="text-[var(--color-border-strong)] text-[11px]">•</span>
+            <span className="text-[var(--color-border-strong)] text-[13px]">•</span>
             <span className="text-[12.5px] text-white/[0.55] font-medium">{duration}</span>
           </>
         )}

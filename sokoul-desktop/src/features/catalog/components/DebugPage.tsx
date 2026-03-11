@@ -14,8 +14,8 @@ export default function DebugPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white p-4 pt-20 font-mono text-sm overflow-hidden flex flex-col">
-      <div className="fixed top-0 left-0 right-0 bg-[#161b22] border-b border-white/10 p-4 flex items-center justify-between z-50 h-[60px]">
+    <div className="min-h-screen bg-[var(--color-bg-base)] text-white p-4 pt-20 font-mono text-sm overflow-hidden flex flex-col">
+      <div className="fixed top-0 left-0 right-0 bg-[var(--color-bg-elevated)] border-b border-white/10 p-4 flex items-center justify-between z-50 h-[60px]">
         <div className="flex items-center gap-4">
           <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded"><ChevronLeft /></button>
           <h1 className="text-lg font-bold flex items-center gap-2 text-red-400"><Bug /> DIAGNOSTIC</h1>
@@ -49,11 +49,11 @@ export default function DebugPage() {
                 <span className="font-bold text-xs px-1.5 py-0.5 rounded bg-white/10">{log.category}</span>
                 <span className="font-semibold">{log.message}</span>
               </div>
-              <span className="text-[10px] opacity-50">{new Date(log.timestamp).toLocaleTimeString()}</span>
+              <span className="text-xs opacity-50">{new Date(log.timestamp).toLocaleTimeString()}</span>
             </div>
             
             {log.data != null && (
-              <pre className="mt-2 p-2 bg-black/50 rounded overflow-x-auto text-[10px] text-gray-400 border border-white/5">
+              <pre className="mt-2 p-2 bg-black/50 rounded overflow-x-auto text-xs text-gray-400 border border-white/5">
                 {String(JSON.stringify(log.data, null, 2))}
               </pre>
             )}

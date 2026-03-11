@@ -44,7 +44,7 @@ export function FilterDrawer({
         onClick={onClose}
       />
       <div className="fixed right-0 top-0 h-full w-[380px] z-[101]
-                      bg-[#0d0f1a] border-l border-white/10
+                      bg-[var(--color-bg-base)] border-l border-white/10
                       flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
         <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
           <div className="flex items-center gap-3">
@@ -52,7 +52,7 @@ export function FilterDrawer({
               {t('filters.heading')}
             </h2>
             {activeFiltersCount > 0 && (
-              <span className="px-2 py-0.5 rounded-md bg-blue-500 text-[10px] font-bold text-white">
+              <span className="px-2 py-0.5 rounded-md bg-blue-500 text-xs font-bold text-white">
                 {activeFiltersCount}
               </span>
             )}
@@ -77,7 +77,7 @@ export function FilterDrawer({
           />
         </div>
 
-        <div className="flex items-center justify-between px-6 py-5 border-t border-white/10 bg-[#0d0f1a]">
+        <div className="flex items-center justify-between px-6 py-5 border-t border-white/10 bg-[var(--color-bg-base)]">
           <button
             onClick={() => onChangeFilters(buildDefaultFilters(mode))}
             className="text-sm font-medium text-white/40 hover:text-white transition-colors"

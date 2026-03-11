@@ -86,9 +86,9 @@ export default function CollectionDetailPage() {
             className="w-full h-full object-cover object-center" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t
-                        from-[#040714] via-[#040714]/40 to-transparent" />
+                        from-[var(--color-bg-base)] via-[var(--color-bg-base)]/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r
-                        from-[#040714]/70 to-transparent" />
+                        from-[var(--color-bg-base)]/70 to-transparent" />
 
         {/* Back button */}
         <button
@@ -175,7 +175,7 @@ export default function CollectionDetailPage() {
                     {film.name}
                   </p>
                   {film.year && (
-                    <p className="text-[10px] text-white/35 mt-0.5">
+                    <p className="text-xs text-white/35 mt-0.5">
                       {film.year}
                     </p>
                   )}

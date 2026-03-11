@@ -73,7 +73,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   return ReactDOM.createPortal(
     <div
       className="fixed z-[1000] w-[320px] rounded-xl overflow-hidden
-                 bg-[#141827] border border-white/10
+                 bg-[var(--color-bg-overlay)] border border-white/10
                  shadow-2xl shadow-black/80
                  animate-hovercard-in"
       style={{ top, left, transformOrigin }}
@@ -104,7 +104,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
 
         {/* Bottom gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t
-                        from-[#141827] via-transparent to-transparent" />
+                        from-[var(--color-bg-overlay)] via-transparent to-transparent" />
 
         {/* Floating action buttons */}
         <div className="absolute bottom-3 left-3 right-3
@@ -130,7 +130,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
           </div>
           {/* Type badge */}
           {item._kind && (
-            <span className="text-[10px] text-white/50 bg-black/40
+            <span className="text-xs text-white/50 bg-black/40
                              px-2 py-0.5 rounded-full ">
               {KIND_KEYS[item._kind] ? t(KIND_KEYS[item._kind]) : item._kind}
             </span>
@@ -148,7 +148,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
         </h3>
 
         {/* Inline metadata */}
-        <div className="flex items-center gap-2 text-[11px] text-white/50 flex-wrap">
+        <div className="flex items-center gap-2 text-[13px] text-white/50 flex-wrap">
           {rating && (
             <span className="text-yellow-400 font-semibold">⭐ {rating}</span>
           )}
@@ -164,7 +164,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
           <div className="flex flex-wrap gap-1">
             {item._genres.slice(0, 3).map(g => (
               <span key={g}
-                className="text-[10px] px-2 py-0.5 rounded-full
+                className="text-xs px-2 py-0.5 rounded-full
                            bg-white/8 text-white/50 border border-white/10">
                 {g}
               </span>
@@ -174,7 +174,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
 
         {/* Synopsis (2 lines max) */}
         {item.overview && (
-          <p className="text-[11px] text-white/40 leading-relaxed line-clamp-2">
+          <p className="text-[13px] text-white/40 leading-relaxed line-clamp-2">
             {item.overview}
           </p>
         )}

@@ -53,7 +53,7 @@ const ActorPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#040714] px-8 pt-24">
+      <div className="min-h-screen bg-[var(--color-bg-base)] px-8 pt-24">
         <div className="flex items-end gap-6 mb-10">
           <Skeleton variant="card" className="w-[120px] h-[180px] rounded-xl" />
           <div className="flex-1">
@@ -72,14 +72,14 @@ const ActorPage: React.FC = () => {
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-[#040714] flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-base)] flex items-center justify-center">
         <QueryErrorState error={error as Error} refetch={refetch} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#040714] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--color-bg-base)] text-white overflow-x-hidden">
 
       <div className="relative h-[55vh] overflow-hidden">
 
@@ -106,7 +106,7 @@ const ActorPage: React.FC = () => {
         />
 
         {/* Bottom gradient → body section */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#04071480] to-[#040714]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--color-bg-base)]/50 to-[var(--color-bg-base)]" />
 
         {/* Back button */}
         <button
@@ -143,7 +143,7 @@ const ActorPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-[#040714] pb-16">
+      <div className="bg-[var(--color-bg-base)] pb-16">
 
         {allMeta.length === 0 && (
           <EmptyState

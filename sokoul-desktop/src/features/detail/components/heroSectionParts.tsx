@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next';
 
 // Rating → color coding
 export function ratingColor(r: number): string {
-  if (r >= 7.5) return '#22c55e';
-  if (r >= 6)   return '#f59e0b';
-  return '#ef4444';
+  if (r >= 7.5) return 'var(--color-success)';
+  if (r >= 6)   return 'var(--color-warning)';
+  return 'var(--color-danger)';
 }
 
 // Compact vote count: 12400 → "12.4k"

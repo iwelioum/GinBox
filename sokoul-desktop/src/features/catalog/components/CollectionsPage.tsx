@@ -286,7 +286,7 @@ function CollectionCard({
 
       {/* Subtle bottom gradient */}
       <div className="absolute inset-0 bg-gradient-to-t
-                      from-[#040714]/50 via-transparent to-transparent" />
+                      from-[var(--color-bg-base)]/50 via-transparent to-transparent" />
 
       {/* Text content — genre-styled title */}
       <div className="absolute inset-0 flex flex-col justify-end p-5">
@@ -312,7 +312,7 @@ function CollectionCard({
                         translate-y-1 group-hover:translate-y-0
                         transition-all duration-300">
           {collection.parts_count > 0 && (
-            <span className="text-[11px] text-white/45">
+            <span className="text-[13px] text-white/45">
               {t('collections.filmCount', { count: collection.parts_count })}
             </span>
           )}
