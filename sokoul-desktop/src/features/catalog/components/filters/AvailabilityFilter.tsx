@@ -84,7 +84,7 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
 
       <button
         onClick={() => onChange({ ...filters, watchableNow: !filters.watchableNow })}
-        className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-all text-sm mb-4 ${
+        className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border transition-colors text-sm mb-4 ${
           filters.watchableNow
             ? 'bg-accent text-white border-accent font-medium'
             : 'bg-transparent border-[var(--color-border)] text-text-secondary hover:bg-white/5 hover:text-text-primary'
@@ -106,7 +106,7 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
             const active = filters.availSources.includes(value);
             return (
               <button key={value} onClick={() => toggleAvailSource(value)}
-                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                   active 
                     ? 'bg-accent text-white font-medium' 
                     : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -129,7 +129,7 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
           <div className="flex flex-wrap gap-2">
             {accessTypes.map(({ value, labelKey, icon: AccessIcon }) => (
               <button key={value} onClick={() => onChange({ ...filters, streamingType: value })}
-                className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                className={`inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                   filters.streamingType === value 
                     ? 'bg-accent text-white font-medium' 
                     : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -153,7 +153,7 @@ export const AvailabilityFilter: React.FC<AvailabilityFilterProps> = ({
               const active = filters.selectedProviders.includes(id);
               return (
                 <button key={id} onClick={() => toggleProvider(id)}
-                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border transition-colors duration-200 ${
                     active 
                       ? 'text-white border-transparent' 
                       : 'bg-transparent border-[var(--color-border)] text-text-secondary hover:bg-white/5'

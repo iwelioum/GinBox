@@ -34,7 +34,7 @@ export function SourcesSidebar({
               key={key} onClick={() => setSortBy(key)}
               className={[
                 'flex items-center gap-2 w-full px-2.5 py-[7px] rounded-[7px] border-none',
-                'text-xs cursor-pointer text-left transition-all duration-[120ms] ease-linear',
+                'text-xs cursor-pointer text-left transition-colors duration-[120ms] ease-linear',
                 sortBy === key
                   ? 'bg-white/[0.09] text-white/[0.92] font-bold'
                   : 'bg-transparent text-white/[0.38] font-medium',
@@ -83,7 +83,7 @@ export function SourcesSidebar({
                     className={[
                       'px-2 py-[3px] rounded-[5px] cursor-pointer',
                       'text-xs font-bold tracking-[0.05em] uppercase whitespace-nowrap',
-                      'transition-all duration-[120ms] ease-linear',
+                      'transition-colors duration-[120ms] ease-linear',
                       on
                         ? 'border border-[var(--color-white-30)] bg-[var(--color-border-medium)] text-white/[0.92]'
                         : 'border border-white/[0.07] bg-white/[0.02] text-white/[0.35]',
@@ -125,7 +125,7 @@ export function SourcesSidebar({
           className="flex items-center gap-1.5 px-2.5 py-[7px] rounded-[7px]
                      border border-[var(--color-border-medium)] bg-[var(--color-white-4)]
                      text-white/[0.55] text-[13px] font-semibold cursor-pointer
-                     transition-all duration-[120ms] ease-linear"
+                     transition-colors duration-[120ms] ease-linear"
         >
           <RefreshCw size={12} /> {t('common.refresh')}
         </button>

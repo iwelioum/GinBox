@@ -28,7 +28,7 @@ export const YearRangeFilter: React.FC<FilterSectionProps> = ({ filters, onChang
       </div>
       <div className="flex flex-wrap gap-2">
         <button onClick={() => onChange({ ...filters, yearRange: [YEAR_MIN, YEAR_MAX] })}
-          className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+          className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
             isDefaultYear 
               ? 'bg-accent text-white font-medium' 
               : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -38,7 +38,7 @@ export const YearRangeFilter: React.FC<FilterSectionProps> = ({ filters, onChang
           const active = filters.yearRange[0] === range[0] && filters.yearRange[1] === range[1];
           return (
             <button key={labelKey} onClick={() => applyPreset(range)}
-              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                 active 
                   ? 'bg-accent text-white font-medium' 
                   : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'

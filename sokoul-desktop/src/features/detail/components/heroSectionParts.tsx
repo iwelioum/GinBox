@@ -139,7 +139,7 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
         type="button"
         onClick={onPlay}
         disabled={isPlayLoading}
-        className="group relative h-13 rounded-2xl px-8 overflow-hidden flex items-center gap-3 font-bold text-base text-white active:scale-[0.96] transition-all duration-200 disabled:opacity-60"
+        className="group relative h-13 rounded-2xl px-8 overflow-hidden flex items-center gap-3 font-bold text-base text-white active:scale-[0.96] transition-[transform,opacity,background-color] duration-200 disabled:opacity-60"
         style={{ background: accentColor ?? 'var(--color-accent)', ...playGlow }}
         onMouseEnter={e => {
           if (accentColor)
@@ -164,7 +164,7 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
         type="button"
         onClick={onToggleFavorite}
         disabled={isAddingToList}
-        className="h-13 rounded-2xl px-6 flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/15 text-white/90 font-medium text-sm hover:bg-white/20 active:scale-[0.96] transition-all duration-200 disabled:opacity-60"
+        className="h-13 rounded-2xl px-6 flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/15 text-white/90 font-medium text-sm hover:bg-white/20 active:scale-[0.96] transition-[transform,opacity,background-color] duration-200 disabled:opacity-60"
       >
         {isAddingToList ? (
           <Loader2 size={18} className="animate-spin" />
@@ -182,10 +182,11 @@ export const HeroActions: React.FC<HeroActionsProps> = ({
         onClick={onDownload}
         title={t('common.sources')}
         aria-label={t('common.sources')}
-        className="h-13 w-13 rounded-2xl flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/15 text-white/60 hover:text-white hover:bg-white/20 active:scale-[0.96] transition-all duration-200"
+        className="h-13 w-13 rounded-2xl flex items-center justify-center bg-white/10 backdrop-blur-md border border-white/15 text-white/60 hover:text-white hover:bg-white/20 active:scale-[0.96] transition-[transform,opacity,background-color] duration-200"
       >
         <Download size={19} />
       </button>
     </div>
   );
 };
+

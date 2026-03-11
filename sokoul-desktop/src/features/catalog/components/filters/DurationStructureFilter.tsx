@@ -54,7 +54,7 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onChange({ ...filters, movieRuntimeRange: null })}
-              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                 filters.movieRuntimeRange === null 
                   ? 'bg-accent text-white font-medium' 
                   : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -65,7 +65,7 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
               const count  = allItems.filter((i) => i._movieRuntime !== null && i._movieRuntime >= range[0] && i._movieRuntime <= range[1]).length;
               return (
                 <button key={labelKey} onClick={() => toggleRange('movieRuntimeRange', range)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-all min-w-[86px] border ${
+                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-colors min-w-[86px] border ${
                     active 
                       ? 'bg-accent text-white border-accent' 
                       : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
@@ -92,7 +92,7 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onChange({ ...filters, seasonsRange: null })}
-              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                 filters.seasonsRange === null 
                   ? 'bg-accent text-white font-medium' 
                   : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -103,7 +103,7 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
               const count  = allItems.filter((i) => i._seasonCount !== null && i._seasonCount >= range[0] && i._seasonCount <= range[1]).length;
               return (
                 <button key={labelKey} onClick={() => toggleRange('seasonsRange', range)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-all min-w-[86px] border ${
+                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-colors min-w-[86px] border ${
                     active 
                       ? 'bg-accent text-white border-accent' 
                       : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
@@ -130,7 +130,7 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
           </p>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => onChange({ ...filters, episodeRtRange: null })}
-              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                 filters.episodeRtRange === null 
                   ? 'bg-accent text-white font-medium' 
                   : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -141,7 +141,7 @@ export const DurationStructureFilter: React.FC<DurationStructureFilterProps> = (
               const count  = allItems.filter((i) => i._episodeRuntime !== null && i._episodeRuntime >= range[0] && i._episodeRuntime <= range[1]).length;
               return (
                 <button key={labelKey} onClick={() => toggleRange('episodeRtRange', range)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-all min-w-[86px] border ${
+                  className={`flex flex-col items-start px-3 py-2 rounded-full transition-colors min-w-[86px] border ${
                     active 
                       ? 'bg-accent text-white border-accent' 
                       : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'

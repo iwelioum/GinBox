@@ -60,7 +60,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
               if (count === 0) return null;
               return (
                 <button key={value} onClick={() => toggleStatus(value)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-full text-sm font-medium transition-all min-w-[110px] border ${
+                  className={`flex flex-col items-start px-3 py-2 rounded-full text-sm font-medium transition-colors min-w-[110px] border ${
                     active 
                       ? 'bg-accent text-white border-accent' 
                       : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
@@ -92,7 +92,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
               const ProgressIcon = USER_STATUS_ICONS[value];
               return (
                 <button key={value} onClick={() => toggleUserStatus(value)}
-                  className={`flex flex-col items-start px-3 py-2 rounded-full text-sm font-medium transition-all min-w-[130px] border ${
+                  className={`flex flex-col items-start px-3 py-2 rounded-full text-sm font-medium transition-colors min-w-[130px] border ${
                     active 
                       ? 'bg-accent text-white border-accent' 
                       : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5'
@@ -126,7 +126,7 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
                     </span>
                     <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-500 rounded-full transition-all"
+                        className="h-full bg-blue-500 rounded-full transition-[width]"
                         style={{ width: `${item._userProgress}%` }}
                       />
                     </div>
@@ -150,3 +150,4 @@ export const StatusProgressFilter: React.FC<StatusProgressFilterProps> = ({
     </section>
   );
 };
+

@@ -158,7 +158,7 @@ export default function CollectionsPage() {
                          bg-white/[0.06] border border-white/[0.08]
                          text-white/80 text-sm placeholder:text-white/30
                          focus:outline-none focus:border-white/20
-                         focus:bg-white/[0.08] transition-all duration-200"
+                         focus:bg-white/[0.08] transition-colors duration-200"
             />
           </div>
         </div>
@@ -171,7 +171,7 @@ export default function CollectionsPage() {
               onClick={() => setActiveCategory(cat.key)}
               className={`
                 flex-shrink-0 px-4 py-1.5 rounded-full text-xs
-                font-medium transition-all duration-200
+                font-medium transition-colors duration-200
                 ${activeCategory === cat.key
                   ? 'bg-white text-black'
                   : 'bg-white/[0.07] text-white/55 border border-white/[0.08] hover:bg-white/[0.12] hover:text-white/80'}
@@ -244,7 +244,7 @@ function CollectionCard({
       onClick={onClick}
       className="relative rounded-2xl overflow-hidden cursor-pointer
                  group text-left ring-1 ring-white/[0.07]
-                 hover:ring-white/25 transition-all duration-300"
+                 hover:ring-white/25 transition-[ring-color,box-shadow] duration-300"
       style={{ aspectRatio: '21/9' }}
     >
       {backdrop ? (
@@ -310,7 +310,7 @@ function CollectionCard({
         <div className="flex items-center gap-3
                         opacity-0 group-hover:opacity-100
                         translate-y-1 group-hover:translate-y-0
-                        transition-all duration-300">
+                        transition-[transform,opacity] duration-300">
           {collection.parts_count > 0 && (
             <span className="text-[13px] text-white/45">
               {t('collections.filmCount', { count: collection.parts_count })}

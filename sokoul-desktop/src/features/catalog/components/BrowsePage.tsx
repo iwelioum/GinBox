@@ -173,7 +173,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
 
           {/* Loading state */}
           {isLoading && rawItems.length === 0 && (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 transition-all duration-300">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3">
               {Array.from({ length: 28 }).map((_, i) => (
                 <div key={i} className="aspect-[2/3] rounded-lg bg-[--color-bg-elevated] animate-pulse" />
               ))}
@@ -195,7 +195,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             <>
               <div
                 ref={resultsSectionRef}
-                className="grid scroll-mt-24 grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 transition-all duration-300"
+                className="grid scroll-mt-24 grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3"
               >
                 {filteredItems.map((item) => (
                   <ContentCard
@@ -220,7 +220,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
                   <button
                     onClick={() => setLoadedPages((p) => p + MORE_PAGES)}
                     disabled={isLoading}
-                    className="px-8 py-3 rounded-full border border-[--color-border] text-sm text-[--color-text-secondary] hover:border-[--color-accent] hover:text-[--color-accent] transition-all disabled:opacity-40"
+                    className="px-8 py-3 rounded-full border border-[--color-border] text-sm text-[--color-text-secondary] hover:border-[--color-accent] hover:text-[--color-accent] transition-colors disabled:opacity-40"
                   >
                     {isLoading ? t('common.loading') : t('browse.loadMore')}
                   </button>
@@ -234,7 +234,7 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             <div className="mt-4 flex justify-center">
               <button
                 onClick={() => setLoadedPages((p) => p + MORE_PAGES)}
-                className="px-8 py-3 rounded-full border border-[--color-border] text-sm text-[--color-text-secondary] hover:border-[--color-accent] hover:text-[--color-accent] transition-all"
+                className="px-8 py-3 rounded-full border border-[--color-border] text-sm text-[--color-text-secondary] hover:border-[--color-accent] hover:text-[--color-accent] transition-colors"
               >
                 {t('browse.loadMoreTitles')}
               </button>
@@ -262,3 +262,4 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     </div>
   );
 }
+

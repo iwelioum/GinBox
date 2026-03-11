@@ -34,7 +34,7 @@ export const RatingPopularityFilter: React.FC<RatingPopularityFilterProps> = ({
             const count  = allItems.filter((i) => min === 0 ? true : (i._rating !== null && i._rating >= min)).length;
             return (
               <button key={min} onClick={() => onChange({ ...filters, ratingMin: min })}
-                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                   active 
                     ? 'bg-accent text-white font-medium' 
                     : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -81,7 +81,7 @@ export const RatingPopularityFilter: React.FC<RatingPopularityFilterProps> = ({
             const active = filters.votesMin === min;
             return (
               <button key={min} title={t(tooltipKey)} onClick={() => onChange({ ...filters, votesMin: min })}
-                className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap ${
+                className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 whitespace-nowrap ${
                   active 
                     ? 'bg-accent text-white font-medium' 
                     : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -107,7 +107,7 @@ export const RatingPopularityFilter: React.FC<RatingPopularityFilterProps> = ({
             const active = filters.popularityTopN === topN;
             return (
               <button key={labelKey} onClick={() => onChange({ ...filters, popularityTopN: topN })}
-                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                   active 
                     ? 'bg-accent text-white font-medium' 
                     : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'

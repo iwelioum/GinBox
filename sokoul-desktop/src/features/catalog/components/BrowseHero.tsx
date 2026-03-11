@@ -172,13 +172,13 @@ export function BrowseHero({ items, onPlay, onInfo }: BrowseHeroProps) {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => onPlay(current)}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-white text-black text-sm font-bold hover:bg-white/90 transition-all"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-white text-black text-sm font-bold hover:bg-white/90 transition-colors"
               >
                 <PlayCircle size={17} /> {t('common.watch')}
               </button>
               <button
                 onClick={() => onInfo(current)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/25 bg-black/30 text-white text-sm font-semibold hover:bg-white/10 hover:border-white/50 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/25 bg-black/30 text-white text-sm font-semibold hover:bg-white/10 hover:border-white/50 transition-colors"
               >
                 <Plus size={17} /> {t('common.moreInfo')}
               </button>
@@ -194,7 +194,7 @@ export function BrowseHero({ items, onPlay, onInfo }: BrowseHeroProps) {
             <button
               key={i}
               onClick={() => { setIdx(i); setPaused(true); }}
-              className="rounded-full transition-all duration-300"
+              className="rounded-full transition-[width,background-color] duration-300"
               style={{
                 width:      i === safeIdx ? 20 : 6,
                 height:     6,
@@ -207,3 +207,4 @@ export function BrowseHero({ items, onPlay, onInfo }: BrowseHeroProps) {
     </section>
   );
 }
+
