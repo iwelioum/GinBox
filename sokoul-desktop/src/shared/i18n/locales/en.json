@@ -675,5 +675,9 @@
     "short": "Short film",
     "reality": "Reality TV",
     "special": "Special"
+  },
+  "error": {
+    "queryFailed": "Failed to load data",
+    "retry": "Retry"
   }
 }

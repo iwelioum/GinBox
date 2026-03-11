@@ -10,9 +10,11 @@ import { ChevronLeft, Film } from 'lucide-react';
 import { endpoints } from '@/shared/api/client';
 import { useAmbientColor } from '../../../shared/hooks/useAmbientColor';
 import { ContentRail } from './ContentRail';
-import { Spinner } from '../../../shared/components/ui/Spinner';
+import { Skeleton } from '../../../shared/components/ui/Skeleton';
 import { Button } from '../../../shared/components/ui/Button';
 import { EmptyState } from '../../../shared/components/ui/EmptyState';
+import { QueryErrorState } from '../../../shared/components/ui/QueryErrorState';
+import { useKidsFilter } from '@/shared/hooks/useKidsFilter';
 import type { CatalogMeta } from '../../../shared/types/index';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
 
@@ -28,13 +30,14 @@ const ActorPage: React.FC = () => {
   const location = useLocation();
   const state = (location.state ?? {}) as ActorLocationState;
 
-  const { data, isLoading, error } = useQuery<{ metas: CatalogMeta[] }>({
+  const { data, isLoading, isError, error, refetch } = useQuery<{ metas: CatalogMeta[] }>({
     queryKey: ['personMovies', id],
     queryFn:  () => endpoints.catalog.getPersonMovies(id!).then((r) => r.data),
     enabled:  !!id,
     staleTime: 5 * 60 * 1000,
   });
 
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
   const name        = state.name ?? t('actor.fallbackName');
   const profilePath = state.profilePath;
   const profileUrl  = profilePath
@@ -44,24 +47,33 @@ const ActorPage: React.FC = () => {
   // Ambient color — backdrop generated from the profile photo
   const ambientColor = useAmbientColor(profileUrl);
 
-  // Partition movies / series
-  const movies  = data?.metas.filter((m) => (m.type || m.media_type) === 'movie')  ?? [];
-  const series  = data?.metas.filter((m) => (m.type || m.media_type) !== 'movie')  ?? [];
-  const allMeta = data?.metas ?? [];
+  const allMeta = filterForKids(data?.metas ?? []);
+  const movies  = allMeta.filter((m) => (m.type || m.media_type) === 'movie');
+  const series  = allMeta.filter((m) => (m.type || m.media_type) !== 'movie');
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#040714] flex items-center justify-center">
-        <Spinner size={48} />
+      <div className="min-h-screen bg-[#040714] px-8 pt-24">
+        <div className="flex items-end gap-6 mb-10">
+          <Skeleton variant="card" className="w-[120px] h-[180px] rounded-xl" />
+          <div className="flex-1">
+            <Skeleton variant="text" width="260px" height="40px" className="mb-3" />
+            <Skeleton variant="text" width="140px" height="16px" />
+          </div>
+        </div>
+        <div className="flex gap-3">
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} variant="poster" />
+          ))}
+        </div>
       </div>
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
-      <div className="min-h-screen bg-[#040714] flex flex-col items-center justify-center text-white/60 gap-4">
-        <p>{t('actor.unableToLoad')}</p>
-        <Button variant="secondary" onClick={() => navigate(-1)}>{t('actor.back')}</Button>
+      <div className="min-h-screen bg-[#040714] flex items-center justify-center">
+        <QueryErrorState error={error as Error} refetch={refetch} />
       </div>
     );
   }

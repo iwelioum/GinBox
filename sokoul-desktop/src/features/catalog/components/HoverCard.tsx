@@ -40,7 +40,7 @@ export const HoverCard: React.FC<HoverCardProps> = ({
   }, []);
 
   const contentType: ContentType = (item.type === 'tv' ? 'series' : item.type) as ContentType;
-  const { data: videos } = useQuery({
+  const { data: videos, isError: videoError } = useQuery({
     queryKey: ['catalogMeta', contentType, String(item.id)],
     queryFn: () => endpoints.catalog.getMeta(contentType, String(item.id)).then(r => r.data),
     enabled: trailerReady,

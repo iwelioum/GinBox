@@ -31,7 +31,7 @@ export function EditorialCard({
   const tmdbId     = item.id.includes(':') ? item.id.split(':').pop()! : item.id;
   const fanartType = (item.type === 'series' ? 'tv' : 'movie') as 'movie' | 'tv';
 
-  const { data: fanartData } = useQuery({
+  const { data: fanartData, isError: fanartError } = useQuery({
     queryKey:  ['fanart-editorial', sectionId, fanartType, tmdbId],
     queryFn:   () => endpoints.fanart.get(fanartType, tmdbId).then(r => r.data),
     enabled:   hovered && !!tmdbId,

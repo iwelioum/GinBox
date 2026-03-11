@@ -8,25 +8,45 @@ import { useTranslation }         from 'react-i18next';
 import { ArrowLeft, Play }        from 'lucide-react';
 import { endpoints }              from '@/shared/api/client';
 import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
+import { Skeleton }               from '@/shared/components/ui/Skeleton';
+import { QueryErrorState }        from '@/shared/components/ui/QueryErrorState';
+import { useKidsFilter }          from '@/shared/hooks/useKidsFilter';
+import type { CatalogMeta }       from '@/shared/types';
 
 export default function CollectionDetailPage() {
   const { id }   = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t }    = useTranslation();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['collection', id],
     queryFn:  () => endpoints.collections.getById(id!).then(r => r.data),
     enabled:  !!id,
     staleTime: 10 * 60_000,
   });
 
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center"
+      <div className="min-h-screen pt-24 px-12"
            style={{ backgroundColor: 'var(--bg-abyss)' }}>
-        <div className="w-8 h-8 border-2 border-white/20
-                        border-t-white/80 rounded-full animate-spin" />
+        <Skeleton variant="text" className="h-10 w-64 mb-4" />
+        <Skeleton variant="text" className="h-5 w-96 mb-8" />
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} variant="poster" className="aspect-[2/3] rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center pt-24"
+           style={{ backgroundColor: 'var(--bg-abyss)' }}>
+        <QueryErrorState error={error as Error} refetch={refetch} />
       </div>
     );
   }
@@ -50,6 +70,11 @@ export default function CollectionDetailPage() {
   const backdrop = data.backdrop_path
     ? `${TMDB_IMAGE_BASE}original${data.backdrop_path}`
     : null;
+
+  const filteredParts = React.useMemo(
+    () => filterForKids(data.parts ?? []),
+    [data.parts, filterForKids],
+  );
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-abyss)' }}>
@@ -82,7 +107,7 @@ export default function CollectionDetailPage() {
             {data.name}
           </h1>
           <p className="text-white/45 text-sm">
-            {t('collectionDetail.filmsInSaga', { count: data.parts?.length ?? 0 })}
+            {t('collectionDetail.filmsInSaga', { count: filteredParts.length })}
           </p>
         </div>
       </div>
@@ -103,9 +128,9 @@ export default function CollectionDetailPage() {
           {t('collectionDetail.allFilms')}
         </h2>
 
-        {data.parts && data.parts.length > 0 ? (
+        {filteredParts.length > 0 ? (
           <div className="grid grid-cols-4 xl:grid-cols-5 gap-4">
-            {[...data.parts]
+            {[...filteredParts]
               .sort((a, b) => (a.year ?? 0) - (b.year ?? 0))
               .map(film => (
                 <button

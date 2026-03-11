@@ -23,6 +23,7 @@ import { BrowseFiltersBar }         from './BrowseFiltersBar';
 import { ContentSection }           from './ContentSection';
 import { EmptyBrowseState }         from './EmptyBrowseState';
 import { FilterDrawer }             from './FilterDrawer';
+import { QueryErrorState }          from '@/shared/components/ui/QueryErrorState';
 
 /* ═══════════════════════════════════════════════════════════
    BrowsePage — main page component (composes sub-components)
@@ -48,6 +49,8 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
     availabilityItems,
     activeFiltersCount,
     isLoading,
+    isError,
+    refetch,
     rawItems,
     playbackHistoryMap,
     activeProfile,
@@ -177,8 +180,13 @@ export default function BrowsePage({ mode = 'all' }: { mode?: BrowsePageMode }) 
             </div>
           )}
 
+          {/* Error state */}
+          {isError && !isLoading && rawItems.length === 0 && (
+            <QueryErrorState error={null} refetch={refetch} />
+          )}
+
           {/* Empty state */}
-          {!isLoading && filteredItems.length === 0 && (
+          {!isLoading && !isError && filteredItems.length === 0 && (
             <EmptyBrowseState mode={mode} onReset={setScopedFilters} />
           )}
 

@@ -6,6 +6,7 @@ import { ChevronLeft, AlertTriangle, RefreshCw, Bug, Zap, Filter } from 'lucide-
 import { client, endpoints } from '@/shared/api/client';
 import { Spinner } from '@/shared/components/ui/Spinner';
 import { EmptyState } from '@/shared/components/ui/EmptyState';
+import { QueryErrorState } from '@/shared/components/ui/QueryErrorState';
 import { ResumeModal } from '@/shared/components/modals/ResumeModal';
 import type { CatalogMeta, ContentType, Source } from '@/shared/types/index';
 import { useLogStore } from '@/stores/logStore';
@@ -37,7 +38,7 @@ export default function SourcesPage() {
   const { activeProfile } = useProfileStore();
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { data: meta } = useQuery<CatalogMeta>({
+  const { data: meta, isError: metaError, error: metaErr, refetch: metaRefetch } = useQuery<CatalogMeta>({
     queryKey: ['catalogMeta', type, id],
     queryFn: () => endpoints.catalog.getMeta(type!, id!).then(r => r.data),
     enabled: !!type && !!id, staleTime: 5 * 60 * 1000,
@@ -128,6 +129,8 @@ export default function SourcesPage() {
           <Spinner size={48} />
           <p className="text-white/50 text-[14px]">{isForceRefresh ? t('sources.searchingNew') : t('sources.searchingBest')}</p>
         </div>
+      ) : metaError ? (
+        <QueryErrorState error={metaErr as Error} refetch={metaRefetch} className="flex-1" />
       ) : fetchError ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-[14px] text-center px-8">
           <AlertTriangle size={40} className="text-red-400" />

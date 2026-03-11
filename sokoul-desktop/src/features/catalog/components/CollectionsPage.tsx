@@ -12,6 +12,8 @@ import { TMDB_IMAGE_BASE }       from '@/shared/constants/tmdb';
 import { getGenreStyleByKey }     from '@/shared/config/genreTypography';
 import { Spinner }                from '@/shared/components/ui/Spinner';
 import { EmptyState }             from '@/shared/components/ui/EmptyState';
+import { QueryErrorState }        from '@/shared/components/ui/QueryErrorState';
+import { Skeleton }               from '@/shared/components/ui/Skeleton';
 
 const CATEGORIES = [
   { key: 'all',     labelKey: 'collections.categoryAll' },
@@ -49,6 +51,9 @@ export default function CollectionsPage() {
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    isError,
+    error,
+    refetch,
   } = useInfiniteQuery({
     queryKey:  ['collections', 'all'],
     queryFn:   ({ pageParam = 1 }) =>
@@ -102,14 +107,24 @@ export default function CollectionsPage() {
 
   if (isLoading) {
     return (
+      <div className="min-h-screen px-8 pt-24"
+           style={{ backgroundColor: 'var(--bg-abyss)' }}>
+        <Skeleton variant="text" width="200px" height="28px" className="mb-2" />
+        <Skeleton variant="text" width="140px" height="16px" className="mb-8" />
+        <div className="grid grid-cols-2 gap-4">
+          {Array.from({ length: 6 }, (_, i) => (
+            <Skeleton key={i} width="100%" height="0" className="aspect-[21/9] rounded-2xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
       <div className="min-h-screen flex items-center justify-center"
            style={{ backgroundColor: 'var(--bg-abyss)' }}>
-        <div className="flex flex-col items-center gap-3">
-          <Spinner size={32} />
-          <span className="text-white/40 text-sm">
-            {t('collections.loading')}
-          </span>
-        </div>
+        <QueryErrorState error={error as Error} refetch={refetch} />
       </div>
     );
   }

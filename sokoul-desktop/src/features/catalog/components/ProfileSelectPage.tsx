@@ -9,7 +9,7 @@ import { endpoints } from '@/shared/api/client'
 import { useProfileStore } from '@/stores/profileStore'
 import { useToast } from '@/shared/hooks/useToast'
 import { TitleBar } from '@/shared/components/layout/TitleBar'
-import { Skeleton } from '@/shared/components/ui'
+import { Skeleton, QueryErrorState } from '@/shared/components/ui'
 import { ProfileCard } from './ProfileCard'
 import { AddProfileButton } from './AddProfileButton'
 import { ProfileForm } from './ProfileForm'
@@ -27,7 +27,7 @@ export default function ProfileSelectPage() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingProfile, setEditingProfile] = useState<Profile | null>(null)
 
-  const { data: profiles = [], isLoading } = useQuery<Profile[]>({
+  const { data: profiles = [], isLoading, isError, error, refetch } = useQuery<Profile[]>({
     queryKey: ['profiles'],
     queryFn: () => endpoints.profiles.list().then((r) => r.data),
   })
@@ -77,6 +77,11 @@ export default function ProfileSelectPage() {
           <p className="text-[var(--color-text-secondary)] text-base mb-8">
             {t('profile.manageProfiles')}
           </p>
+        )}
+
+        {/* Error state */}
+        {isError && !isLoading && (
+          <QueryErrorState error={error} refetch={refetch} className="mb-8" />
         )}
 
         {/* Profile grid */}

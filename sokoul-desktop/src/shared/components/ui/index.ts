@@ -21,5 +21,8 @@ export { Tabs } from './Tabs';
 export { Toggle } from './Toggle';
 export type { ToggleProps } from './Toggle';
 
+export { QueryErrorState } from './QueryErrorState';
+export type { QueryErrorStateProps } from './QueryErrorState';
+
 export { ToastContainer } from './Toast';
 export type { ToastData } from './Toast';

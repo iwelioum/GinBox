@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
 import { TMDB_IMAGE_BASE } from '@/shared/constants/tmdb';
+import { useKidsFilter } from '@/shared/hooks/useKidsFilter';
 
 interface SimilarSectionProps {
   items?: CatalogMeta[];
@@ -16,8 +17,12 @@ interface SimilarSectionProps {
 export const SimilarSection: React.FC<SimilarSectionProps> = ({ items, theme: _theme }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { filterForKids } = useKidsFilter<CatalogMeta>();
 
-  const displayed = items?.slice(0, 8) ?? [];
+  const displayed = React.useMemo(
+    () => filterForKids(items ?? []).slice(0, 8),
+    [items, filterForKids],
+  );
   if (displayed.length === 0) return null;
 
   return (

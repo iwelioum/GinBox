@@ -39,6 +39,8 @@ export interface BrowseData {
   availabilityItems:  EnrichedItem[];
   activeFiltersCount: number;
   isLoading:          boolean;
+  isError:            boolean;
+  refetch:            () => void;
   rawItems:           CatalogMeta[];
   playbackHistoryMap: Map<string, PlaybackEntry>;
   userProgressMap:    Map<string, UserProgressEntry>;
@@ -114,6 +116,8 @@ export function useBrowseData(
 
   const results   = useQueries({ queries });
   const isLoading = results.some((r) => r.isLoading);
+  const isError   = results.some((r) => r.isError);
+  const refetch   = React.useCallback(() => results.forEach((r) => r.refetch()), [results]);
 
   const rawItems = React.useMemo(() => {
     const all: CatalogMeta[] = [];
@@ -234,6 +238,8 @@ export function useBrowseData(
     availabilityItems,
     activeFiltersCount,
     isLoading,
+    isError,
+    refetch,
     rawItems,
     playbackHistoryMap,
     userProgressMap,

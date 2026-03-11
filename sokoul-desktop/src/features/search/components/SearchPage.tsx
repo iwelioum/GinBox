@@ -8,8 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Search as SearchIcon, Clock, X, TrendingUp } from 'lucide-react';
 import { endpoints } from '@/shared/api/client';
 import { ContentCard } from '@/features/catalog/components/ContentCard';
-import { Spinner } from '../../../shared/components/ui/Spinner';
+import { Skeleton } from '../../../shared/components/ui/Skeleton';
 import { EmptyState } from '../../../shared/components/ui/EmptyState';
+import { QueryErrorState } from '../../../shared/components/ui/QueryErrorState';
 import { useSearchHistory } from '@/shared/hooks/useSearchHistory';
 import { useKidsFilter } from '@/shared/hooks/useKidsFilter';
 import { useCatalogStore } from '@/features/catalog/store/catalog.store';
@@ -53,7 +54,7 @@ export default function SearchPage() {
     }
   }, [debouncedQuery, setSearchParams]);
 
-  const { data, isLoading } = useQuery<{ metas: CatalogMeta[] }>({
+  const { data, isLoading, isError, error, refetch } = useQuery<{ metas: CatalogMeta[] }>({
     queryKey: ['search', 'multi', debouncedQuery],
     queryFn: () => endpoints.catalog.search(debouncedQuery, 'multi').then((r) => r.data),
     enabled: !!debouncedQuery,
@@ -141,11 +142,25 @@ export default function SearchPage() {
         )}
       </div>
 
-      {/* Loading */}
+      {/* Loading skeleton */}
       {isLoading && (
-        <div className="flex justify-center items-center h-64">
-          <Spinner size={48} />
+        <div
+          className="max-w-4xl mx-auto"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+            gap: '1.5rem',
+          }}
+        >
+          {Array.from({ length: 10 }, (_, i) => (
+            <Skeleton key={i} variant="card" />
+          ))}
         </div>
+      )}
+
+      {/* Error state */}
+      {isError && !isLoading && (
+        <QueryErrorState error={error} refetch={refetch} className="mt-16" />
       )}
 
       {/* Empty state — show history or search hint */}

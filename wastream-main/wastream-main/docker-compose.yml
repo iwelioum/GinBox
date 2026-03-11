@@ -1,0 +1,20 @@
+services:
+  wastream:
+    image: dyhlio/wastream:latest
+    container_name: wastream
+    ports:
+      - "7000:7000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - SECRET_KEY=your-secret-key-min-32-chars
+      - ADMIN_PASSWORD=your-admin-password-here
+      - WAWACITY_URL=https://example.com
+      - FREE_TELECHARGER_URL=https://example.com
+      - DARKI_API_URL=https://api.example.com
+      - DARKI_API_KEY=your_api_key_here
+      - MOVIX_URL=https://example.com
+      - WEBSHARE_URL=https://example.com
+      - DATABASE_TYPE=sqlite
+      - DATABASE_PATH=/app/data/wastream.db
+    restart: unless-stopped

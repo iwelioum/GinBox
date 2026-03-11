@@ -157,7 +157,7 @@ export const StatsSection: React.FC<StatsSectionProps> = (props) => {
     return () => obs.disconnect();
   }, []);
 
-  const { data: trakt } = useQuery({
+  const { data: trakt, isError: traktError } = useQuery({
     queryKey:  ['trakt-reviews', type, id],
     queryFn:   () => endpoints.trakt.getReviews(type, id).then(r => r.data),
     enabled:   !!type && !!id,

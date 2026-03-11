@@ -675,5 +675,9 @@
     "short": "Court métrage",
     "reality": "Téléréalité",
     "special": "Spécial"
+  },
+  "error": {
+    "queryFailed": "Échec du chargement des données",
+    "retry": "Réessayer"
   }
 }
