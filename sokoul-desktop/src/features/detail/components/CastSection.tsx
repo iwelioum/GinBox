@@ -13,7 +13,7 @@ interface CastCardProps {
 
 const CastCard: React.FC<CastCardProps> = ({ person }) => {
   const navigate = useNavigate();
-  const photoUrl = person.profile_path || person.profilePath || null;
+  const photoUrl = person.profile_path || null;
 
   return (
     <div

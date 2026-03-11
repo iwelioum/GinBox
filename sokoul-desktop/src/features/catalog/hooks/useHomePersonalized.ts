@@ -60,8 +60,6 @@ export function useHomePersonalized(
         name: li.title,
         poster: li.posterUrl,
         poster_path: li.posterUrl,
-        backdrop_path: li.backdropUrl,
-        vote_average: li.rating,
       }));
   }, [favItems]);
 

@@ -102,10 +102,7 @@ export default function MyListsPage() {
                   type:        item.contentType,
                   name:        item.title,
                   poster:      item.posterUrl,
-                  background:  item.backdropUrl,
                   description: '',
-                  year:        item.year,
-                  imdbRating:  item.rating,
                 }
                 return (
                   <div

@@ -21,16 +21,12 @@ pub async fn search_prowlarr(
         ContentType::Series => "5000",
     };
 
-    let url = format!(
-        "{}/api/v1/search?query={}&categories={}&limit=50",
-        state.prowlarr_url,
-        query,
-        categories
-    );
+    let base_url = format!("{}/api/v1/search", state.prowlarr_url);
 
     let response = state
         .http_client
-        .get(&url)
+        .get(&base_url)
+        .query(&[("query", query), ("categories", categories), ("limit", "50")])
         .header("X-Api-Key", &state.prowlarr_key)
         .send()
         .await

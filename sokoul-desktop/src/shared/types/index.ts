@@ -9,13 +9,13 @@ declare module 'react' {
 /** Media type discriminator used throughout the app to branch API calls, routing, and UI rendering between movies and series. */
 export type ContentType = 'movie' | 'series' | 'tv';
 
-/** Actor/crew entry from TMDB credits; dual path fields (profile_path, profilePath) accommodate inconsistent backend normalization. */
+/** Actor/crew entry from TMDB credits; backend always sends profile_path (via serde rename). */
 export interface CastMember {
   id: number;
   name: string;
-  character: string;
+  character?: string;
   profile_path?: string;
-  profilePath?: string; // Fallback
+  order?: number;
 }
 
 /** Wrapper for cast data returned by the TMDB credits endpoint, consumed by the detail page's cast carousel. */
@@ -197,11 +197,12 @@ export interface UserList {
   name: string;
   listType: 'favorites' | 'watchlist' | 'custom';
   isDefault: boolean;
+  traktListId?: string;
   createdAt: number;
   updatedAt: number;
 }
 
-/** An entry in a user list, storing enough metadata (poster, year, rating) to render cards without refetching from TMDB. */
+/** An entry in a user list; fields match the backend ListItem model (no backdropUrl/year/rating — those are not returned by the API). */
 export interface ListItem {
   id: number;
   listId: number;
@@ -209,9 +210,7 @@ export interface ListItem {
   contentType: ContentType;
   title: string;
   posterUrl?: string;
-  backdropUrl?: string;
-  year?: number;
-  rating?: number;
+  sortOrder: number;
   addedAt: number;
 }
 
