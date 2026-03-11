@@ -313,3 +313,32 @@ Before marking any task complete, agents must verify:
 - [ ] Naming conventions respected
 - [ ] UI visually consistent with existing pages
 - [ ] No regressions introduced
+
+---
+
+# LEARNED RULES (from agent sessions)
+
+## Session 0-1 — Foundation
+- "Never pass Function/Map/Set in `navigate()` state — structuredClone crashes"
+- "`parseTorrentName()` returns quality values: '2160p','1080p','720p','480p','4K','4k','UHD' — do not invent others"
+- "All backend providers already run in parallel via `tokio::join!` in stream.rs"
+- "PreferencesStore uses localStorage (`sokoul_stream_preferences`), NOT backend preferences.rs"
+- "Profile.id is `number`, not string"
+
+## Session 2 — Component Splits
+- "Components > 300 lines must be split into sub-components with focused responsibilities"
+- "MPV speed control: `window.mpv.command({ command: ['set_property', 'speed', rate] })`"
+- "All icon-only buttons in ControlsBar require `aria-label` — always add when creating new ones"
+
+## Session 3 — Performance & Consistency
+- "`parseTorrentName()` must ALWAYS be wrapped in `useMemo([source.title])` — it's an expensive regex parser"
+- "EmptyState from `shared/components/ui` is the standard — never use inline div empty states"
+- "Spinner from `shared/components/ui` is the standard — never create custom CSS spinners"
+- "Kids filter uses genre_ids (fail-open: no genres = include). Applied in: HomePage, BrowsePage, SearchPage, useHomePersonalized"
+- "`useKidsFilter<T>()` hook wraps profileStore.isKids for reusability"
+
+## Session 4 — i18n & Cleanup
+- "All UI text must use `t()` from react-i18next — no hardcoded English/French strings"
+- "Error handling must use toast() from useToast — never console.error for user-facing errors"
+- "Fanart queries have `staleTime: Infinity` — this is correct, fanart data never changes"
+- "Type-only re-exports (e.g. `BadgeProps`) should not be in barrel index.ts unless consumed externally"
