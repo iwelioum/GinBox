@@ -79,3 +79,43 @@
 @media (max-width: 768px) {
   .scroll-btn { display: none !important; }
 }
+
+/* ── Detail page premium animations ────────────────────────────────────── */
+
+@keyframes section-reveal {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.section-reveal {
+  animation: section-reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes accent-glow-pulse {
+  0%, 100% { opacity: 0.06; }
+  50%      { opacity: 0.12; }
+}
+
+.accent-glow-pulse {
+  animation: accent-glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes shine-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%);  }
+}
+
+@keyframes blur-in {
+  from { opacity: 0; filter: blur(8px); transform: translateY(12px); }
+  to   { opacity: 1; filter: blur(0);   transform: translateY(0);    }
+}
+
+.blur-in {
+  animation: blur-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Synopsis gradient mask for "read more" fade */
+.synopsis-mask {
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}

@@ -1,9 +1,10 @@
 // components/detail/HeroSection.tsx
-// Cinematic hero — staggered animations · dynamic accent glow · premium badges
+// Cinematic hero — Framer Motion stagger · accent glow · premium typography
 
 import * as React from 'react';
 import { ChevronDown, ChevronUp, Tv2, Film } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import type { CatalogMeta } from '../../../shared/types/index';
 import type { GenreTheme } from '../../../shared/utils/genreTheme';
 import { resolveLogoOrTitle } from '@/shared/utils/logoUtils';
@@ -23,47 +24,25 @@ interface HeroSectionProps {
   onToggleFavorite?: () => void;
 }
 
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20, filter: 'blur(6px)' },
+  visible: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
 export const HeroSection: React.FC<HeroSectionProps> = ({
-  item, theme: _theme, logoUrl, backdropUrl,
+  item, theme: _theme, logoUrl, backdropUrl: _backdropUrl,
   isFavorite = false, isAddingToList = false,
   isPlayLoading = false, accentColor,
   onPlay, onDownload, onToggleFavorite,
 }) => {
   const { t } = useTranslation();
-
-  // Staggered visibility states
-  const [logoReady,    setLogoReady]    = React.useState(false);
-  const [metaReady,    setMetaReady]    = React.useState(false);
-  const [synopsisReady,setSynopsisReady]= React.useState(false);
-  const [btnsReady,    setBtnsReady]    = React.useState(false);
   const [synopsisExpanded, setSynopsisExpanded] = React.useState(false);
 
-  const sectionRef = React.useRef<HTMLElement>(null);
-
-  React.useEffect(() => {
-    setLogoReady(false); setMetaReady(false);
-    setSynopsisReady(false); setBtnsReady(false); setSynopsisExpanded(false);
-
-    const t1 = setTimeout(() => setLogoReady(true),     200);
-    const t2 = setTimeout(() => setMetaReady(true),     380);
-    const t3 = setTimeout(() => setSynopsisReady(true), 520);
-    const t4 = setTimeout(() => setBtnsReady(true),     640);
-    return () => {
-      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4);
-    };
-  }, [item.id]);
-
-  // Parallax scroll
-  React.useEffect(() => {
-    const el = sectionRef.current;
-    if (!el || !backdropUrl) return;
-    const onScroll = () =>
-      el.style.setProperty('--parallax-y', `${window.scrollY * 0.3}px`);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [backdropUrl]);
-
-  // Data derivations
   const title        = item.title || item.name || '';
   const year         = (item.release_date || item.first_air_date || item.releaseInfo || '').toString().slice(0, 4);
   const runtime      = item.runtime ? `${Math.floor(item.runtime / 60)}h ${item.runtime % 60}m` : '';
@@ -77,65 +56,57 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const seriesStatus = item.status;
   const accent       = accentColor ?? 'var(--color-accent)';
 
-  // Resolve logo or genre-styled text
   const genreIds = item.genre_ids ?? [];
   const identity = resolveLogoOrTitle(logoUrl ?? null, null, title, genreIds, 'hero');
 
   return (
     <section
-      ref={sectionRef}
       className="relative flex items-end"
-      style={{ height: '82vh', minHeight: 560, maxHeight: 900 }}
+      style={{ height: 'var(--detail-hero-height)', minHeight: 560, maxHeight: 920 }}
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-      {accentColor && (
-        <div
-          className="absolute inset-0 opacity-[0.07] mix-blend-color pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at 20% 80%, ${accentColor}, transparent 60%)` }}
-        />
-      )}
+      {/* Content container with stagger orchestration */}
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        className="relative z-20 px-[var(--section-px)] pb-16 w-full max-w-[900px]"
+      >
 
-      <div className="relative z-20 px-[var(--section-px)] pb-14 w-full max-w-[900px]">
-
-        {/* Content type + series status badges */}
-        <div
-          className="flex items-center gap-2 mb-4"
-          style={{
-            opacity:   logoReady ? 1 : 0,
-            transform: logoReady ? 'translateY(0)' : 'translateY(10px)',
-            transition: 'opacity 0.5s ease, transform 0.5s ease',
-          }}
-        >
+        {/* Content type badge */}
+        <motion.div variants={fadeUp} className="flex items-center gap-2.5 mb-5">
           <span
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[13px] font-bold tracking-widest uppercase"
-            style={{ background: `${accent}22`, border: `1px solid ${accent}55`, color: accent }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold
+                       tracking-[0.15em] uppercase backdrop-blur-sm border transition-colors duration-200"
+            style={{
+              background: `color-mix(in srgb, ${accent} 12%, transparent)`,
+              borderColor: `color-mix(in srgb, ${accent} 25%, transparent)`,
+              color: accent,
+            }}
           >
-            {isSeries ? <Tv2 size={11} /> : <Film size={11} />}
+            {isSeries ? <Tv2 size={12} /> : <Film size={12} />}
             {isSeries ? t('common.series') : t('common.movie')}
           </span>
           {isSeries && seriesStatus && (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[13px] font-semibold tracking-wider uppercase bg-white/10 border border-white/15 text-white/60">
+            <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold
+                             tracking-wider uppercase bg-[var(--color-white-8)] backdrop-blur-sm
+                             border border-[var(--color-border)] text-[var(--color-text-muted)]">
               {seriesStatus}
             </span>
           )}
-        </div>
+        </motion.div>
 
         {/* Logo or title */}
-        <div style={{
-          opacity: logoReady ? 1 : 0,
-          transform: logoReady ? 'translateY(0)' : 'translateY(16px)',
-          transition: 'opacity 0.6s ease, transform 0.6s ease',
-        }}>
+        <motion.div variants={fadeUp}>
           {identity.kind === 'logo' ? (
             <img
               alt={title}
               src={identity.url}
-              className="max-w-[600px] min-w-[180px] w-[34vw] mb-3 drop-shadow-2xl"
-              style={{ filter: 'drop-shadow(0 6px 32px rgba(0,0,0,0.9))' }}
+              className="max-w-[600px] min-w-[180px] w-[34vw] mb-4
+                         drop-shadow-[0_8px_32px_rgba(0,0,0,0.8)]"
             />
           ) : (
             <h1
-              className="mb-3 drop-shadow-2xl [text-wrap:balance]"
+              className="mb-4 [text-wrap:balance] drop-shadow-[0_4px_24px_rgba(0,0,0,0.7)]"
               style={{
                 fontFamily: identity.style.fontFamily,
                 fontSize: identity.style.fontSize,
@@ -144,7 +115,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 textTransform: identity.style.textTransform,
                 fontStyle: identity.style.fontStyle,
                 color: identity.style.color,
-                textShadow: identity.style.textShadow,
                 lineHeight: 1.05,
               }}
             >
@@ -152,66 +122,60 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </h1>
           )}
           {tagline && (
-            <p className="text-white/50 italic text-sm font-medium mb-4 max-w-lg leading-snug">{tagline}</p>
+            <p className="text-[var(--color-text-muted)] italic text-[0.9375rem] font-medium mb-5 max-w-lg leading-snug">
+              {tagline}
+            </p>
           )}
-        </div>
+        </motion.div>
 
-        <HeroMetaBadges
-          visible={metaReady}
-          ratingStr={ratingStr} rating={rating} voteCount={voteCount}
-          year={year} runtime={runtime} isSeries={isSeries} seasons={seasons}
-          genreNames={genreNames}
-        />
+        {/* Meta badges */}
+        <motion.div variants={fadeUp}>
+          <HeroMetaBadges
+            ratingStr={ratingStr} rating={rating} voteCount={voteCount}
+            year={year} runtime={runtime} isSeries={isSeries} seasons={seasons}
+            genreNames={genreNames}
+          />
+        </motion.div>
 
-        {/* Synopsis with fade */}
+        {/* Synopsis */}
         {item.overview && (
-          <div
-            className="mb-8 max-w-[680px]"
-            style={{
-              opacity: synopsisReady ? 1 : 0,
-              transform: synopsisReady ? 'translateY(0)' : 'translateY(10px)',
-              transition: 'opacity 0.5s ease, transform 0.5s ease',
-            }}
-          >
+          <motion.div variants={fadeUp} className="mb-8 max-w-[680px]">
             <div className="relative">
               <p
-                className="text-white/65 text-[0.9375rem] leading-relaxed"
-                style={{
-                  display: '-webkit-box',
-                  WebkitLineClamp: synopsisExpanded ? 'unset' : 3,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: synopsisExpanded ? 'visible' : 'hidden',
-                }}
+                className={`text-[var(--color-text-secondary)] text-[0.9375rem] leading-relaxed
+                           ${!synopsisExpanded ? 'line-clamp-3 synopsis-mask' : ''}`}
               >
                 {item.overview}
               </p>
-              {!synopsisExpanded && item.overview.length > 160 && (
-                <div className="absolute bottom-0 inset-x-0 h-8 bg-gradient-to-t from-transparent to-transparent pointer-events-none" />
-              )}
             </div>
             {item.overview.length > 160 && (
               <button
                 type="button"
                 onClick={() => setSynopsisExpanded(v => !v)}
-                className="mt-2 flex items-center gap-1.5 text-white/40 hover:text-white/80 text-xs font-medium transition-colors group"
+                className="mt-2.5 flex items-center gap-1.5 text-[var(--color-text-muted)]
+                           hover:text-[var(--color-text-secondary)] text-sm font-medium
+                           transition-colors group focus-visible:outline-none
+                           focus-visible:text-[var(--color-accent)]"
               >
                 {synopsisExpanded ? (
-                  <><ChevronUp size={13} className="group-hover:-translate-y-0.5 transition-transform" /> {t('common.showLess')}</>
+                  <><ChevronUp size={14} className="group-hover:-translate-y-0.5 transition-transform" /> {t('common.showLess')}</>
                 ) : (
-                  <><ChevronDown size={13} className="group-hover:translate-y-0.5 transition-transform" /> {t('common.showMore')}</>
+                  <><ChevronDown size={14} className="group-hover:translate-y-0.5 transition-transform" /> {t('common.showMore')}</>
                 )}
               </button>
             )}
-          </div>
+          </motion.div>
         )}
 
-        <HeroActions
-          visible={btnsReady}
-          accent={accent} accentColor={accentColor}
-          isFavorite={isFavorite} isAddingToList={isAddingToList} isPlayLoading={isPlayLoading}
-          onPlay={onPlay} onDownload={onDownload} onToggleFavorite={onToggleFavorite}
-        />
-      </div>
+        {/* Action buttons */}
+        <motion.div variants={fadeUp}>
+          <HeroActions
+            accent={accent} accentColor={accentColor}
+            isFavorite={isFavorite} isAddingToList={isAddingToList} isPlayLoading={isPlayLoading}
+            onPlay={onPlay} onDownload={onDownload} onToggleFavorite={onToggleFavorite}
+          />
+        </motion.div>
+      </motion.div>
     </section>
   );
 };

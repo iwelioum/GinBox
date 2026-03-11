@@ -95,4 +95,8 @@
   --section-px:          calc(3.5vw + 24px);
   --navbar-height:       64px;
   --titlebar-height:     32px;
+
+  /* ── Detail page premium ─────────────────────────────────────────────── */
+  --detail-hero-height:  85vh;
+  --detail-content-max:  1400px;
 }

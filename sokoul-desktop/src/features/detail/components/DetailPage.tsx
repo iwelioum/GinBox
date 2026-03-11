@@ -1,10 +1,11 @@
-// DetailPage.tsx — Netflix 2025 × Infuse × Apple TV detail layout
-// Premium dark aesthetic with full-width hero and premium typography
+// DetailPage.tsx — Premium cinematic detail layout
+// Full-viewport hero with layered backdrop, scroll-driven section reveals
 
 import * as React from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { useDetailData } from '../hooks/useDetailData';
 import { useDetailPlayback } from '../hooks/useDetailPlayback';
@@ -23,15 +24,32 @@ const SagaSection = React.lazy(() => import('./SagaSection').then(m => ({ defaul
 const StatsSection = React.lazy(() => import('./StatsSection').then(m => ({ default: m.StatsSection })));
 const SimilarSection = React.lazy(() => import('./SimilarSection').then(m => ({ default: m.SimilarSection })));
 
+const sectionVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } },
+};
+
+function RevealSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <motion.div
+      variants={sectionVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 const DetailPage: React.FC = () => {
   const { t } = useTranslation();
   const data = useDetailData();
   const playback = useDetailPlayback(data);
   const navigate = useNavigate();
 
-  // Bug fix: validate route type param — redirect on invalid type
   if (!data.isValidType) return <Navigate to="/" replace />;
-
   if (data.metaLoading || data.creditsLoading) return <DetailSkeleton />;
 
   if (data.metaError || !data.item) {
@@ -51,120 +69,139 @@ const DetailPage: React.FC = () => {
         : `${TMDB_IMAGE_BASE}original${backdropRaw.startsWith('/') ? '' : '/'}${backdropRaw}`)
     : null;
 
+  const accent = data.theme.accentColor ?? 'var(--color-accent)';
+
   return (
-    <div className="relative min-h-screen" style={{ backgroundColor: 'var(--color-bg-base)' }}>
-      {/* Backdrop — couvre hero + large zone de fondu (130vh).
-          Trois couches CSS stacked sur un seul élément :
-          1) fondu vertical : image visible → fond solide à 90%
-          2) assombrissement gauche : lisibilité du texte hero
-          3) l'image elle-même                                         */}
+    <div className="relative min-h-screen bg-[var(--color-bg-base)]">
+
+      {/* ── Cinematic backdrop ─────────────────────────────────────────── */}
       {bgBackdrop && (
-        <div
-          style={{
-            position:  'absolute',
-            top: 0, left: 0, right: 0,
-            height:    '100vh',
-            zIndex:    0,
-            backgroundImage: [
-              'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 12%, transparent 48%, var(--color-bg-base) 92%)',
-              'linear-gradient(to right,  rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 45%, transparent 70%)',
-              `url(${bgBackdrop})`,
-            ].join(', '),
-            backgroundSize:     'auto, auto, cover',
-            backgroundPosition: 'top, top, top center',
-            backgroundRepeat:   'no-repeat',
-          }}
-        />
+        <>
+          <div
+            className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)] bg-cover bg-top bg-no-repeat"
+            style={{ backgroundImage: `url(${bgBackdrop})` }}
+          />
+          {/* Vertical fade — image → base */}
+          <div className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)]
+                          bg-gradient-to-b from-black/50 via-transparent via-40% to-[var(--color-bg-base)]" />
+          {/* Left text-readability gradient */}
+          <div className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)]
+                          bg-gradient-to-r from-black/80 via-black/30 via-50% to-transparent" />
+          {/* Accent glow — genre-aware radial */}
+          <div
+            className="absolute inset-x-0 top-0 h-[var(--detail-hero-height)] accent-glow-pulse mix-blend-color pointer-events-none"
+            style={{ background: `radial-gradient(ellipse 80% 60% at 15% 75%, ${accent}, transparent 65%)` }}
+          />
+          {/* Bottom hard edge into content */}
+          <div className="absolute inset-x-0 bottom-0 h-48 -translate-y-[calc(100vh-var(--detail-hero-height))]
+                          bg-gradient-to-t from-[var(--color-bg-base)] to-transparent pointer-events-none" />
+        </>
       )}
 
-      {/* Tout le contenu est z-10 : passe au-dessus du backdrop z-0 */}
+      {/* ── Content layer ──────────────────────────────────────────────── */}
       <div className="relative z-10">
 
-      {/* Back button — scrolls with content */}
-      <button
-        onClick={() => navigate(-1)}
-        className="absolute left-5 top-[calc(var(--titlebar-height,0px)+var(--navbar-height,64px)+12px)] z-50
-                   flex items-center gap-2 px-4 py-2 rounded-lg bg-black/40 text-[var(--color-text-primary)]/90
-                   text-sm font-medium border border-white/10 hover:bg-black/60 transition-colors"
-      >
-        <ChevronLeft size={16} />
-        {type === 'movie' ? t('detail.backToMovies') : t('detail.backToSeries')}
-      </button>
+        {/* Back button */}
+        <motion.button
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          onClick={() => navigate(-1)}
+          className="fixed left-5 top-[calc(var(--titlebar-height,0px)+var(--navbar-height,64px)+12px)] z-50
+                     flex items-center gap-2 px-4 py-2 rounded-xl
+                     bg-[var(--color-bg-glass)] backdrop-blur-xl
+                     text-[var(--color-text-primary)]/90 text-sm font-medium
+                     border border-[var(--color-border)]
+                     hover:bg-[var(--color-bg-overlay)] hover:border-[var(--color-border-medium)]
+                     transition-colors duration-200
+                     focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] focus-visible:outline-none"
+        >
+          <ChevronLeft size={16} />
+          {type === 'movie' ? t('detail.backToMovies') : t('detail.backToSeries')}
+        </motion.button>
 
-      {/* Hero Section */}
-      <HeroSection
-        item={item}
-        theme={data.theme}
-        logoUrl={data.logoUrl ?? undefined}
-        backdropUrl={bgBackdrop ?? undefined}
-        isFavorite={data.isFavorite}
-        isAddingToList={playback.isAddingToList}
-        isPlayLoading={playback.isPlayLoading}
-        accentColor={data.theme.accentColor}
-        onPlay={playback.handlePlay}
-        onDownload={playback.handleDownload}
-        onToggleFavorite={data.activeProfile ? playback.handleToggleFavorite : () => {}}
-      />
+        {/* Hero */}
+        <HeroSection
+          item={item}
+          theme={data.theme}
+          logoUrl={data.logoUrl ?? undefined}
+          backdropUrl={bgBackdrop ?? undefined}
+          isFavorite={data.isFavorite}
+          isAddingToList={playback.isAddingToList}
+          isPlayLoading={playback.isPlayLoading}
+          accentColor={data.theme.accentColor}
+          onPlay={playback.handlePlay}
+          onDownload={playback.handleDownload}
+          onToggleFavorite={data.activeProfile ? playback.handleToggleFavorite : () => {}}
+        />
 
-      {/* Play Error */}
-      {playback.playError && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-red-900/90 text-[var(--color-text-primary)] 
-                        px-5 py-3 rounded-lg border border-red-500 flex items-center gap-3 shadow-2xl z-50">
-          <span className="text-sm font-semibold">{playback.playError}</span>
-          <button 
-            onClick={() => playback.setPlayError(null)} 
-            className="ml-2 px-3 py-1 bg-[var(--color-text-primary)]/20 hover:bg-[var(--color-text-primary)]/30 
-                       rounded text-xs font-bold transition-colors"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+        {/* Play error toast */}
+        <AnimatePresence>
+          {playback.playError && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+                         bg-[var(--color-danger)]/15 backdrop-blur-xl
+                         text-[var(--color-text-primary)] px-5 py-3 rounded-xl
+                         border border-[var(--color-danger)]/30
+                         flex items-center gap-3 shadow-2xl"
+            >
+              <span className="text-sm font-semibold">{playback.playError}</span>
+              <button
+                onClick={() => playback.setPlayError(null)}
+                className="ml-2 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition-colors"
+              >✕</button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* Content — remonte dans le fondu */}
-      <div className="-mt-16 px-[var(--section-px)] pt-0 pb-8">
-        <InfoSection item={item} theme={data.theme} />
+        {/* ── Content sections ─────────────────────────────────────── */}
+        <div className="-mt-16 px-[var(--section-px)] pb-8">
+          <RevealSection>
+            <InfoSection item={item} theme={data.theme} />
+          </RevealSection>
 
-        {data.isSeries && data.seasons.length > 0 && (
-          <div className="space-y-8">
-            <DetailEpisodes
-              seasons={data.seasons}
-              episodesOfSeason={data.episodesOfSeason}
-              episodeVideos={data.episodeVideos}
-              selectedSeason={data.selectedSeason}
-              selectedEpisode={data.selectedEpisode}
-              selectedEpisodeData={data.selectedEpisodeData}
-              getEpisodeProgress={data.getEpisodeProgress}
-              isPlayLoading={playback.isPlayLoading}
-              onSelectSeason={data.setSelectedSeason}
-              onSelectEpisode={data.setSelectedEpisode}
-              onWatchEpisode={playback.handleWatchEpisode}
-            />
-          </div>
-        )}
+          {data.isSeries && data.seasons.length > 0 && (
+            <RevealSection className="mt-8">
+              <DetailEpisodes
+                seasons={data.seasons}
+                episodesOfSeason={data.episodesOfSeason}
+                episodeVideos={data.episodeVideos}
+                selectedSeason={data.selectedSeason}
+                selectedEpisode={data.selectedEpisode}
+                selectedEpisodeData={data.selectedEpisodeData}
+                getEpisodeProgress={data.getEpisodeProgress}
+                isPlayLoading={playback.isPlayLoading}
+                onSelectSeason={data.setSelectedSeason}
+                onSelectEpisode={data.setSelectedEpisode}
+                onWatchEpisode={playback.handleWatchEpisode}
+              />
+            </RevealSection>
+          )}
 
-        <div className="max-w-[1400px] mx-auto pt-8 pb-24 space-y-8">
-          <React.Suspense fallback={
-            <div className="space-y-8 animate-pulse">
-              <div className="h-6 w-32 rounded bg-[var(--color-bg-elevated)]" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="aspect-[2/3] rounded-[var(--radius-card)] skeleton-shimmer bg-[var(--color-bg-elevated)]" />
-                ))}
+          <div className="max-w-[var(--detail-content-max)] mx-auto pt-8 pb-24 space-y-12">
+            <React.Suspense fallback={
+              <div className="space-y-8">
+                <div className="h-6 w-32 rounded skeleton-shimmer bg-[var(--color-bg-elevated)]" />
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="aspect-[2/3] rounded-[var(--radius-card)] skeleton-shimmer bg-[var(--color-bg-elevated)]" />
+                  ))}
+                </div>
               </div>
-            </div>
-          }>
-            <TrailerSection videos={data.videos} theme={data.theme} />
-            <StatsSection item={item} theme={data.theme} />
-            <CastSection credits={data.credits} theme={data.theme} />
-            {data.images && <GallerySection images={data.images} />}
-            {data.collection && <SagaSection collection={data.collection} currentId={Number(data.id)} />}
-            <SimilarSection items={data.similar} theme={data.theme} />
-          </React.Suspense>
+            }>
+              <RevealSection><TrailerSection videos={data.videos} theme={data.theme} /></RevealSection>
+              <RevealSection><StatsSection item={item} theme={data.theme} /></RevealSection>
+              <RevealSection><CastSection credits={data.credits} theme={data.theme} /></RevealSection>
+              {data.images && <RevealSection><GallerySection images={data.images} /></RevealSection>}
+              {data.collection && <RevealSection><SagaSection collection={data.collection} currentId={Number(data.id)} /></RevealSection>}
+              <RevealSection><SimilarSection items={data.similar} theme={data.theme} /></RevealSection>
+            </React.Suspense>
+          </div>
         </div>
       </div>
-
-      </div>{/* fin z-10 */}
     </div>
   );
 };
