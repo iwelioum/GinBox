@@ -131,7 +131,7 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
             disabled={isPlayLoading}
             className={`ml-auto bg-[var(--color-accent)] text-white text-xs font-semibold 
                        px-4 py-2 rounded-[var(--radius-card)] hover:bg-[var(--color-accent-hover)] 
-                       transition-all duration-200 ${
+                       transition-[color,background-color,opacity] duration-200 ${
               isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
             } ${isPlayLoading ? 'cursor-default opacity-70' : ''}`}
           >
@@ -142,3 +142,4 @@ export const EpisodeCard: React.FC<EpisodeCardProps> = React.memo(({
     </div>
   );
 });
+

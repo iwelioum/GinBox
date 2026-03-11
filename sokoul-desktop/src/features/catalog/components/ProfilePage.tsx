@@ -128,7 +128,7 @@ export default function ProfilePage() {
         <div className="w-full flex flex-col gap-3 mt-2">
           <button
             onClick={() => navigate('/profile-select')}
-            className="w-full rounded-lg py-3 px-6 font-medium text-sm transition-all duration-150"
+            className="w-full rounded-lg py-3 px-6 font-medium text-sm transition-colors duration-150"
             style={{
               background: 'rgba(255,255,255,0.10)',
               border:     '1px solid rgba(255,255,255,0.10)',
@@ -146,7 +146,7 @@ export default function ProfilePage() {
 
           <button
             onClick={() => navigate('/settings')}
-            className="w-full rounded-lg py-3 px-6 font-medium text-sm transition-all duration-150"
+            className="w-full rounded-lg py-3 px-6 font-medium text-sm transition-colors duration-150"
             style={{
               background: 'var(--color-accent)',
               color:      '#fff',

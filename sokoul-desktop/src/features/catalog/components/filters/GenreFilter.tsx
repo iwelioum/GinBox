@@ -55,7 +55,7 @@ export const GenreFilter: React.FC<GenreFilterProps> = ({
           const active = filters.genres.includes(name);
           return (
             <button key={name} onClick={() => toggleGenre(name)}
-              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 whitespace-nowrap flex items-center gap-1.5 ${
+              className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 whitespace-nowrap flex items-center gap-1.5 ${
                 active 
                   ? 'bg-accent text-white font-medium' 
                   : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'

@@ -59,7 +59,7 @@ export function FilterDrawer({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X size={18} />
           </button>
@@ -86,7 +86,7 @@ export function FilterDrawer({
           </button>
           <button
             onClick={onClose}
-            className="px-6 py-2.5 bg-white text-black rounded-xl text-sm font-bold hover:bg-white/90 transition-all shadow-lg active:scale-95"
+            className="px-6 py-2.5 bg-white text-black rounded-xl text-sm font-bold hover:bg-white/90 transition-colors shadow-lg active:scale-95"
           >
             {t('browse.viewResults', { count: filteredCount })}
           </button>

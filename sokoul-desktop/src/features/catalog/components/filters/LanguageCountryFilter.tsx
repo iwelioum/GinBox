@@ -84,7 +84,7 @@ export const LanguageCountryFilter: React.FC<LanguageCountryFilterProps> = ({
               const active = filters.originalLanguages.includes(code);
               return (
                 <button key={code} onClick={() => toggleLang(code)}
-                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                     active 
                       ? 'bg-accent text-white font-medium' 
                       : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'
@@ -112,7 +112,7 @@ export const LanguageCountryFilter: React.FC<LanguageCountryFilterProps> = ({
               const active = filters.countries.includes(code);
               return (
                 <button key={code} onClick={() => toggleCountry(code)}
-                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                     active 
                       ? 'bg-accent text-white font-medium' 
                       : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'

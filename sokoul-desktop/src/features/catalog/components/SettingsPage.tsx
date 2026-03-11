@@ -209,7 +209,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => navigate('/profile-select')}
-                className="flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-150
+                className="flex-1 rounded-lg py-2 text-sm font-medium transition-colors duration-150
                            hover:opacity-80 active:scale-95
                            bg-[var(--color-white-8)] border border-[var(--color-white-12)] text-white/[0.85]"
               >
@@ -218,7 +218,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => navigate('/profile-select')}
-                className="flex-1 rounded-lg py-2 text-sm font-medium transition-all duration-150
+                className="flex-1 rounded-lg py-2 text-sm font-medium transition-colors duration-150
                            hover:opacity-80 active:scale-95
                            bg-[var(--color-accent)] text-white"
               >

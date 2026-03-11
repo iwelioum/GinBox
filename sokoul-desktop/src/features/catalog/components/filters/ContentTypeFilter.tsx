@@ -41,7 +41,7 @@ export const ContentTypeFilter: React.FC<ContentTypeFilterProps> = ({
           if (count === 0) return null;
           return (
             <button key={kind} onClick={() => toggleKind(kind)}
-              className={`flex flex-col items-center gap-2 py-3 px-2 rounded-lg text-center transition-all duration-200 border ${
+              className={`flex flex-col items-center gap-2 py-3 px-2 rounded-lg text-center transition-colors duration-200 border ${
                 active
                   ? 'bg-accent text-white border-accent font-semibold'
                   : 'bg-transparent text-text-secondary border-[var(--color-border)] hover:bg-white/5 hover:text-text-primary'

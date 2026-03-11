@@ -33,7 +33,7 @@ export const AgeRatingFilter: React.FC<FilterSectionProps> = ({ filters, onChang
                     : [...filters.selectedRatings, rating],
                 });
               }}
-              className={`text-sm px-3 py-1.5 rounded-full transition-all duration-200 ${
+              className={`text-sm px-3 py-1.5 rounded-full transition-colors duration-200 ${
                 active
                   ? 'bg-accent text-white font-medium'
                   : 'bg-transparent text-text-secondary border border-[var(--color-border)] hover:bg-white/5'

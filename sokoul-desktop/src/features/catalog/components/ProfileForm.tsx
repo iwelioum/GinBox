@@ -127,7 +127,7 @@ export function ProfileForm({ isOpen, onClose, profileToEdit }: ProfileFormProps
                       type="button"
                       onClick={() => setSelectedColor(color)}
                       aria-label={`Avatar color ${color}`}
-                      className={`w-7 h-7 rounded-full transition-all duration-150 ${
+                      className={`w-7 h-7 rounded-full transition-colors duration-150 ${
                         selectedColor === color
                           ? 'ring-2 ring-white ring-offset-2 ring-offset-[var(--color-bg-overlay)] scale-110'
                           : 'hover:scale-110'
@@ -194,7 +194,7 @@ export function ProfileForm({ isOpen, onClose, profileToEdit }: ProfileFormProps
                 className={`
                   flex-1 py-3 px-6 rounded-lg font-medium
                   bg-[var(--color-accent)] text-white
-                  transition-all duration-[var(--transition-fast)]
+                  transition-colors duration-[var(--transition-fast)]
                   hover:bg-[var(--color-accent-hover)]
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
